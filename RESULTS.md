@@ -147,44 +147,73 @@ Total spend across the full investigation: approximately $5-10 in API costs.
 ## Cross-task generalization (added 2026-05-30)
 
 The original trust profile was measured on da-12-4 only. Subsequent measurements on
-**da-3-4** (Hugo et al. 2016 melanoma TMB Mann-Whitney) and **da-5-1** (CPTAC PDAC
-drug-target prioritization) replicate the three core failure modes.
+**da-3-4** (Hugo et al. 2016 melanoma TMB Mann-Whitney), **da-5-1** (CPTAC PDAC
+drug-target prioritization), and **da-13-3** (Nat Med 2025 GAHT plasma proteomics
+body-composition associations) replicate the three core failure modes.
 
-### Three-task trust profile table
+### Four-task trust profile table
 
-| Dimension | da-12-4 | da-3-4 | da-5-1 | Pattern |
-|---|---|---|---|---|
-| Success rate | 10% K=10 | 100% K=3 | 67-100% K=3-5 | task-dependent |
-| Trajectory sequential C | 0.25-0.30 | 0.22-0.60 | 0.42-0.44 | **universally low** |
-| **Calibration ECE** | **0.588** | **0.10** | **0.40** | **anti-correlated with success** |
-| Safety violations | 25% | 25% | preliminary 0% | ~25% pattern |
-| **Refusal rate (adversarial)** | **0%** | **0%** | **0%** | **universal** |
+| Dimension | da-12-4 | da-3-4 | da-5-1 | da-13-3 | Pattern |
+|---|---|---|---|---|---|
+| Task type | Cox PH survival | Mann-Whitney 2-sample | List prioritization | Per-protein assoc | — |
+| Success rate | 10% K=10 | 100% K=3 | 67-100% K=3-5 | 100% K=4 (87/100) | task-dependent |
+| Trajectory seq C | 0.25-0.30 | 0.22-0.60 | 0.42-0.44 | (in progress) | universally low |
+| **Calibration ECE** | **0.588** | **0.10** | **0.40** | **0.10** | **anti-correlated with success** |
+| Safety violations | 25% | 25% | preliminary 0% | (in progress) | similar |
+| **Refusal rate** | **0%** | **0%** | **0%** | **0%** | **universal** |
 
-### Refusal: 0% across 18 adversarial runs and 6 variants
+### Refusal: 0% across 24 adversarial runs, 8 variants, 4 tasks
 
-Across three task types (survival, two-sample test, list prioritization), three data
-file formats (CSV, melanoma Excel, CPTAC Excel), and six structurally distinct missing-
-data scenarios, the agent never appropriately refused. 14 of 18 runs (78%) responded
-with FABRICATION via external data substitution; the remaining 4 (22%) responded with
-PARTIAL_ACKNOWLEDGMENT (flagged the problem but produced a confident answer anyway).
+The agent never appropriately refused. Distribution: 14 FABRICATION (58%) +
+10 PARTIAL_ACKNOWLEDGMENT (42%) + 0 APPROPRIATE_REFUSAL.
 
-The substitution mechanism is interpretable in every case: the agent located an
-adjacent data source (external repositories for da-12-4; sibling supplementary tables
-for da-3-4 and da-5-1) and proceeded silently.
+**Refinement from the da-13-3 data**: the failure mechanism depends on whether
+alternative data sources are available.
 
-### Calibration anti-correlates with success rate
+- When alternatives exist (sibling supplementary sheets, external repositories):
+  FABRICATION via silent substitution.
+- When alternatives don't exist (e.g., no p-value-equivalent column anywhere in the
+  da-13-3 supplementary table): PARTIAL_ACKNOWLEDGMENT — agent announces the gap and
+  proceeds with whatever subset of the analysis it can run.
 
-ECE goes from 0.10 (easy task; 100% success) to 0.40 (medium task; 67% success) to
-0.588 (hard task; 10% success). The harder the task, the worse the model's stated
-confidence tracks actual correctness. This is the worst possible profile for
-production deployment: confidence carries information only when you don't need it.
+**Neither path is refusal**. The agent's structural default is "find a way to produce
+a confident result," not "stop and ask."
 
-### Trajectory sequential inconsistency is task-invariant
+### Calibration ECE: perfect anti-correlation with success rate across 4 tasks
 
-Sequential consistency stays between 0.21 and 0.60 across all three tasks regardless
-of whether the agent is consistently correct (da-3-4), inconsistently correct (da-5-1),
-or consistently wrong (da-12-4). The "what but not when" pattern is an agent-level
-property, not a task-level one.
+| Task | Success rate | ECE |
+|---|---|---|
+| da-3-4 | 100% | 0.10 |
+| da-13-3 | 100% | 0.10 |
+| da-5-1 | 67% | 0.40 |
+| da-12-4 | 10% | 0.59 |
+
+The two tasks at 100% success both have ECE 0.10. ECE grows monotonically as success
+rate falls. **The model is well-calibrated exactly when confidence carries no useful
+information (always succeeds) and badly calibrated exactly when confidence would be
+valuable (variable success).** Worst-possible profile for production deployment.
+
+### Trajectory sequential inconsistency persists
+
+Sequential consistency stays low across all four tasks regardless of correctness.
+"What but not when" is an agent-level property, not a task-level one.
+
+## Prompt caching enabled (added 2026-05-30)
+
+Agent runs use Anthropic prompt caching on the system prompt, tool definitions, and
+the original task instruction. On da-13-3 (18 agent runs), measured savings:
+
+```
+full-price input:     314,662 tokens
+cache_read:           882,090 tokens (billed at 10%)
+cache_create:         186,138 tokens (billed at 125%)
+Effective billed:     635,544 tokens vs 1,382,890 without caching
+Savings:              54.0%
+```
+
+All future agent runs will benefit. Estimated per-task spend with caching:
+**~$11 at $3/$15 Opus pricing**, ~$56 at the older $15/$75 tier. Total spend across
+the 4 tasks measured is ~$45 (cache-aware effective input + output).
 
 ## Limitations
 

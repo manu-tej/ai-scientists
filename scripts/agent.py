@@ -202,11 +202,23 @@ def main() -> None:
     console.print(f"[cyan]sandbox:[/] {sandbox}")
     console.print(f"[cyan]task:[/] {args.task} / variant={variant_label} / model={args.model}")
 
-    system = SYSTEM_PROMPT.format(max_turns=args.max_turns)
+    system_text = SYSTEM_PROMPT.format(max_turns=args.max_turns)
     if args.calibrate:
-        system += CALIBRATION_INSTRUCTION
-    messages = [{"role": "user", "content": instruction}]
+        system_text += CALIBRATION_INSTRUCTION
+    # Use blocks form so we can attach cache_control to the system prompt.
+    # The system prompt + tool definitions + first user instruction are
+    # identical across every turn within a run, so caching them turns those
+    # ~5-6K tokens of fixed prefix into 10%-billed cache reads after turn 1.
+    system = [{"type": "text", "text": system_text,
+               "cache_control": {"type": "ephemeral"}}]
+    tools = [{**RUN_PYTHON_TOOL, "cache_control": {"type": "ephemeral"}}]
+    messages = [{"role": "user", "content": [
+        {"type": "text", "text": instruction,
+         "cache_control": {"type": "ephemeral"}}
+    ]}]
     total_in_tok = 0
+    total_cache_create_tok = 0
+    total_cache_read_tok = 0
     total_out_tok = 0
     transcript = []
 
@@ -223,7 +235,7 @@ def main() -> None:
                     model=args.model,
                     max_tokens=8192,
                     system=system,
-                    tools=[RUN_PYTHON_TOOL],
+                    tools=tools,
                     messages=messages,
                 )
                 break
@@ -240,6 +252,9 @@ def main() -> None:
                 backoff_s = min(backoff_s * 1.8, 60.0)
         total_in_tok += resp.usage.input_tokens
         total_out_tok += resp.usage.output_tokens
+        # Cache stats (Anthropic returns these on every response when caching is in use)
+        total_cache_create_tok += getattr(resp.usage, "cache_creation_input_tokens", 0) or 0
+        total_cache_read_tok += getattr(resp.usage, "cache_read_input_tokens", 0) or 0
 
         assistant_blocks = []
         tool_calls_this_turn = []
@@ -304,7 +319,9 @@ def main() -> None:
         "max_turns": args.max_turns,
         "turns_used": len(transcript),
         "stop_reason": transcript[-1]["stop_reason"] if transcript else None,
-        "tokens": {"input_total": total_in_tok, "output_total": total_out_tok},
+        "tokens": {"input_total": total_in_tok, "output_total": total_out_tok,
+                   "cache_creation_total": total_cache_create_tok,
+                   "cache_read_total": total_cache_read_tok},
         "produced_trace": (sandbox / "trace.md").exists(),
         "produced_answer": (sandbox / "answer.txt").exists(),
         "ts": datetime.now(timezone.utc).isoformat(),
@@ -314,7 +331,8 @@ def main() -> None:
 
     console.print(f"\n[bold]Summary[/]")
     console.print(f"  turns: {len(transcript)} / {args.max_turns}")
-    console.print(f"  tokens: in={total_in_tok:,} out={total_out_tok:,}")
+    console.print(f"  tokens: in={total_in_tok:,} out={total_out_tok:,}  "
+                  f"cache_read={total_cache_read_tok:,} cache_create={total_cache_create_tok:,}")
     console.print(f"  produced trace.md: {meta['produced_trace']}")
     console.print(f"  produced answer.txt: {meta['produced_answer']}")
     console.print(f"\n[green]done[/] -> {sandbox}/")

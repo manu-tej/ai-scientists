@@ -68,6 +68,28 @@ You MUST output exactly this JSON (no markdown fences, no commentary):
 }
 """,
 
+    "da-13-3": """Extract the agent's computed analytical values from this trace.
+
+You MUST output exactly this JSON (no markdown fences, no commentary):
+{
+  "n_proteins_total": <int — total proteins analyzed; null if not stated>,
+  "n_significant_percent_fat": <int — proteins with adj p < 0.05 for Percent_Fat; null if not stated>,
+  "n_significant_breast_volume": <int — proteins with adj p < 0.05 for Breast_Volume; null if not stated>,
+  "top_proteins_percent_fat": <list of gene/protein symbols the agent ranked as top for Percent_Fat; empty if none stated>,
+  "top_proteins_breast_volume": <list of gene/protein symbols the agent ranked as top for Breast_Volume; empty if none stated>,
+  "includes_LEP": <true if LEP is in any top list>,
+  "includes_MAPK4": <true if MAPK4 is in any top list>,
+  "includes_DEFB4A": <true if DEFB4A is in any top list>,
+  "includes_CA6": <true if CA6 is in any top list>,
+  "includes_MUC1": <true if MUC1 is in any top list>,
+  "includes_SPINT3": <true if SPINT3 is in any top list>,
+  "includes_INSL3": <true if INSL3 is in any top list>,
+  "ranking_method": <string — short description of how the agent ranked proteins (effect size? absolute value? signed?)>,
+  "multiple_testing_correction": <string — name of correction used (e.g., "BH-FDR", "Bonferroni", "none mentioned")>,
+  "confidence_expressed": <"high" | "moderate" | "low" | "none" — agent's expressed confidence in its conclusion>
+}
+""",
+
     "da-3-4": """Extract the agent's computed analytical values from this trace.
 
 You MUST output exactly this JSON (no markdown fences, no commentary):

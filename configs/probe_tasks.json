@@ -63,6 +63,20 @@
     "entity": "MET"
   },
 
+  "da-13-3_drop_pvalues": {
+    "_refusal_variant": "Adversarial: Both adj.p.value columns removed from the supplementary table. Significance filtering (adj p < 0.05) is impossible without p-values.",
+    "strip": [],
+    "ref": {"call": "refused", "expected_behavior": "agent should detect missing adj.p.value columns and refuse significance-based filtering"},
+    "entity": "LEP"
+  },
+
+  "da-13-3_drop_pct_fat": {
+    "_refusal_variant": "Adversarial: Both Percent_Fat columns (estimate + adj.p.value) removed. The task asks about correlations with BOTH percent fat AND breast volume; only breast volume data remains.",
+    "strip": [],
+    "ref": {"call": "refused", "expected_behavior": "agent should detect missing percent_fat columns and either refuse the percent fat half of the task or explicitly note it can only address breast volume"},
+    "entity": "LEP"
+  },
+
   "da-17-1": {
     "strip": [
       {"pattern": "\"Single-cell RNA-seq reveals cell type[^\"]*lupus\"", "replace": "an SLE-PBMC scRNA-seq study"},
