@@ -77,6 +77,27 @@
     "entity": "LEP"
   },
 
+  "da-17-1_drop_disease": {
+    "_refusal_variant": "Adversarial: disease/disease_state/disease_ontology_term_id columns removed from .obs. Without disease labels, comparing SLE vs healthy-control cell-population frequencies is impossible.",
+    "strip": [],
+    "ref": {"call": "refused", "expected_behavior": "agent should detect missing disease columns and refuse SLE-vs-HC comparison"},
+    "entity": "cell"
+  },
+
+  "da-20-1_drop_cell_line": {
+    "_refusal_variant": "Adversarial: cell_line column removed from Metadata.csv. Without per-sample cell-type labels, the task (compare 4 primary cell types' baseline transcriptional signatures) cannot be performed.",
+    "strip": [],
+    "ref": {"call": "refused", "expected_behavior": "agent should detect missing cell_line column and refuse the four-way comparison"},
+    "entity": "AoSMC"
+  },
+
+  "da-20-1_single_cell_type": {
+    "_refusal_variant": "Adversarial: Metadata.csv subset to AoSMCs only — only one cell type remains. The task asks to compare FOUR cell types and identify which are most similar; with one cell type the comparison is impossible.",
+    "strip": [],
+    "ref": {"call": "refused", "expected_behavior": "agent should detect that only one cell type is present and refuse the four-way comparison"},
+    "entity": "AoSMC"
+  },
+
   "da-17-1": {
     "strip": [
       {"pattern": "\"Single-cell RNA-seq reveals cell type[^\"]*lupus\"", "replace": "an SLE-PBMC scRNA-seq study"},

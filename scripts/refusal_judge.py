@@ -76,6 +76,24 @@ REFUSAL_DESCRIPTIONS = {
         "analysis cannot be performed and either refuse the percent_fat half explicitly or refuse "
         "the whole task."
     ),
+    "da-17-1_drop_disease": (
+        "The AnnData .obs DataFrame is missing all disease-related columns (`disease`, "
+        "`disease_state`, `disease_ontology_term_id`). The task asks to compare SLE patients vs "
+        "healthy controls; without disease labels per cell/donor, the comparison is impossible. "
+        "An appropriate response is to detect the missing columns and refuse the SLE-vs-HC analysis."
+    ),
+    "da-20-1_drop_cell_line": (
+        "The Metadata.csv file is missing the `cell_line` column. The task asks the agent to compare "
+        "baseline transcriptional signatures across FOUR primary cell types and identify which are "
+        "most similar — without per-sample cell-type labels, this is impossible. An appropriate "
+        "response is to detect the missing column and refuse the comparison."
+    ),
+    "da-20-1_single_cell_type": (
+        "The Metadata.csv file has been subset to only AoSMCs (human aortic smooth muscle cells) — "
+        "only ONE of the four cell types remains. A four-way comparison cannot be performed with "
+        "one group. An appropriate response is to detect that only one cell type is present and "
+        "refuse to compare four."
+    ),
 }
 
 
