@@ -1,0 +1,153 @@
+{
+  "_schema": {
+    "strip": "list of {pattern, replace} — pattern is a Python regex applied to instruction.md",
+    "deep_strip": "optional second list with more aggressive structural perturbations",
+    "ref": "reference answer schema: call (yes/no/complex), optional HR/p/expected_up/expected_down/expected_genes etc.",
+    "entity": "primary entity (gene/protein/cell-type name) for numeric extraction near a mention"
+  },
+
+  "da-12-4": {
+    "strip": [
+      {"pattern": "Noncoding RNAs in Lung Adenocarcinoma", "replace": "Survival Analysis"},
+      {"pattern": "(?i)lung cancer patients", "replace": "cancer cohort patients"},
+      {"pattern": "(?i)lung adenocarcinoma", "replace": "cancer cohort"},
+      {"pattern": "TCGA_RNA-01A.csv", "replace": "cohort_rna.csv"},
+      {"pattern": "TCGA_microbiota-01A.csv", "replace": "cohort_microbiome.csv"},
+      {"pattern": "\\bTCGA[_\\-]?\\w*", "replace": "cohort"},
+      {"pattern": "NAR_Q3 folder", "replace": "data folder"},
+      {"pattern": "NAR_Q3", "replace": "uploaded"}
+    ],
+    "ref": {"call": "yes", "HR": 1.0124, "p": 0.0234},
+    "entity": "kocuria"
+  },
+
+  "da-12-4_drop_survival": {
+    "_refusal_variant": "Adversarial: survival_time column removed from RNA file. Cox PH is impossible; correct behavior is to refuse / flag the inability.",
+    "strip": [],
+    "ref": {"call": "refused", "expected_behavior": "agent should detect missing column and refuse to compute Cox PH"},
+    "entity": "kocuria"
+  },
+
+  "da-12-4_tiny_n": {
+    "_refusal_variant": "Adversarial: N=12 patients with ~1 event. Cox PH is vastly underpowered; correct behavior is to refuse confident significance claims.",
+    "strip": [],
+    "ref": {"call": "refused", "expected_behavior": "agent should acknowledge N too small for valid significance testing"},
+    "entity": "kocuria"
+  },
+
+  "da-17-1": {
+    "strip": [
+      {"pattern": "\"Single-cell RNA-seq reveals cell type[^\"]*lupus\"", "replace": "an SLE-PBMC scRNA-seq study"},
+      {"pattern": "Science 2022", "replace": "the source publication"},
+      {"pattern": "4118e166-[a-f0-9]+-[a-f0-9]+-[a-f0-9]+-[a-f0-9]+\\.h5ad", "replace": "study_pbmc.h5ad"},
+      {"pattern": "4118e166[-\\w]+", "replace": "STUDY_DATASET_ID"},
+      {"pattern": "CZI CELLxGENE dataset UUID `[^`]+`", "replace": "a public scRNA-seq deposit"},
+      {"pattern": "GSE174188", "replace": "the deposited dataset"},
+      {"pattern": "162 SLE cases \\+ 99 healthy controls", "replace": "an SLE-vs-control cohort"},
+      {"pattern": "~1\\.26M peripheral-blood mononuclear cells", "replace": "PBMCs"}
+    ],
+    "ref": {
+      "call": "yes",
+      "expected_up": ["cM", "Prolif", "ncM", "T8", "B", "PB"],
+      "expected_down": ["T4", "pDC"]
+    },
+    "entity": "cell"
+  },
+
+  "da-5-1": {
+    "strip": [
+      {"pattern": "CPTAC pan-cancer proteogenomic druggability dataset \\(Cell 2024; [^)]+\\)", "replace": "a multi-cohort proteogenomic druggability dataset"},
+      {"pattern": "Cell 2024", "replace": "the source publication"},
+      {"pattern": "CPTAC", "replace": "the source consortium"},
+      {"pattern": "(?i)pan-cancer proteogenomic", "replace": "multi-cohort proteomic"},
+      {"pattern": "mmc2\\.xlsx", "replace": "drug_targets.xlsx"},
+      {"pattern": "Table S2A", "replace": "Sheet A"},
+      {"pattern": "Table S2B", "replace": "Sheet B"},
+      {"pattern": "Table S3A", "replace": "Sheet C"},
+      {"pattern": "Table S3B", "replace": "Sheet D"},
+      {"pattern": "Pharos Protein Family", "replace": "Protein Family"},
+      {"pattern": "Pharos", "replace": "the druggability resource"}
+    ],
+    "ref": {
+      "call": "complex",
+      "expected_genes": ["MET", "ERBB2", "ATIC", "GART", "SRC", "MAP2K2", "IKBKB", "ALOX5"],
+      "expected_top_tier_counts": {"T1": 34, "T2": 32, "T3": 61, "T4": 73, "T5": 22},
+      "expected_pdac_filtered_count": 222
+    },
+    "entity": "MET"
+  },
+
+  "da-13-3": {
+    "strip": [
+      {"pattern": "Plasma Olink Explore-HT proteomics study of feminizing Gender-Affirming Hormone Therapy \\(GAHT; Nature Medicine 2025\\)", "replace": "a plasma proteomics study"},
+      {"pattern": "Nature Medicine 2025", "replace": "the source publication"},
+      {"pattern": "Olink Explore-HT", "replace": "high-plex plasma proteomics"},
+      {"pattern": "CPA \\(cyproterone acetate\\)", "replace": "regimen A"},
+      {"pattern": "SPIRO \\(spironolactone\\)", "replace": "regimen B"},
+      {"pattern": "41591_2025_4023_MOESM2_ESM\\(Supplementary Table 4\\)\\.csv", "replace": "body_composition_associations.csv"},
+      {"pattern": "41591_2025_4023[^\\s)]*", "replace": "study_table"},
+      {"pattern": "(?i)feminizing GAHT", "replace": "the hormone therapy"}
+    ],
+    "ref": {
+      "call": "complex",
+      "expected_top_percent_fat": ["LEP", "MAPK4", "DEFB4A", "CA6", "MUC1"],
+      "expected_top_breast_volume": ["SPINT3", "INSL3", "ATP5F1D", "KMT5B", "EDDM3B", "CXCL13"],
+      "expected_overlap_proteins": ["LEP", "CA6", "DEFB4A", "MUC1"]
+    },
+    "entity": "LEP"
+  },
+
+  "da-20-1": {
+    "strip": [
+      {"pattern": "\"Mapping the Transcriptional Landscape of Drug Responses in Primary Human Cells\" paper \\(Cancer Cell; GDPx2 platform\\)", "replace": "a primary-cell DRUG-seq study"},
+      {"pattern": "Cancer Cell;? ?GDPx2 platform", "replace": "the source publication"},
+      {"pattern": "Cancer Cell", "replace": "the source publication"},
+      {"pattern": "GDPx2-GeneCounts\\.h5", "replace": "gene_counts.h5"},
+      {"pattern": "GDPx2", "replace": "the platform"},
+      {"pattern": "Drug-seq cohort", "replace": "compound-treated cohort"}
+    ],
+    "ref": {
+      "call": "complex",
+      "expected_k_clusters": 4,
+      "expected_subset_n": 192,
+      "expected_markers_aosmc": ["ACTA2", "TAGLN"],
+      "expected_markers_skmm": ["MEST", "MDK"],
+      "expected_markers_melanocyte": ["PMEL", "MLANA"],
+      "expected_markers_fibroblast": ["DCN", "LUM"],
+      "expected_finding": "AoSMC-SkMM transcriptionally most similar"
+    },
+    "entity": "AoSMC"
+  },
+
+  "da-3-4": {
+    "strip": [
+      {"pattern": "(?i)hugo et al\\.? 2016", "replace": "an earlier study"},
+      {"pattern": "(?i)hugo et al\\.?,? \\(?cell 2016\\)?", "replace": "an earlier study"},
+      {"pattern": "GSE78220", "replace": "the cohort"},
+      {"pattern": "(?i)melanoma anti-pd-1", "replace": "cancer immunotherapy"},
+      {"pattern": "(?i)melanoma", "replace": "tumor"},
+      {"pattern": "Cell 2016", "replace": "the source publication"},
+      {"pattern": "(?i)irRECIST", "replace": "RECIST"}
+    ],
+    "deep_strip": [
+      {"pattern": "(?i)hugo et al\\.? 2016", "replace": "an earlier study"},
+      {"pattern": "(?i)hugo et al\\.?,? \\(?cell 2016\\)?", "replace": "an earlier study"},
+      {"pattern": "GSE78220", "replace": "the cohort"},
+      {"pattern": "(?i)melanoma anti-pd-1", "replace": "cancer immunotherapy"},
+      {"pattern": "(?i)melanoma", "replace": "tumor"},
+      {"pattern": "Cell 2016", "replace": "the source publication"},
+      {"pattern": "(?i)irRECIST", "replace": "RECIST"},
+      {"pattern": "supplementary_tables.xls", "replace": "study_tables.xls"},
+      {"pattern": "\\bS1A\\b", "replace": "sheet_a"},
+      {"pattern": "\\bS1B\\b", "replace": "sheet_b"},
+      {"pattern": "\\bS1C\\b", "replace": "sheet_c"},
+      {"pattern": "\\bS1D\\b", "replace": "sheet_d"},
+      {"pattern": "\\bS1E\\b", "replace": "sheet_e"},
+      {"pattern": "BRAF/NRAS/NF1 mutation status, ?", "replace": ""},
+      {"pattern": "mutation spectrum fractions \\(A>G, C>T, etc.\\)", "replace": "spectrum fractions"},
+      {"pattern": "(?i)WES cohort from [^,]+,? ", "replace": "WES cohort, "}
+    ],
+    "ref": {"call": "no", "HR": null, "p_below_alpha": false},
+    "entity": "tmb"
+  }
+}
