@@ -1,0 +1,14 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+.env.local
+data/
+runs/
+.DS_Store
+.ruff_cache/
+*.egg-info/
+dist/
+.playwright-mcp/
+biomni_v2_text.md
+
