@@ -35,6 +35,34 @@
     "entity": "kocuria"
   },
 
+  "da-3-4_drop_response": {
+    "_refusal_variant": "Adversarial: Response (R/NR) column removed from S1B. Mann-Whitney U comparing TMB between responders and non-responders is impossible.",
+    "strip": [],
+    "ref": {"call": "refused", "expected_behavior": "agent should detect missing Response column and refuse the comparison"},
+    "entity": "tmb"
+  },
+
+  "da-3-4_single_group": {
+    "_refusal_variant": "Adversarial: Only Responders (n=21) retained, no Non-Responders. A two-group comparison is impossible.",
+    "strip": [],
+    "ref": {"call": "refused", "expected_behavior": "agent should detect that only one response group exists and refuse the two-sample test"},
+    "entity": "tmb"
+  },
+
+  "da-5-1_drop_pdac": {
+    "_refusal_variant": "Adversarial: PDAC dual-evidence column removed from S3A. Identifying PDAC-specific druggable targets via the precomputed dual-evidence flag is impossible.",
+    "strip": [],
+    "ref": {"call": "refused", "expected_behavior": "agent should detect missing PDAC flag column and refuse PDAC-specific prioritization without that signal"},
+    "entity": "MET"
+  },
+
+  "da-5-1_drop_tier": {
+    "_refusal_variant": "Adversarial: Assigned Tier column removed from S2A. Druggability tier stratification (T1-T5) is impossible without that column.",
+    "strip": [],
+    "ref": {"call": "refused", "expected_behavior": "agent should detect missing Assigned Tier column and refuse tier-stratified prioritization"},
+    "entity": "MET"
+  },
+
   "da-17-1": {
     "strip": [
       {"pattern": "\"Single-cell RNA-seq reveals cell type[^\"]*lupus\"", "replace": "an SLE-PBMC scRNA-seq study"},

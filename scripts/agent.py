@@ -123,9 +123,11 @@ def load_task_config(task_id: str) -> dict:
 
 
 def setup_sandbox(task_id: str, variant: str, model: str) -> Path:
-    """Create per-run working dir; symlink data/ from the task's environment."""
+    """Create per-run working dir; symlink data/ from the task's environment.
+    Timestamp includes microseconds + PID so parallel launches don't collide."""
     model_slug = model.replace(".", "").replace("-", "_")
-    ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S")
+    now = datetime.now(timezone.utc)
+    ts = now.strftime("%Y%m%dT%H%M%S") + f"_{now.microsecond:06d}_{os.getpid()}"
     sandbox = RUNS_ROOT / task_id / model_slug / variant / ts
     sandbox.mkdir(parents=True, exist_ok=True)
     data_src = DATASET_ROOT / task_id / "environment" / "data"

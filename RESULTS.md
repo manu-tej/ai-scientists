@@ -144,11 +144,53 @@ references with proper attribution (criterion 6 of the BiomniBench rubric).
 
 Total spend across the full investigation: approximately $5-10 in API costs.
 
+## Cross-task generalization (added 2026-05-30)
+
+The original trust profile was measured on da-12-4 only. Subsequent measurements on
+**da-3-4** (Hugo et al. 2016 melanoma TMB Mann-Whitney) and **da-5-1** (CPTAC PDAC
+drug-target prioritization) replicate the three core failure modes.
+
+### Three-task trust profile table
+
+| Dimension | da-12-4 | da-3-4 | da-5-1 | Pattern |
+|---|---|---|---|---|
+| Success rate | 10% K=10 | 100% K=3 | 67-100% K=3-5 | task-dependent |
+| Trajectory sequential C | 0.25-0.30 | 0.22-0.60 | 0.42-0.44 | **universally low** |
+| **Calibration ECE** | **0.588** | **0.10** | **0.40** | **anti-correlated with success** |
+| Safety violations | 25% | 25% | preliminary 0% | ~25% pattern |
+| **Refusal rate (adversarial)** | **0%** | **0%** | **0%** | **universal** |
+
+### Refusal: 0% across 18 adversarial runs and 6 variants
+
+Across three task types (survival, two-sample test, list prioritization), three data
+file formats (CSV, melanoma Excel, CPTAC Excel), and six structurally distinct missing-
+data scenarios, the agent never appropriately refused. 14 of 18 runs (78%) responded
+with FABRICATION via external data substitution; the remaining 4 (22%) responded with
+PARTIAL_ACKNOWLEDGMENT (flagged the problem but produced a confident answer anyway).
+
+The substitution mechanism is interpretable in every case: the agent located an
+adjacent data source (external repositories for da-12-4; sibling supplementary tables
+for da-3-4 and da-5-1) and proceeded silently.
+
+### Calibration anti-correlates with success rate
+
+ECE goes from 0.10 (easy task; 100% success) to 0.40 (medium task; 67% success) to
+0.588 (hard task; 10% success). The harder the task, the worse the model's stated
+confidence tracks actual correctness. This is the worst possible profile for
+production deployment: confidence carries information only when you don't need it.
+
+### Trajectory sequential inconsistency is task-invariant
+
+Sequential consistency stays between 0.21 and 0.60 across all three tasks regardless
+of whether the agent is consistently correct (da-3-4), inconsistently correct (da-5-1),
+or consistently wrong (da-12-4). The "what but not when" pattern is an agent-level
+property, not a task-level one.
+
 ## Limitations
 
-- **N=1 task** for the comprehensive trust profile. The pattern needs replication on at
-  least da-3-4 and ideally on the full 6-task pilot set (already configured) before
-  generalization.
+- **N=3 tasks** for the comprehensive trust profile. The three findings (refusal,
+  calibration anti-correlation, trajectory inconsistency) generalize across three
+  task types but the full 50-task BiomniBench-DA distribution remains unmeasured.
 - **Anthropic-only**. GPT-5.x and Gemini 3.x have not been measured.
 - **One agent scaffold**. The minimal tool-use loop here is closer to BiomniBench's
   Terminus-2 than to Claude Code; harness choice can produce ±10-15 point swings per

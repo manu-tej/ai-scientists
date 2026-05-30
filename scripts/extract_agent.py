@@ -46,6 +46,44 @@ You MUST output exactly this JSON (no markdown fences, no commentary):
   "confidence_expressed": <"high" | "moderate" | "low" | "none" — agent's expressed confidence in its conclusion>
 }
 """,
+
+    "da-5-1": """Extract the agent's computed analytical values from this trace.
+
+You MUST output exactly this JSON (no markdown fences, no commentary):
+{
+  "n_pdac_candidates": <int — number of PDAC dual-evidence candidates the agent identified; null if not stated>,
+  "n_druggable_after_tier_merge": <int — number of candidates after joining with druggability tiers (S2A); null if not stated>,
+  "n_top_targets": <int — number of final top targets the agent reported; null if not stated>,
+  "top_targets_listed": <list of gene symbols — the final ranked top targets the agent named, in order; empty list if none stated>,
+  "includes_MET": <true if MET is in the agent's top targets>,
+  "includes_ERBB2": <true if ERBB2 is in the agent's top targets>,
+  "includes_ATIC": <true if ATIC is in the agent's top targets>,
+  "includes_GART": <true if GART is in the agent's top targets>,
+  "includes_SRC": <true if SRC is in the agent's top targets>,
+  "includes_MAP2K2": <true if MAP2K2 is in the agent's top targets>,
+  "includes_IKBKB": <true if IKBKB is in the agent's top targets>,
+  "includes_ALOX5": <true if ALOX5 is in the agent's top targets>,
+  "ranking_method": <string — short description of how the agent ranked targets (e.g., "tier + CancerTypes_with_TvN+Dep")>,
+  "confidence_expressed": <"high" | "moderate" | "low" | "none" — agent's expressed confidence in its conclusion>
+}
+""",
+
+    "da-3-4": """Extract the agent's computed analytical values from this trace.
+
+You MUST output exactly this JSON (no markdown fences, no commentary):
+{
+  "n_responders": <int — number of Responder (R) patients in the analysis cohort; null if not stated>,
+  "n_nonresponders": <int — number of Non-Responder (NR) patients; null if not stated>,
+  "median_R_TotalNonSyn": <float — median TotalNonSyn mutation count among Responders; null if not stated>,
+  "median_NR_TotalNonSyn": <float — median TotalNonSyn mutation count among Non-Responders; null if not stated>,
+  "mann_whitney_u_statistic": <float — Mann-Whitney U test statistic; null if not stated>,
+  "mann_whitney_p_value": <float — p-value from the Mann-Whitney U test on TMB vs Response; null if not stated>,
+  "spearman_p_value": <float — p-value from Spearman correlation if also computed; null if not stated>,
+  "tmb_call": <"yes" | "no" | "borderline" — agent's final conclusion about TMB being significantly associated with response>,
+  "statistical_test_used": <string — short name of the primary test (e.g., "Mann-Whitney U", "t-test", "Spearman")>,
+  "confidence_expressed": <"high" | "moderate" | "low" | "none" — agent's expressed confidence in its conclusion>
+}
+""",
 }
 
 
