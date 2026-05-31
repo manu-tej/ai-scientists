@@ -239,6 +239,10 @@ def main() -> None:
         key = os.environ.get("GEMINI_API_KEY", "")
         if not key or key == "REPLACE_WITH_YOUR_GEMINI_API_KEY":
             sys.exit("GEMINI_API_KEY missing or still the placeholder — add your real key to .env")
+    if args.model.startswith(("gpt", "o1", "o3", "o4")):
+        key = os.environ.get("OPENAI_API_KEY", "")
+        if not key or key == "REPLACE_WITH_YOUR_OPENAI_API_KEY":
+            sys.exit("OPENAI_API_KEY missing or still the placeholder — add your real key to .env")
 
     console = Console()
     cfg = load_task_config(args.task)

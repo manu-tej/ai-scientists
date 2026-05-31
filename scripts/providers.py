@@ -9,6 +9,7 @@ across providers.
 from __future__ import annotations
 
 import itertools
+import json
 import os
 import time
 from abc import ABC, abstractmethod
@@ -252,9 +253,92 @@ class GeminiProvider(Provider):
         )
 
 
+def _normalize_openai_stop(finish_reason: str, has_calls: bool) -> str:
+    fr = (finish_reason or "").lower()
+    if fr == "length":
+        return "max_tokens"
+    if fr == "tool_calls" or has_calls:
+        return "tool_use"
+    if fr == "stop":
+        return "end_turn"
+    return finish_reason
+
+
+class OpenAIProvider(Provider):
+    """OpenAI chat.completions with function calling (mirrors the Anthropic loop)."""
+
+    def __init__(self, model: str, system_text: str, max_tokens: int = 8192):
+        from openai import OpenAI
+        self._client = OpenAI()
+        self._model = model
+        self._max_tokens = max_tokens
+        self._tools = [{"type": "function", "function": {
+            "name": RUN_PYTHON_SPEC["name"],
+            "description": RUN_PYTHON_SPEC["description"],
+            "parameters": RUN_PYTHON_SPEC["parameters"],
+        }}]
+        self._messages: list[dict] = [{"role": "system", "content": system_text}]
+
+    def add_user_text(self, text: str) -> None:
+        self._messages.append({"role": "user", "content": text})
+
+    def add_tool_results(self, results):
+        for (tid, content, _err) in results:
+            self._messages.append({"role": "tool", "tool_call_id": tid, "content": content})
+
+    def advance(self) -> TurnResult:
+        from openai import RateLimitError, APIStatusError
+        backoff, attempts = 8.0, 0
+        while True:
+            try:
+                resp = self._client.chat.completions.create(
+                    model=self._model, messages=self._messages, tools=self._tools,
+                    max_completion_tokens=self._max_tokens)
+                break
+            except (RateLimitError, APIStatusError) as e:
+                attempts += 1
+                code = getattr(e, "status_code", None)
+                if attempts > 6 or (code is not None and code not in (429, 500, 503)):
+                    raise
+                time.sleep(backoff)
+                backoff = min(backoff * 1.8, 60.0)
+        choice = resp.choices[0]
+        msg = choice.message
+        tcs = msg.tool_calls or []
+        # Re-append the assistant turn in API-acceptable form.
+        asst: dict = {"role": "assistant", "content": msg.content or ""}
+        if tcs:
+            asst["tool_calls"] = [{"id": tc.id, "type": "function",
+                                   "function": {"name": tc.function.name, "arguments": tc.function.arguments}}
+                                  for tc in tcs]
+        self._messages.append(asst)
+        calls = []
+        for tc in tcs:
+            try:
+                code = json.loads(tc.function.arguments or "{}").get("code", "")
+            except json.JSONDecodeError:
+                code = ""
+            calls.append(ToolCall(id=tc.id, code=code))
+        u = resp.usage
+        cached = getattr(getattr(u, "prompt_tokens_details", None), "cached_tokens", 0) or 0
+        return TurnResult(
+            text_blocks=[msg.content] if msg.content else [],
+            tool_calls=calls,
+            stop_reason=_normalize_openai_stop(choice.finish_reason, bool(calls)),
+            in_tokens=u.prompt_tokens, out_tokens=u.completion_tokens,
+            cache_create=0, cache_read=cached,
+        )
+
+    def drop_last_assistant(self) -> None:
+        if self._messages and self._messages[-1].get("role") == "assistant":
+            self._messages.pop()
+
+
 def make_provider(model: str, system_text: str, max_tokens: int = 8192) -> Provider:
     if model.startswith("claude"):
         return AnthropicProvider(model, system_text, max_tokens)
     if model.startswith("gemini"):
         return GeminiProvider(model, system_text, max_tokens)
-    raise ValueError(f"Unknown model provider for '{model}' (expected claude-* or gemini-*)")
+    if model.startswith("gpt") or model.startswith("o1") or model.startswith("o3") or model.startswith("o4"):
+        return OpenAIProvider(model, system_text, max_tokens)
+    raise ValueError(f"Unknown model provider for '{model}' (expected claude-*, gemini-*, or gpt-*)")

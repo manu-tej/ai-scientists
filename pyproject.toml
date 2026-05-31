@@ -22,6 +22,7 @@ dependencies = [
     "xlrd>=2.0.2",
     "pytest>=9.0.3",
     "google-genai>=1.33.0",
+    "openai>=2.38.0",
 ]
 
 [build-system]

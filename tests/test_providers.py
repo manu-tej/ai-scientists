@@ -9,7 +9,7 @@ import pytest
 
 from scripts.providers import (
     ToolCall, TurnResult, FakeProvider, GeminiProvider,
-    _normalize_gemini_stop, make_provider,
+    _normalize_gemini_stop, _normalize_openai_stop, make_provider,
 )
 from scripts.agent import run_agent_loop
 
@@ -85,14 +85,21 @@ def test_gemini_parse_response():
 
 # ---- routing ---- #
 
+def test_normalize_openai_stop():
+    assert _normalize_openai_stop("tool_calls", True) == "tool_use"
+    assert _normalize_openai_stop("stop", False) == "end_turn"
+    assert _normalize_openai_stop("length", False) == "max_tokens"
+
+
 def test_routes_by_prefix(monkeypatch):
     import scripts.providers as P
     chosen = {}
     monkeypatch.setattr(P, "AnthropicProvider", lambda *a, **k: chosen.setdefault("p", "anthropic"))
     monkeypatch.setattr(P, "GeminiProvider", lambda *a, **k: chosen.setdefault("p", "gemini"))
+    monkeypatch.setattr(P, "OpenAIProvider", lambda *a, **k: chosen.setdefault("p", "openai"))
     make_provider("claude-opus-4-7", "sys"); assert chosen["p"] == "anthropic"
-    chosen.clear()
-    make_provider("gemini-3.1-pro-preview", "sys"); assert chosen["p"] == "gemini"
+    chosen.clear(); make_provider("gemini-3.1-pro-preview", "sys"); assert chosen["p"] == "gemini"
+    chosen.clear(); make_provider("gpt-5.1", "sys"); assert chosen["p"] == "openai"
 
 
 def test_unknown_model_raises():

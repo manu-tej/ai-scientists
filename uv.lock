@@ -124,6 +124,7 @@ dependencies = [
     { name = "huggingface-hub" },
     { name = "lifelines" },
     { name = "numpy" },
+    { name = "openai" },
     { name = "openpyxl" },
     { name = "pandas" },
     { name = "pytest" },
@@ -146,6 +147,7 @@ requires-dist = [
     { name = "huggingface-hub", extras = ["cli"], specifier = ">=0.27.0" },
     { name = "lifelines", specifier = ">=0.30.3" },
     { name = "numpy", specifier = ">=1.26.0" },
+    { name = "openai", specifier = ">=2.38.0" },
     { name = "openpyxl", specifier = ">=3.1.5" },
     { name = "pandas", specifier = ">=2.2.0" },
     { name = "pytest", specifier = ">=9.0.3" },
@@ -990,6 +992,25 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/8a/90/0ac3bc947217e66dec77e7cbc6a1979d1af70b6461b82f620d3bccd5e4c8/numpy-2.4.6-cp313-cp313t-win32.whl", hash = "sha256:29a287e0cf63ff528da061de6b9f64a4618da591ca1046aafc54062e40ca7eab", size = 6084971, upload-time = "2026-05-18T23:35:29.387Z" },
     { url = "https://files.pythonhosted.org/packages/77/71/5673e351671a1d2bd6063b91b44f70c0affea7d1516fa7a6572941ba4aa1/numpy-2.4.6-cp313-cp313t-win_amd64.whl", hash = "sha256:25c692919ac5a01f170a3bfcd62d745b24fd095c353d50812637d6fcab442e75", size = 12458532, upload-time = "2026-05-18T23:35:32.175Z" },
     { url = "https://files.pythonhosted.org/packages/3f/88/19d3503c5046e688f049274b27a3ef3d771152fa80d3ba3d01a3dff61abe/numpy-2.4.6-cp313-cp313t-win_arm64.whl", hash = "sha256:1e978ec1e8bd0e0e4de6bb75de9d30cbb74db6b6a2bb727618613703ca0167dd", size = 10291881, upload-time = "2026-05-18T23:35:35.465Z" },
+]
+
+[[package]]
+name = "openai"
+version = "2.38.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "anyio" },
+    { name = "distro" },
+    { name = "httpx" },
+    { name = "jiter" },
+    { name = "pydantic" },
+    { name = "sniffio" },
+    { name = "tqdm" },
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/8f/12/cfa322c5f5dd8fa21aab9a7a8e979e7a11123800f86ca8d82eb68a83d213/openai-2.38.0.tar.gz", hash = "sha256:798694c6cf74145541fda94325b6f8f72d8e1fd0262cc137c8d728177a6a4ce3", size = 772764, upload-time = "2026-05-21T21:23:42.105Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/0a/bf/ccff9be562e24207716d04ef9dc931c76aff0c89a7265da43e2104d7fe06/openai-2.38.0-py3-none-any.whl", hash = "sha256:ec6661c57b2dcc47414a767e6e3335c7ed3d19c9696999283a3c82e95c756a3c", size = 1344910, upload-time = "2026-05-21T21:23:39.636Z" },
 ]
 
 [[package]]
