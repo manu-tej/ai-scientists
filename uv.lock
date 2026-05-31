@@ -11,53 +11,6 @@ resolution-markers = [
 ]
 
 [[package]]
-name = "ai-scientists"
-version = "0.0.1"
-source = { editable = "." }
-dependencies = [
-    { name = "anndata" },
-    { name = "anthropic" },
-    { name = "google-genai" },
-    { name = "h5py" },
-    { name = "huggingface-hub" },
-    { name = "lifelines" },
-    { name = "numpy" },
-    { name = "openpyxl" },
-    { name = "pandas" },
-    { name = "pytest" },
-    { name = "python-dotenv" },
-    { name = "pyyaml" },
-    { name = "rich" },
-    { name = "scanpy" },
-    { name = "scikit-learn" },
-    { name = "scipy" },
-    { name = "statsmodels" },
-    { name = "xlrd" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "anndata", specifier = ">=0.12.16" },
-    { name = "anthropic", specifier = ">=0.42.0" },
-    { name = "google-genai", specifier = ">=1.33.0" },
-    { name = "h5py", specifier = ">=3.16.0" },
-    { name = "huggingface-hub", extras = ["cli"], specifier = ">=0.27.0" },
-    { name = "lifelines", specifier = ">=0.30.3" },
-    { name = "numpy", specifier = ">=1.26.0" },
-    { name = "openpyxl", specifier = ">=3.1.5" },
-    { name = "pandas", specifier = ">=2.2.0" },
-    { name = "pytest", specifier = ">=9.0.3" },
-    { name = "python-dotenv", specifier = ">=1.0.1" },
-    { name = "pyyaml", specifier = ">=6.0.3" },
-    { name = "rich", specifier = ">=13.9.0" },
-    { name = "scanpy", specifier = ">=1.12.1" },
-    { name = "scikit-learn", specifier = ">=1.5.0" },
-    { name = "scipy", specifier = ">=1.13.0" },
-    { name = "statsmodels", specifier = ">=0.14.0" },
-    { name = "xlrd", specifier = ">=2.0.2" },
-]
-
-[[package]]
 name = "anndata"
 version = "0.12.16"
 source = { registry = "https://pypi.org/simple" }
@@ -158,6 +111,53 @@ dependencies = [
     { name = "scipy" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/85/ae/7f2031ea76140444b2453fa139041e5afd4a09fc5300cfefeb1103291f80/autograd-gamma-0.5.0.tar.gz", hash = "sha256:f27abb7b8bb9cffc8badcbf59f3fe44a9db39e124ecacf1992b6d952934ac9c4", size = 3952, upload-time = "2020-10-15T16:51:06.785Z" }
+
+[[package]]
+name = "benchbench"
+version = "0.0.1"
+source = { editable = "." }
+dependencies = [
+    { name = "anndata" },
+    { name = "anthropic" },
+    { name = "google-genai" },
+    { name = "h5py" },
+    { name = "huggingface-hub" },
+    { name = "lifelines" },
+    { name = "numpy" },
+    { name = "openpyxl" },
+    { name = "pandas" },
+    { name = "pytest" },
+    { name = "python-dotenv" },
+    { name = "pyyaml" },
+    { name = "rich" },
+    { name = "scanpy" },
+    { name = "scikit-learn" },
+    { name = "scipy" },
+    { name = "statsmodels" },
+    { name = "xlrd" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "anndata", specifier = ">=0.12.16" },
+    { name = "anthropic", specifier = ">=0.42.0" },
+    { name = "google-genai", specifier = ">=1.33.0" },
+    { name = "h5py", specifier = ">=3.16.0" },
+    { name = "huggingface-hub", extras = ["cli"], specifier = ">=0.27.0" },
+    { name = "lifelines", specifier = ">=0.30.3" },
+    { name = "numpy", specifier = ">=1.26.0" },
+    { name = "openpyxl", specifier = ">=3.1.5" },
+    { name = "pandas", specifier = ">=2.2.0" },
+    { name = "pytest", specifier = ">=9.0.3" },
+    { name = "python-dotenv", specifier = ">=1.0.1" },
+    { name = "pyyaml", specifier = ">=6.0.3" },
+    { name = "rich", specifier = ">=13.9.0" },
+    { name = "scanpy", specifier = ">=1.12.1" },
+    { name = "scikit-learn", specifier = ">=1.5.0" },
+    { name = "scipy", specifier = ">=1.13.0" },
+    { name = "statsmodels", specifier = ">=0.14.0" },
+    { name = "xlrd", specifier = ">=2.0.2" },
+]
 
 [[package]]
 name = "certifi"

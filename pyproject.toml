@@ -1,5 +1,5 @@
 [project]
-name = "ai-scientists"
+name = "benchbench"
 version = "0.0.1"
 description = "BiomniBench-DA baseline agent + scoring harness"
 requires-python = ">=3.12,<3.14"
