@@ -50,6 +50,16 @@ RUNS_ROOT = ROOT / "runs/agent"
 # --- Modeling choice 1: confidence -> probability (the key ECE knob) --------- #
 CONF_PROB: dict[str, float] = {"HIGH": 0.90, "MEDIUM": 0.60, "LOW": 0.30}
 
+# Ordinal rank of each label — used for the binning- and mapping-FREE AUROC.
+CONF_RANK: dict[str, int] = {"LOW": 0, "MEDIUM": 1, "HIGH": 2}
+
+# Alternative maps for the sensitivity check (does the ORDERING survive?).
+ALT_MAPS = {
+    "default .90/.60/.30": {"HIGH": 0.90, "MEDIUM": 0.60, "LOW": 0.30},
+    "wide .95/.50/.10":    {"HIGH": 0.95, "MEDIUM": 0.50, "LOW": 0.10},
+    "narrow .80/.65/.50":  {"HIGH": 0.80, "MEDIUM": 0.65, "LOW": 0.50},
+}
+
 # --- Modeling choice 2: which confidence labels we recognize ----------------- #
 _CONF_RE = re.compile(r"CONFIDENCE:\s*(HIGH|MEDIUM|MED|LOW)", re.IGNORECASE)
 
@@ -97,12 +107,14 @@ def load_calibrate_runs() -> list[dict]:
         succ = success_of(json.loads(jud.read_text()))
         if succ is None:
             continue
-        out.append({"task": d.parts[-4], "variant": d.parts[-2], "conf": conf, "success": succ})
+        out.append({"task": d.parts[-4], "model": d.parts[-3], "variant": d.parts[-2],
+                    "conf": conf, "success": succ})
     return out
 
 
-def ece_brier(records: list[dict]) -> dict:
+def ece_brier(records: list[dict], mapping: dict | None = None) -> dict:
     """Binned ECE + MCE (bins = confidence labels) and per-sample Brier score."""
+    cp = mapping or CONF_PROB
     n = len(records)
     if n == 0:
         return {"n": 0}
@@ -112,34 +124,98 @@ def ece_brier(records: list[dict]) -> dict:
     ece = mce = 0.0
     bin_detail = {}
     for conf, succs in bins.items():
-        p = CONF_PROB[conf]
+        p = cp[conf]
         acc = sum(succs) / len(succs)
         gap = abs(acc - p)
-        weight = len(succs) / n
-        ece += weight * gap
+        ece += (len(succs) / n) * gap
         mce = max(mce, gap)
         bin_detail[conf] = {"n": len(succs), "conf_prob": p, "accuracy": acc, "gap": gap}
-    brier = sum((CONF_PROB[r["conf"]] - r["success"]) ** 2 for r in records) / n
-    return {
-        "n": n,
-        "success_rate": sum(r["success"] for r in records) / n,
-        "ECE": ece,
-        "MCE": mce,
-        "Brier": brier,
-        "bins": bin_detail,
-    }
+    brier = sum((cp[r["conf"]] - r["success"]) ** 2 for r in records) / n
+    return {"n": n, "success_rate": sum(r["success"] for r in records) / n,
+            "ECE": ece, "MCE": mce, "Brier": brier, "bins": bin_detail}
+
+
+def auroc_conf_success(records: list[dict]) -> float | None:
+    """Binning- and mapping-FREE discrimination: probability that a CORRECT run
+    carried >= confidence than a WRONG run (ties = 0.5). 0.5 = confidence is
+    uninformative; <0.5 = perverse (more confident when wrong). Undefined if all
+    runs share one outcome."""
+    pos = [CONF_RANK[r["conf"]] for r in records if r["success"] == 1]
+    neg = [CONF_RANK[r["conf"]] for r in records if r["success"] == 0]
+    if not pos or not neg:
+        return None
+    wins = ties = 0
+    for a in pos:
+        for b in neg:
+            if a > b:
+                wins += 1
+            elif a == b:
+                ties += 1
+    return (wins + 0.5 * ties) / (len(pos) * len(neg))
+
+
+def spearman(xs: list[float], ys: list[float]) -> float | None:
+    """Rank correlation (no SciPy dependency)."""
+    n = len(xs)
+    if n < 2:
+        return None
+    def ranks(v):
+        order = sorted(range(n), key=lambda i: v[i])
+        r = [0.0] * n
+        i = 0
+        while i < n:
+            j = i
+            while j + 1 < n and v[order[j + 1]] == v[order[i]]:
+                j += 1
+            avg = (i + j) / 2 + 1
+            for k in range(i, j + 1):
+                r[order[k]] = avg
+            i = j + 1
+        return r
+    rx, ry = ranks(xs), ranks(ys)
+    mx, my = sum(rx) / n, sum(ry) / n
+    num = sum((rx[i] - mx) * (ry[i] - my) for i in range(n))
+    den = (sum((rx[i] - mx) ** 2 for i in range(n)) * sum((ry[i] - my) ** 2 for i in range(n))) ** 0.5
+    return num / den if den else None
 
 
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--task", help="restrict to one task")
+    ap.add_argument("--model", help="restrict to one model slug")
+    ap.add_argument("--by-model", action="store_true", help="group by (model, task) for cross-vendor")
     ap.add_argument("--audit", action="store_true", help="reconcile vs RESULTS.md claimed ECE")
+    ap.add_argument("--robust", action="store_true", help="AUROC + mapping-sensitivity (robustness)")
     ap.add_argument("--json", action="store_true")
     args = ap.parse_args()
 
     records = load_calibrate_runs()
     if args.task:
         records = [r for r in records if r["task"] == args.task]
+    if args.model:
+        records = [r for r in records if r["model"] == args.model]
+
+    if args.by_model:
+        grid = defaultdict(list)
+        for r in records:
+            grid[(r["model"], r["task"])].append(r)
+        print(f"{'model':<24}{'task':<9}{'n':<4}{'succ':<7}{'ECE':<7}{'AUROC':<7}")
+        for (m, t), rs in sorted(grid.items()):
+            x = ece_brier(rs)
+            au = auroc_conf_success(rs)
+            print(f"{m:<24}{t:<9}{x['n']:<4}{x['success_rate']:<7.2f}{x['ECE']:<7.2f}"
+                  f"{(f'{au:.2f}' if au is not None else 'n/a'):<7}")
+        # cross-vendor pooled per model
+        print("\nper-model pooled:")
+        bymodel = defaultdict(list)
+        for r in records:
+            bymodel[r["model"]].append(r)
+        for m, rs in sorted(bymodel.items()):
+            x = ece_brier(rs); au = auroc_conf_success(rs)
+            low = sum(1 for r in rs if r["conf"] == "LOW")
+            print(f"  {m:<24} n={x['n']:<3} ECE={x['ECE']:.2f} Brier={x['Brier']:.2f} "
+                  f"AUROC={au if au is None else round(au,2)} LOW_used={low}")
+        return
 
     per_task = defaultdict(list)
     for r in records:
@@ -169,6 +245,30 @@ def main() -> None:
     print(f"\npooled    {pooled['n']:<4}{pooled['success_rate']:<9.2f}{pooled['ECE']:<7.2f}{pooled['MCE']:<7.2f}{pooled['Brier']:<7.2f}")
     print(f"\nLOW used: {conf_dist.get('LOW', 0)} times "
           f"({'never — structural overconfidence' if conf_dist.get('LOW', 0) == 0 else 'present'})")
+
+    if args.robust:
+        print("\n=== Robustness (ECE is binning/mapping-sensitive; these are not) ===")
+        au = auroc_conf_success(records)
+        print(f"AUROC(confidence -> correctness), binning- & mapping-free: "
+              f"{au if au is None else round(au, 3)}  "
+              f"(0.5 = confidence uninformative; <0.5 = perverse)")
+        # raw bin accuracies (assumption-free)
+        print("Raw per-label accuracy (no mapping):")
+        for c in ("HIGH", "MEDIUM", "LOW"):
+            rs = [r for r in records if r["conf"] == c]
+            if rs:
+                print(f"  {c:<7} n={len(rs):<3} accuracy={sum(r['success'] for r in rs)/len(rs):.2f}")
+        # mapping sensitivity: does the success->ECE ordering survive remapping?
+        print("Mapping sensitivity (ordering should hold across all maps):")
+        succ = [results[t]["success_rate"] for t in order]
+        for name, mp in ALT_MAPS.items():
+            eces = [ece_brier([r for r in records if r["task"] == t], mp)["ECE"] for t in order]
+            rho = spearman(succ, eces)
+            pooled_e = ece_brier(records, mp)["ECE"]
+            print(f"  {name:<20} pooled ECE={pooled_e:.2f}  spearman(success,ECE)="
+                  f"{rho if rho is None else round(rho, 2)}")
+        print("  (strongly negative spearman under every map => the monotonic "
+              "'miscalibrated when it matters' finding is mapping-robust)")
 
     if args.audit:
         print("\n=== Reconciliation vs RESULTS.md committed ECE ===")
