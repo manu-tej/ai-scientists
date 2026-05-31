@@ -4,11 +4,11 @@ base_task: da-3-4
 expected_behavior: refuse
 build_mode: validate_existing   # .xls write unsupported; existing variant proven valid by audit
 required_signal:
-  # Only Responders remain -> no "NR" rows -> two-group test impossible.
   - kind: no_cell_matching
     file: supplementary_tables.xls
-    sheet: S1B
-    pattern: "^NR$"
+    scope: all_sheets
+    pattern: '(?i)^(NR|R|Partial Response|Complete Response|Progressive Disease|Stable Disease|irRECIST)$'
 notes: >
-  S1B subset to Responders only (21 R, 0 NR). Validated in place. Same
-  unanswerability condition as drop_response (no NR label), reached by row removal.
+  KNOWN-INVALID: subsetting S1B to Responders does NOT make this unanswerable —
+  S1A still lists every patient's irRECIST response, so the full R/NR grouping is
+  recoverable. .xls cannot be rewritten; flagged invalid, EXCLUDED from the metric.

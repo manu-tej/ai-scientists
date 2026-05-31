@@ -83,13 +83,18 @@ def _eval(check: SignalCheck, data_dir: Path) -> CheckResult:
         return CheckResult(k, n <= mx, f"n_rows={n} (max {mx})")
 
     if k == "no_cell_matching":
-        # Scan EVERY cell of a sheet/file for a leaked answer label (handles
-        # messy/positional headers where a removed column can't be named).
+        # Scan EVERY cell for a leaked answer VALUE (handles messy/positional
+        # headers AND cross-sheet value leaks where the signal is derivable from
+        # another sheet's column values, not its header). scope=all_sheets scans
+        # every sheet of an Excel file.
         import pandas as pd
         pat = re.compile(check.params["pattern"])
+        cells: set = set()
         if getattr(ad, "is_excel", False):
-            df = pd.read_excel(p, sheet_name=check.params.get("sheet"), header=None, dtype=str)
-            cells = {str(v) for v in df.values.ravel() if v == v}  # drop NaN
+            sheets = ad.sheet_names() if check.params.get("scope") == "all_sheets" else [check.params.get("sheet")]
+            for sh in sheets:
+                df = pd.read_excel(p, sheet_name=sh, header=None, dtype=str)
+                cells |= {str(v) for v in df.values.ravel() if v == v}
         else:
             cells = {v for row in ad._rows() for v in row}
         hits = [c for c in cells if pat.search(c)]

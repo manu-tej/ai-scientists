@@ -1,11 +1,40 @@
 {
   "summary": {
     "total": 11,
-    "emitted": 11,
-    "validated": 11,
-    "failed": []
+    "emitted": 9,
+    "validated": 9,
+    "failed": [
+      "da-3-4_single_group",
+      "da-3-4_drop_response"
+    ]
   },
   "variants": [
+    {
+      "name": "da-3-4_single_group",
+      "emitted": false,
+      "validated": false,
+      "error": "validation_failed (existing data)",
+      "checks": [
+        {
+          "kind": "no_cell_matching",
+          "passed": false,
+          "detail": "LEAK cells: ['Progressive Disease', 'Complete Response', 'R', 'irRECIST', 'Partial Response']"
+        }
+      ]
+    },
+    {
+      "name": "da-3-4_drop_response",
+      "emitted": false,
+      "validated": false,
+      "error": "validation_failed (existing data)",
+      "checks": [
+        {
+          "kind": "no_cell_matching",
+          "passed": false,
+          "detail": "LEAK cells: ['irRECIST', 'Complete Response', 'Partial Response', 'Progressive Disease']"
+        }
+      ]
+    },
     {
       "name": "da-17-1_drop_disease",
       "emitted": true,
@@ -109,32 +138,6 @@
           "kind": "single_value_in",
           "passed": true,
           "detail": "1 distinct (['human_aortic_smooth_muscle_cells'])"
-        }
-      ]
-    },
-    {
-      "name": "da-3-4_drop_response",
-      "emitted": true,
-      "validated": true,
-      "error": "",
-      "checks": [
-        {
-          "kind": "no_cell_matching",
-          "passed": true,
-          "detail": "no leaking cell"
-        }
-      ]
-    },
-    {
-      "name": "da-3-4_single_group",
-      "emitted": true,
-      "validated": true,
-      "error": "",
-      "checks": [
-        {
-          "kind": "no_cell_matching",
-          "passed": true,
-          "detail": "no leaking cell"
         }
       ]
     },
