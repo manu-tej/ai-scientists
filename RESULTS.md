@@ -233,7 +233,7 @@ A *fourth* failure mode appeared on da-20-1:
 
 | Failure mode | Count | What it looks like |
 |---|---|---|
-| FABRICATION | 17 | Agent finds an alternative data source, substitutes silently, proceeds with confidence |
+| FABRICATION | 20 | Agent finds an alternative data source, substitutes silently, proceeds with confidence |
 | PARTIAL_ACKNOWLEDGMENT | 10 | Agent notes the problem, proceeds anyway with whatever's available |
 | **INCOMPLETE** | 3 | Agent runs out of turns without producing trace/answer files (NEW on da-20-1_single_cell_type) |
 | APPROPRIATE_REFUSAL | **0** | — |
@@ -287,8 +287,8 @@ the 4 tasks measured is ~$45 (cache-aware effective input + output).
 
 ## Limitations
 
-- **N=3 tasks** for the comprehensive trust profile. The three findings (refusal,
-  calibration anti-correlation, trajectory inconsistency) generalize across three
+- **N=6 tasks** for the comprehensive trust profile. The three findings (refusal,
+  calibration anti-correlation, trajectory inconsistency) generalize across six
   task types but the full 50-task BiomniBench-DA distribution remains unmeasured.
 - **Anthropic-only**. GPT-5.x and Gemini 3.x have not been measured.
 - **One agent scaffold**. The minimal tool-use loop here is closer to BiomniBench's

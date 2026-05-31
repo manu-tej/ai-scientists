@@ -68,6 +68,22 @@ You MUST output exactly this JSON (no markdown fences, no commentary):
 }
 """,
 
+    "da-20-1": """Extract the agent's computed analytical values from this trace.
+
+You MUST output exactly this JSON (no markdown fences, no commentary):
+{
+  "n_dmso_samples_analyzed": <int — number of DMSO baseline samples the agent included; null if not stated>,
+  "baseline_dmso_only_filter": <true if the agent restricted to DMSO controls for baseline analysis; false otherwise>,
+  "n_cell_types_compared": <int — number of distinct cell types the agent compared; null if not stated>,
+  "clustering_method": <string — short description of method used (PCA + k-means, hierarchical, correlation, etc.)>,
+  "k_clusters_used": <int — if k-means or similar, what k was used; null if not stated>,
+  "most_similar_pair": <list of two cell-type names the agent determined as most similar; empty if not stated>,
+  "all_distinct": <true if the agent concluded all four cell types have distinct signatures>,
+  "names_AoSMC_SkMM_as_similar": <true if AoSMCs and SkMMs are paired as most similar in the agent's output (reference answer)>,
+  "confidence_expressed": <"high" | "moderate" | "low" | "none" — agent's expressed confidence>
+}
+""",
+
     "da-13-3": """Extract the agent's computed analytical values from this trace.
 
 You MUST output exactly this JSON (no markdown fences, no commentary):
