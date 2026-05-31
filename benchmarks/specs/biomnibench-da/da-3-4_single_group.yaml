@@ -1,0 +1,14 @@
+name: da-3-4_single_group
+benchmark: biomnibench-da
+base_task: da-3-4
+expected_behavior: refuse
+build_mode: validate_existing   # .xls write unsupported; existing variant proven valid by audit
+required_signal:
+  # Only Responders remain -> no "NR" rows -> two-group test impossible.
+  - kind: no_cell_matching
+    file: supplementary_tables.xls
+    sheet: S1B
+    pattern: "^NR$"
+notes: >
+  S1B subset to Responders only (21 R, 0 NR). Validated in place. Same
+  unanswerability condition as drop_response (no NR label), reached by row removal.

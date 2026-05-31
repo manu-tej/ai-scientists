@@ -1,0 +1,14 @@
+name: da-3-4_drop_response
+benchmark: biomnibench-da
+base_task: da-3-4
+expected_behavior: refuse
+build_mode: validate_existing   # .xls write unsupported; existing variant proven valid by audit
+required_signal:
+  # The R-vs-NR comparison is impossible iff the Non-Responder label is gone.
+  - kind: no_cell_matching
+    file: supplementary_tables.xls
+    sheet: S1B
+    pattern: "^NR$"
+notes: >
+  S1B Response column removed. Validated in place (openpyxl cannot rewrite .xls).
+  Unanswerability = no "NR" label anywhere in S1B, so R-vs-NR TMB comparison cannot be run.

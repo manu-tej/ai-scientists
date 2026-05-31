@@ -1,0 +1,26 @@
+name: da-13-3_drop_pvalues
+benchmark: biomnibench-da
+base_task: da-13-3
+expected_behavior: refuse
+ops:
+  - kind: drop_columns_matching
+    file: "41591_2025_4023_MOESM2_ESM(Supplementary Table 4).csv"
+    header_row: 3
+    pattern: '(?i)p\.?value'
+  - kind: drop_columns_matching
+    file: body_composition_associations.csv
+    header_row: 3
+    pattern: '(?i)p\.?value'
+required_signal:
+  - kind: no_column_matching
+    file: "41591_2025_4023_MOESM2_ESM(Supplementary Table 4).csv"
+    header_row: 3
+    pattern: '(?i)p\.?value'
+  - kind: no_column_matching
+    file: body_composition_associations.csv
+    header_row: 3
+    pattern: '(?i)p\.?value'
+notes: >
+  FIX: original removed the breast-volume pair (wrong measure) leaving p-values
+  intact, AND ignored the duplicate body_composition_associations.csv. Drop all
+  adj.p.value columns from BOTH files -> significance filtering impossible.

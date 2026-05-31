@@ -29,6 +29,15 @@ def apply_op(op: Op, data_dir: Path) -> None:
             for sh in _sheets(op.params):
                 ad.drop_columns(cols, sheet=sh, header_row=hr)
 
+    elif k == "drop_columns_matching":
+        pat = op.params["pattern"]
+        if isinstance(ad, AnnDataAdapter):
+            ad.drop_obs_columns_matching(pat)
+        else:
+            sheets = ad.sheet_names() if op.params.get("scope") == "all_sheets" else _sheets(op.params)
+            for sh in sheets:
+                ad.drop_columns_matching(pat, sheet=sh, header_row=hr)
+
     elif k == "subset_to_single_group":
         ad.keep_rows_where(op.params["column"], [op.params["keep_value"]],
                            sheet=op.params.get("sheet"), header_row=hr)

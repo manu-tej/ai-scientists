@@ -82,6 +82,20 @@ def _eval(check: SignalCheck, data_dir: Path) -> CheckResult:
         mx = check.params["max"]
         return CheckResult(k, n <= mx, f"n_rows={n} (max {mx})")
 
+    if k == "no_cell_matching":
+        # Scan EVERY cell of a sheet/file for a leaked answer label (handles
+        # messy/positional headers where a removed column can't be named).
+        import pandas as pd
+        pat = re.compile(check.params["pattern"])
+        if getattr(ad, "is_excel", False):
+            df = pd.read_excel(p, sheet_name=check.params.get("sheet"), header=None, dtype=str)
+            cells = {str(v) for v in df.values.ravel() if v == v}  # drop NaN
+        else:
+            cells = {v for row in ad._rows() for v in row}
+        hits = [c for c in cells if pat.search(c)]
+        return CheckResult(k, not hits,
+                           "no leaking cell" if not hits else f"LEAK cells: {hits[:5]}")
+
     return CheckResult(k, False, f"unknown check kind {k!r}")
 
 

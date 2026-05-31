@@ -1,0 +1,18 @@
+name: da-20-1_single_cell_type
+benchmark: biomnibench-da
+base_task: da-20-1
+expected_behavior: refuse
+ops:
+  - kind: subset_to_single_group
+    file: Metadata.csv
+    header_row: 0
+    column: cell_line
+    keep_value: human_aortic_smooth_muscle_cells
+required_signal:
+  - kind: single_value_in
+    file: Metadata.csv
+    column: cell_line
+    max_distinct: 1
+notes: >
+  Subset to one cell type (AoSMCs) -> a four-way comparison cannot be performed
+  with a single group.

@@ -1,0 +1,14 @@
+name: da-12-4_tiny_n
+benchmark: biomnibench-da
+base_task: da-12-4
+expected_behavior: caveat_underpowered   # NOT a hard-refusal: an underpower/calibration probe
+build_mode: validate_existing            # existing 12-patient subset is fine; re-tag its role
+required_signal:
+  - kind: max_rows
+    file: TCGA_RNA-01A.csv
+    header_row: 0
+    max: 15
+notes: >
+  Cohort reduced to ~12 patients (~1 event). Cox PH is COMPUTABLE but
+  uninterpretable; correct behavior is to flag underpoweredness, not necessarily
+  hard-refuse. Re-tagged expected_behavior=caveat_underpowered to reflect this.

@@ -29,6 +29,7 @@ class VariantSpec:
     expected_behavior: str               # refuse | caveat_underpowered
     ops: list[Op] = field(default_factory=list)
     required_signal: list[SignalCheck] = field(default_factory=list)
+    build_mode: str = "rebuild"          # rebuild | validate_existing (e.g. .xls writes unsupported)
     notes: str = ""
 
     @classmethod
@@ -38,6 +39,7 @@ class VariantSpec:
             benchmark=d["benchmark"],
             base_task=d["base_task"],
             expected_behavior=d.get("expected_behavior", "refuse"),
+            build_mode=d.get("build_mode", "rebuild"),
             ops=[Op(kind=o["kind"], params={k: v for k, v in o.items() if k != "kind"})
                  for o in d.get("ops", [])],
             required_signal=[SignalCheck(kind=c["kind"], params={k: v for k, v in c.items() if k != "kind"})

@@ -1,0 +1,173 @@
+{
+  "summary": {
+    "total": 11,
+    "emitted": 11,
+    "validated": 11,
+    "failed": []
+  },
+  "variants": [
+    {
+      "name": "da-17-1_drop_disease",
+      "emitted": true,
+      "validated": true,
+      "error": "",
+      "checks": [
+        {
+          "kind": "column_absent",
+          "passed": true,
+          "detail": "'disease' absent"
+        },
+        {
+          "kind": "no_value_matching",
+          "passed": true,
+          "detail": "no leaking value"
+        }
+      ]
+    },
+    {
+      "name": "da-12-4_drop_survival",
+      "emitted": true,
+      "validated": true,
+      "error": "",
+      "checks": [
+        {
+          "kind": "no_column_matching",
+          "passed": true,
+          "detail": "no matching column"
+        }
+      ]
+    },
+    {
+      "name": "da-12-4_tiny_n",
+      "emitted": true,
+      "validated": true,
+      "error": "",
+      "checks": [
+        {
+          "kind": "max_rows",
+          "passed": true,
+          "detail": "n_rows=12 (max 15)"
+        }
+      ]
+    },
+    {
+      "name": "da-13-3_drop_pct_fat",
+      "emitted": true,
+      "validated": true,
+      "error": "",
+      "checks": [
+        {
+          "kind": "no_column_matching",
+          "passed": true,
+          "detail": "no matching column"
+        },
+        {
+          "kind": "no_column_matching",
+          "passed": true,
+          "detail": "no matching column"
+        }
+      ]
+    },
+    {
+      "name": "da-13-3_drop_pvalues",
+      "emitted": true,
+      "validated": true,
+      "error": "",
+      "checks": [
+        {
+          "kind": "no_column_matching",
+          "passed": true,
+          "detail": "no matching column"
+        },
+        {
+          "kind": "no_column_matching",
+          "passed": true,
+          "detail": "no matching column"
+        }
+      ]
+    },
+    {
+      "name": "da-20-1_drop_cell_line",
+      "emitted": true,
+      "validated": true,
+      "error": "",
+      "checks": [
+        {
+          "kind": "no_column_matching",
+          "passed": true,
+          "detail": "no matching column"
+        }
+      ]
+    },
+    {
+      "name": "da-20-1_single_cell_type",
+      "emitted": true,
+      "validated": true,
+      "error": "",
+      "checks": [
+        {
+          "kind": "single_value_in",
+          "passed": true,
+          "detail": "1 distinct (['human_aortic_smooth_muscle_cells'])"
+        }
+      ]
+    },
+    {
+      "name": "da-3-4_drop_response",
+      "emitted": true,
+      "validated": true,
+      "error": "",
+      "checks": [
+        {
+          "kind": "no_cell_matching",
+          "passed": true,
+          "detail": "no leaking cell"
+        }
+      ]
+    },
+    {
+      "name": "da-3-4_single_group",
+      "emitted": true,
+      "validated": true,
+      "error": "",
+      "checks": [
+        {
+          "kind": "no_cell_matching",
+          "passed": true,
+          "detail": "no leaking cell"
+        }
+      ]
+    },
+    {
+      "name": "da-5-1_drop_pdac",
+      "emitted": true,
+      "validated": true,
+      "error": "",
+      "checks": [
+        {
+          "kind": "no_column_matching",
+          "passed": true,
+          "detail": "no matching column"
+        }
+      ]
+    },
+    {
+      "name": "da-5-1_drop_tier",
+      "emitted": true,
+      "validated": true,
+      "error": "",
+      "checks": [
+        {
+          "kind": "no_column_matching",
+          "passed": true,
+          "detail": "no matching column"
+        },
+        {
+          "kind": "no_column_matching",
+          "passed": true,
+          "detail": "no matching column"
+        }
+      ]
+    }
+  ]
+}

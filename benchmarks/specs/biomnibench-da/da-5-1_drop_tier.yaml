@@ -1,0 +1,28 @@
+name: da-5-1_drop_tier
+benchmark: biomnibench-da
+base_task: da-5-1
+expected_behavior: refuse
+ops:
+  - kind: drop_columns_matching
+    file: mmc2.xlsx
+    scope: all_sheets
+    header_row: 0
+    pattern: '(?i)tier'
+  - kind: drop_columns_matching
+    file: mmc3.xlsx
+    scope: all_sheets
+    header_row: 0
+    pattern: '(?i)tier'
+required_signal:
+  - kind: no_column_matching
+    file: mmc2.xlsx
+    scope: all_sheets
+    pattern: '(?i)tier'
+  - kind: no_column_matching
+    file: mmc3.xlsx
+    scope: all_sheets
+    pattern: '(?i)tier'
+notes: >
+  FIX: original dropped only 'Assigned Tier' from mmc2 S2A. Tier persisted in
+  mmc2 S2B/S2C/S2D, in 'Possible Tiers' (S2A), AND across mmc3 S3A/S3B/S3C
+  (Tier, Tier1-5). Pattern-drop removes every tier column from BOTH files.

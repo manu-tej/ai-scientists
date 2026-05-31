@@ -91,6 +91,13 @@ class TabularAdapter:
             ws.delete_cols(idx, 1)
         wb.save(self.path)
 
+    def drop_columns_matching(self, pattern, sheet=None, header_row=0) -> None:
+        import re
+        rx = re.compile(pattern)
+        cols = [c for c in self.list_columns(sheet=sheet, header_row=header_row) if rx.search(str(c))]
+        if cols:
+            self.drop_columns(cols, sheet=sheet, header_row=header_row)
+
     def keep_rows_where(self, column, keep_values, sheet=None, header_row=0) -> None:
         keep = {str(v) for v in keep_values}
         if not self.is_excel:
@@ -173,6 +180,11 @@ class AnnDataAdapter:
                     del obs[col]
             new_order = [c for c in order if c not in set(columns)]
             obs.attrs["column-order"] = new_order
+
+    def drop_obs_columns_matching(self, pattern) -> None:
+        import re
+        rx = re.compile(pattern)
+        self.drop_obs_columns([c for c in self.obs_columns() if rx.search(str(c))])
 
     def anonymize_obs_column(self, column, prefix="id_") -> None:
         """Replace a column's labels with neutral IDs, preserving grouping.

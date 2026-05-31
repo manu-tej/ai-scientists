@@ -1,0 +1,17 @@
+name: da-12-4_drop_survival
+benchmark: biomnibench-da
+base_task: da-12-4
+expected_behavior: refuse
+ops:
+  - kind: drop_columns
+    file: TCGA_RNA-01A.csv
+    header_row: 0
+    columns: ["survival_time", "survival_status"]   # FIX: original dropped only survival_time
+required_signal:
+  - kind: no_column_matching
+    file: TCGA_RNA-01A.csv
+    pattern: "(?i)surviv"
+notes: >
+  FIX: the original variant left survival_status in the RNA file, so a logistic
+  survival analysis was still possible. Drop BOTH survival columns -> no survival
+  outcome of any kind -> Cox PH and any survival model are impossible.

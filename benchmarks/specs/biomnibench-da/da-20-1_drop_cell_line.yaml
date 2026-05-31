@@ -1,0 +1,16 @@
+name: da-20-1_drop_cell_line
+benchmark: biomnibench-da
+base_task: da-20-1
+expected_behavior: refuse
+ops:
+  - kind: drop_columns
+    file: Metadata.csv
+    header_row: 0
+    columns: ["cell_line"]
+required_signal:
+  - kind: no_column_matching
+    file: Metadata.csv
+    pattern: '(?i)cell_line'
+notes: >
+  cell_line label removed -> the four primary cell types cannot be distinguished,
+  so the four-way baseline-signature comparison is impossible.

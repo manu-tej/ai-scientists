@@ -1,0 +1,18 @@
+name: da-5-1_drop_pdac
+benchmark: biomnibench-da
+base_task: da-5-1
+expected_behavior: refuse
+ops:
+  - kind: drop_columns_matching
+    file: mmc3.xlsx
+    scope: all_sheets
+    header_row: 0
+    pattern: '(?i)pdac'
+required_signal:
+  - kind: no_column_matching
+    file: mmc3.xlsx
+    scope: all_sheets
+    pattern: '(?i)pdac'
+notes: >
+  PDAC dual-evidence column(s) removed from mmc3 (S3A). mmc2 carries no PDAC
+  column (verified), so the PDAC-specific prioritization cannot be performed.
