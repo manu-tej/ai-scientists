@@ -211,6 +211,11 @@ class GeminiProvider(Provider):
                     model=self._model, contents=self._contents, config=self._config)
                 break
             except Exception as e:
+                msg = str(e)
+                # Daily-quota 429s ("per_day", multi-hour retry) are NOT transient —
+                # retrying just burns the request budget. Abort immediately.
+                if "per_day" in msg or "PerDay" in msg or "RequestsPerDay" in msg:
+                    raise RuntimeError(f"Gemini daily quota exhausted; aborting (not retrying): {msg[:200]}") from e
                 attempts += 1
                 code = getattr(e, "code", None) or getattr(e, "status_code", None)
                 if attempts > 6 or (code not in (429, 503, 500, None)):
