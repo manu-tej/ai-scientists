@@ -38,7 +38,10 @@ def base_of(task_id: str) -> str:
 def migrate_toml(src_toml: Path, dst_toml: Path, name: str) -> None:
     old = tomllib.loads(src_toml.read_text())
     meta = "\n".join(f'{k} = "{v}"' for k, v in old.get("metadata", {}).items())
-    venv = "\n".join(f'{k} = "{v}"' for k, v in old.get("verifier", {}).get("env", {}).items())
+    # Intentionally drop [verifier.env] (the BiomniBench Gemini-judge keys): we run
+    # with --disable-verification and score traces with our OWN judges, so requiring
+    # GEMINI_API_KEY would force a key into the container and defeat subscription auth.
+    venv = ""
     allow = old.get("environment", {}).get("allow_internet", True)
     dst_toml.write_text(f'''schema_version = "1.3"
 artifacts = []
