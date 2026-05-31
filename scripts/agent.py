@@ -24,11 +24,11 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
-from anthropic import Anthropic
 from dotenv import load_dotenv
 from rich.console import Console
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))  # so `scripts.providers` imports when run as a script
 CONFIG_FILE = ROOT / "configs/probe_tasks.json"
 DATASET_ROOT = ROOT / "data/biomnibench-da"
 RUNS_ROOT = ROOT / "runs/agent"
@@ -170,6 +170,57 @@ def format_tool_result(result: dict) -> str:
     return "\n\n".join(parts)
 
 
+def run_agent_loop(provider, sandbox: Path, max_turns: int, console=None) -> dict:
+    """Drive a Provider to completion, writing sandbox artifacts. Provider-agnostic:
+    every artifact is identical regardless of vendor."""
+    total_in = total_out = total_cc = total_cr = 0
+    transcript = []
+    for turn in range(1, max_turns + 1):
+        r = provider.advance()
+        total_in += r.in_tokens; total_out += r.out_tokens
+        total_cc += r.cache_create; total_cr += r.cache_read
+        if console:
+            for t in r.text_blocks:
+                console.print(f"[dim]  turn {turn}:[/] {t.strip()[:120]}")
+        transcript.append({"turn": turn, "stop_reason": r.stop_reason,
+                           "in_tokens": r.in_tokens, "out_tokens": r.out_tokens})
+        if r.stop_reason == "end_turn":
+            break
+        if r.stop_reason == "max_tokens" and r.tool_calls:
+            provider.drop_last_assistant()
+            provider.add_user_text("Your previous response was cut off. Please continue "
+                                   "with a SHORTER tool call (just the next focused step).")
+            continue
+        if r.stop_reason != "tool_use" or not r.tool_calls:
+            if console:
+                console.print(f"[yellow]  stop_reason={r.stop_reason} — exiting[/]")
+            break
+        tc_dir = sandbox / "_tool_calls"
+        tc_dir.mkdir(exist_ok=True)
+        results = []
+        for tc in r.tool_calls:
+            if console:
+                console.print(f"[blue]  run_python[/] ({len(tc.code)} chars)")
+            (tc_dir / f"turn_{turn:02d}_{tc.id[-8:]}.py").write_text(tc.code)
+            out = run_python(tc.code, sandbox)
+            content = format_tool_result(out)
+            (tc_dir / f"turn_{turn:02d}_{tc.id[-8:]}.out").write_text(content)
+            results.append((tc.id, content, out["returncode"] != 0))
+        provider.add_tool_results(results)
+    else:
+        if console:
+            console.print(f"[red]  hit max_turns ({max_turns})[/]")
+    return {
+        "turns_used": len(transcript),
+        "stop_reason": transcript[-1]["stop_reason"] if transcript else None,
+        "tokens": {"input_total": total_in, "output_total": total_out,
+                   "cache_creation_total": total_cc, "cache_read_total": total_cr},
+        "produced_trace": (sandbox / "trace.md").exists(),
+        "produced_answer": (sandbox / "answer.txt").exists(),
+        "_transcript": transcript,
+    }
+
+
 def main() -> None:
     p = argparse.ArgumentParser()
     p.add_argument("--task", required=True)
@@ -182,11 +233,14 @@ def main() -> None:
     args = p.parse_args()
 
     load_dotenv()
-    if not os.environ.get("ANTHROPIC_API_KEY"):
+    if args.model.startswith("claude") and not os.environ.get("ANTHROPIC_API_KEY"):
         sys.exit("ANTHROPIC_API_KEY missing")
+    if args.model.startswith("gemini"):
+        key = os.environ.get("GEMINI_API_KEY", "")
+        if not key or key == "REPLACE_WITH_YOUR_GEMINI_API_KEY":
+            sys.exit("GEMINI_API_KEY missing or still the placeholder — add your real key to .env")
 
     console = Console()
-    client = Anthropic()
     cfg = load_task_config(args.task)
     instruction = (DATASET_ROOT / args.task / "instruction.md").read_text()
     if args.variant == "stripped":
@@ -205,111 +259,13 @@ def main() -> None:
     system_text = SYSTEM_PROMPT.format(max_turns=args.max_turns)
     if args.calibrate:
         system_text += CALIBRATION_INSTRUCTION
-    # Use blocks form so we can attach cache_control to the system prompt.
-    # The system prompt + tool definitions + first user instruction are
-    # identical across every turn within a run, so caching them turns those
-    # ~5-6K tokens of fixed prefix into 10%-billed cache reads after turn 1.
-    system = [{"type": "text", "text": system_text,
-               "cache_control": {"type": "ephemeral"}}]
-    tools = [{**RUN_PYTHON_TOOL, "cache_control": {"type": "ephemeral"}}]
-    messages = [{"role": "user", "content": [
-        {"type": "text", "text": instruction,
-         "cache_control": {"type": "ephemeral"}}
-    ]}]
-    total_in_tok = 0
-    total_cache_create_tok = 0
-    total_cache_read_tok = 0
-    total_out_tok = 0
-    transcript = []
 
-    for turn in range(1, args.max_turns + 1):
-        # Retry-with-backoff on 429s; the org-wide TPM cap is shared across
-        # concurrent agent runs and the bucket refills in seconds.
-        import time as _time
-        from anthropic import RateLimitError as _RateLimitError, APIStatusError as _APIStatusError
-        backoff_s = 8.0
-        attempts = 0
-        while True:
-            try:
-                resp = client.messages.create(
-                    model=args.model,
-                    max_tokens=8192,
-                    system=system,
-                    tools=tools,
-                    messages=messages,
-                )
-                break
-            except (_RateLimitError, _APIStatusError) as e:
-                attempts += 1
-                code = getattr(e, "status_code", None)
-                if code is not None and code not in (429, 503, 529) and not isinstance(e, _RateLimitError):
-                    raise
-                if attempts > 6:
-                    raise
-                wait = backoff_s
-                console.print(f"[yellow]  turn {turn}: rate-limited ({code}); sleeping {wait:.0f}s (attempt {attempts}/6)[/]")
-                _time.sleep(wait)
-                backoff_s = min(backoff_s * 1.8, 60.0)
-        total_in_tok += resp.usage.input_tokens
-        total_out_tok += resp.usage.output_tokens
-        # Cache stats (Anthropic returns these on every response when caching is in use)
-        total_cache_create_tok += getattr(resp.usage, "cache_creation_input_tokens", 0) or 0
-        total_cache_read_tok += getattr(resp.usage, "cache_read_input_tokens", 0) or 0
+    from scripts.providers import make_provider
+    provider = make_provider(args.model, system_text)
+    provider.add_user_text(instruction)
 
-        assistant_blocks = []
-        tool_calls_this_turn = []
-        for block in resp.content:
-            assistant_blocks.append(block.to_dict() if hasattr(block, "to_dict") else block.model_dump())
-            if block.type == "text":
-                snippet = block.text.strip().replace("\n", " ")[:120]
-                console.print(f"[dim]  turn {turn}:[/] {snippet}")
-            elif block.type == "tool_use":
-                tool_calls_this_turn.append(block)
-        messages.append({"role": "assistant", "content": resp.content})
+    loop_meta = run_agent_loop(provider, sandbox, args.max_turns, console)
 
-        transcript.append({
-            "turn": turn,
-            "stop_reason": resp.stop_reason,
-            "in_tokens": resp.usage.input_tokens,
-            "out_tokens": resp.usage.output_tokens,
-        })
-
-        if resp.stop_reason == "end_turn":
-            console.print(f"[yellow]  end_turn at turn {turn}[/]")
-            break
-        if resp.stop_reason == "max_tokens" and tool_calls_this_turn:
-            # The response was cut off mid-tool-call; the partial tool_use block
-            # is unusable. Drop the broken assistant turn and nudge the model
-            # to retry with a shorter response.
-            console.print(f"[yellow]  turn {turn}: max_tokens hit with partial tool_use — retrying[/]")
-            messages.pop()  # remove the malformed assistant message we just appended
-            messages.append({"role": "user",
-                              "content": "Your previous response was cut off. Please continue with a SHORTER tool call (just the next focused step, not multiple operations bundled)."})
-            continue
-        if resp.stop_reason != "tool_use" or not tool_calls_this_turn:
-            console.print(f"[yellow]  stop_reason={resp.stop_reason} — exiting[/]")
-            break
-
-        tool_results = []
-        for tc in tool_calls_this_turn:
-            code = tc.input.get("code", "")
-            console.print(f"[blue]  run_python[/] ({len(code)} chars)")
-            (sandbox / f"_tool_calls").mkdir(exist_ok=True)
-            (sandbox / "_tool_calls" / f"turn_{turn:02d}_{tc.id[-8:]}.py").write_text(code)
-            result = run_python(code, sandbox)
-            content = format_tool_result(result)
-            (sandbox / "_tool_calls" / f"turn_{turn:02d}_{tc.id[-8:]}.out").write_text(content)
-            tool_results.append({
-                "type": "tool_result",
-                "tool_use_id": tc.id,
-                "content": content,
-                "is_error": result["returncode"] != 0,
-            })
-        messages.append({"role": "user", "content": tool_results})
-    else:
-        console.print(f"[red]  hit max_turns ({args.max_turns})[/]")
-
-    # Save final state
     meta = {
         "task": args.task,
         "variant": variant_label,
@@ -317,25 +273,20 @@ def main() -> None:
         "calibrate": args.calibrate,
         "model": args.model,
         "max_turns": args.max_turns,
-        "turns_used": len(transcript),
-        "stop_reason": transcript[-1]["stop_reason"] if transcript else None,
-        "tokens": {"input_total": total_in_tok, "output_total": total_out_tok,
-                   "cache_creation_total": total_cache_create_tok,
-                   "cache_read_total": total_cache_read_tok},
-        "produced_trace": (sandbox / "trace.md").exists(),
-        "produced_answer": (sandbox / "answer.txt").exists(),
+        "turns_used": loop_meta["turns_used"],
+        "stop_reason": loop_meta["stop_reason"],
+        "tokens": loop_meta["tokens"],
+        "produced_trace": loop_meta["produced_trace"],
+        "produced_answer": loop_meta["produced_answer"],
         "ts": datetime.now(timezone.utc).isoformat(),
     }
     (sandbox / "meta.json").write_text(json.dumps(meta, indent=2))
-    (sandbox / "transcript.json").write_text(json.dumps(transcript, indent=2))
+    (sandbox / "transcript.json").write_text(json.dumps(loop_meta["_transcript"], indent=2))
 
-    console.print(f"\n[bold]Summary[/]")
-    console.print(f"  turns: {len(transcript)} / {args.max_turns}")
-    console.print(f"  tokens: in={total_in_tok:,} out={total_out_tok:,}  "
-                  f"cache_read={total_cache_read_tok:,} cache_create={total_cache_create_tok:,}")
-    console.print(f"  produced trace.md: {meta['produced_trace']}")
-    console.print(f"  produced answer.txt: {meta['produced_answer']}")
-    console.print(f"\n[green]done[/] -> {sandbox}/")
+    console.print(f"\n[bold]Summary[/]  turns={meta['turns_used']}/{args.max_turns} "
+                  f"in={meta['tokens']['input_total']:,} out={meta['tokens']['output_total']:,} "
+                  f"trace={meta['produced_trace']} answer={meta['produced_answer']}")
+    console.print(f"[green]done[/] -> {sandbox}/")
 
 
 if __name__ == "__main__":
