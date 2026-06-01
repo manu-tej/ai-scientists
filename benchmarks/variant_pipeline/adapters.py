@@ -21,29 +21,46 @@ class UnsupportedFormat(Exception):
 # --------------------------------------------------------------------------- #
 
 class TabularAdapter:
-    DELIM = {".csv": ",", ".tsv": "\t", ".txt": None}  # None => sniff
+    DELIM = {".csv": ",", ".tsv": "\t", ".txt": None, ".diff": "\t"}  # None => sniff; .diff = Cuffdiff TSV
 
     def __init__(self, path: Path):
         self.path = Path(path)
-        self.ext = self.path.suffix.lower()
+        # Transparent gzip: a ".tsv.gz" file is a TSV that happens to be
+        # compressed. Key the format/delimiter logic off the INNER extension
+        # (.tsv) and route I/O through gzip, so ops/validator work unchanged.
+        self.gz = self.path.suffix.lower() == ".gz"
+        inner = Path(self.path.stem) if self.gz else self.path
+        self.ext = inner.suffix.lower()
         self.is_excel = self.ext in (".xls", ".xlsx")
+
+    def _open(self, mode: str):
+        if self.gz:
+            import gzip
+            return gzip.open(self.path, mode + "t", newline="")
+        return open(self.path, mode, newline="")
 
     # ---- delimiter sniff for plain text ---- #
     def _sep(self) -> str:
         s = self.DELIM.get(self.ext, ",")
         if s is not None:
             return s
-        first = self.path.read_text(errors="replace").split("\n", 1)[0]
+        with self._open("r") as fh:
+            first = fh.readline()
         return "\t" if ("\t" in first and "," not in first) else ","
 
     # ---- csv via the stdlib reader (robust to ragged preamble rows) ---- #
     def _rows(self) -> list[list[str]]:
-        with open(self.path, newline="") as fh:
+        with self._open("r") as fh:
             return list(_csv.reader(fh, delimiter=self._sep()))
 
     def _write_rows(self, rows) -> None:
-        with open(self.path, "w", newline="") as fh:
-            _csv.writer(fh, delimiter=self._sep()).writerows(rows)
+        # Resolve the delimiter BEFORE opening in "w" mode: open(...,"w")
+        # truncates the file, after which _sep()'s first-line sniff would see
+        # an empty line and wrongly fall back to ",". Snapshot it first so a
+        # sniffed TSV (.txt) round-trips as TSV instead of being rewritten CSV.
+        sep = self._sep()
+        with self._open("w") as fh:
+            _csv.writer(fh, delimiter=sep).writerows(rows)
 
     # ---- reads ---- #
     def list_columns(self, sheet=None, header_row=0) -> list:
@@ -215,7 +232,11 @@ class AnnDataAdapter:
 def get_adapter(path: str | Path):
     p = Path(path)
     ext = p.suffix.lower()
-    if ext in (".csv", ".tsv", ".txt", ".xls", ".xlsx"):
+    # Transparent gzip: dispatch on the inner extension (.tsv.gz -> .tsv).
+    inner = Path(p.stem).suffix.lower() if ext == ".gz" else ext
+    if inner in (".csv", ".tsv", ".txt", ".diff"):  # gz only for delimited text
+        return TabularAdapter(p)
+    if ext in (".csv", ".tsv", ".txt", ".diff", ".xls", ".xlsx"):
         return TabularAdapter(p)
     if ext == ".h5ad":
         return AnnDataAdapter(p)
