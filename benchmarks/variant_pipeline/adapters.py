@@ -41,12 +41,20 @@ class TabularAdapter:
 
     # ---- delimiter sniff for plain text ---- #
     def _sep(self) -> str:
-        s = self.DELIM.get(self.ext, ",")
+        # Unknown/extensionless inner files (e.g. a bare "metabolite.gz" GWAS
+        # table) fall through to sniffing rather than silently assuming CSV.
+        s = self.DELIM.get(self.ext, None)
         if s is not None:
             return s
         with self._open("r") as fh:
             first = fh.readline()
-        return "\t" if ("\t" in first and "," not in first) else ","
+        if "\t" in first:
+            return "\t"
+        if "," in first:
+            return ","
+        if " " in first:  # whitespace-delimited (e.g. GWAS summary stats)
+            return " "
+        return ","
 
     # ---- csv via the stdlib reader (robust to ragged preamble rows) ---- #
     def _rows(self) -> list[list[str]]:
@@ -63,15 +71,21 @@ class TabularAdapter:
             _csv.writer(fh, delimiter=sep).writerows(rows)
 
     # ---- reads ---- #
+    @staticmethod
+    def _sheet(sheet):
+        # pandas: sheet_name=None reads ALL sheets into a dict. When a caller
+        # doesn't name a sheet, default to the first one (index 0) instead.
+        return 0 if sheet is None else sheet
+
     def list_columns(self, sheet=None, header_row=0) -> list:
         if self.is_excel:
-            return list(pd.read_excel(self.path, sheet_name=sheet, header=header_row, nrows=1).columns)
+            return list(pd.read_excel(self.path, sheet_name=self._sheet(sheet), header=header_row, nrows=1).columns)
         rows = self._rows()
         return [c for c in rows[header_row] if c != ""] if len(rows) > header_row else []
 
     def column_values(self, column, sheet=None, header_row=0) -> list:
         if self.is_excel:
-            df = pd.read_excel(self.path, sheet_name=sheet, header=header_row)
+            df = pd.read_excel(self.path, sheet_name=self._sheet(sheet), header=header_row)
             return df[column].dropna().astype(str).tolist() if column in df.columns else []
         rows = self._rows()
         header = rows[header_row]
@@ -82,7 +96,7 @@ class TabularAdapter:
 
     def n_rows(self, sheet=None, header_row=0) -> int:
         if self.is_excel:
-            return len(pd.read_excel(self.path, sheet_name=sheet, header=header_row))
+            return len(pd.read_excel(self.path, sheet_name=self._sheet(sheet), header=header_row))
         return max(0, len(self._rows()) - header_row - 1)
 
     def sheet_names(self) -> list:
@@ -232,9 +246,10 @@ class AnnDataAdapter:
 def get_adapter(path: str | Path):
     p = Path(path)
     ext = p.suffix.lower()
-    # Transparent gzip: dispatch on the inner extension (.tsv.gz -> .tsv).
-    inner = Path(p.stem).suffix.lower() if ext == ".gz" else ext
-    if inner in (".csv", ".tsv", ".txt", ".diff"):  # gz only for delimited text
+    # Transparent gzip: dispatch on the inner extension (.tsv.gz -> .tsv). A
+    # bare "<name>.gz" with no recognized inner ext (e.g. metabolite.gz) is still
+    # treated as a delimited table — the adapter sniffs the separator.
+    if ext == ".gz":
         return TabularAdapter(p)
     if ext in (".csv", ".tsv", ".txt", ".diff", ".xls", ".xlsx"):
         return TabularAdapter(p)
