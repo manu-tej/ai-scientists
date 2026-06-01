@@ -1,0 +1,33 @@
+name: da-15-1_single_group
+benchmark: biomnibench-da
+base_task: da-15-1
+expected_behavior: refuse
+ops:
+  # Collapse the cohort to a single disease level (ALS only) by dropping all
+  # Control rows. A between-group differential-expression contrast (ALS vs
+  # Control) is then undefined: only one group remains, so no comparison can
+  # be fit. We keep both `disease` AND `subject_group` in place — the point is
+  # that the GROUPING VARIABLE has only one level, not that the label is gone.
+  - kind: subset_to_single_group
+    file: Cervical_Spinal_Cord_metadata.tsv.gz
+    column: disease
+    keep_value: ALS
+    header_row: 0
+required_signal:
+  # disease and its 1:1-collinear sibling subject_group must each collapse to a
+  # single distinct value, proving the contrast has no second arm.
+  - kind: single_value_in
+    file: Cervical_Spinal_Cord_metadata.tsv.gz
+    column: disease
+    max_distinct: 1
+  - kind: single_value_in
+    file: Cervical_Spinal_Cord_metadata.tsv.gz
+    column: subject_group
+    max_distinct: 1
+notes: >
+  WHY unanswerable: the rubric's core comparison (Criterion 1) is ALS vs
+  Control differential expression. Subsetting the cervical cohort to ALS-only
+  leaves a single group (138 ALS, 0 controls), so the disease contrast has no
+  reference arm and cannot be estimated. Both disease and the perfectly
+  collinear subject_group collapse to one distinct value, confirming no hidden
+  second level survives in a sibling column.

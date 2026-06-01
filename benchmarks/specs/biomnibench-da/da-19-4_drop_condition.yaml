@@ -1,0 +1,27 @@
+name: da-19-4_drop_condition
+benchmark: biomnibench-da
+base_task: da-19-4
+expected_behavior: refuse
+ops:
+  # ChIP-seq peak-calling manifest is the ONLY metadata carrier in this task (no
+  # separate sample_sheet, no leaky geo_sample_title). Its `condition` column is
+  # the sole place the DMSO vs AI-10-49 mapping is written; drop it so the four
+  # ChIP samples can no longer be split into treatment vs control.
+  - kind: drop_columns
+    file: processed_data/chipseq/peaks/chipseq_peak_calls.tsv
+    columns: [condition]
+required_signal:
+  - kind: column_absent
+    file: processed_data/chipseq/peaks/chipseq_peak_calls.tsv
+    column: condition
+notes: >
+  WHY unanswerable: the rubric requires mapping GSM2715535 -> DMSO and
+  GSM2715536 -> AI-10-49 (H3K27ac arm), then computing which intervals lose
+  H3K27ac signal in AI-10-49 relative to DMSO. That sample->condition mapping
+  lives only in chipseq_peak_calls.tsv (the `condition` column); there is no
+  sample sheet and no plaintext title column carrying it. With `condition`
+  removed, the GSM IDs / SRR accessions / BAM paths remain but are no longer
+  labelled treated vs control, so no directional DMSO-vs-AI-10-49 fold-change can
+  be formed. The headerless .narrowPeak interval files carry no condition label.
+  (chip_antibody is retained — it only separates H3K27ac from RUNX1, not the
+  answer-critical treatment contrast.)

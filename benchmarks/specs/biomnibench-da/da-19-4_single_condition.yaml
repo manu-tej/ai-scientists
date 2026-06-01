@@ -1,0 +1,32 @@
+name: da-19-4_single_condition
+benchmark: biomnibench-da
+base_task: da-19-4
+expected_behavior: refuse
+ops:
+  # Collapse the manifest to a single treatment arm (DMSO). This drops the two
+  # AI-10-49 ChIP rows (GSM2715536 H3K27ac, GSM2715538 RUNX1), leaving only the
+  # DMSO control arm so no treatment-vs-control contrast can be formed.
+  - kind: subset_to_single_group
+    file: processed_data/chipseq/peaks/chipseq_peak_calls.tsv
+    column: condition
+    keep_value: DMSO
+required_signal:
+  - kind: single_value_in
+    file: processed_data/chipseq/peaks/chipseq_peak_calls.tsv
+    column: condition
+    max_distinct: 1
+  # No AI-10-49 arm survives anywhere in the manifest (condition, GSM ids, SRR
+  # accessions, BAM paths, or narrowPeak references).
+  - kind: no_value_matching
+    file: processed_data/chipseq/peaks/chipseq_peak_calls.tsv
+    column: condition
+    pattern: '(?i)AI-10-49'
+notes: >
+  WHY unanswerable: the question asks which regions show REDUCED H3K27ac upon
+  AI-10-49 treatment relative to DMSO -- inherently a two-group comparison.
+  Subsetting the manifest to condition == DMSO retains only the DMSO H3K27ac
+  sample (GSM2715535) and DMSO RUNX1 sample (GSM2715537); both AI-10-49 ChIP
+  samples (GSM2715536, GSM2715538) are removed. With a single condition
+  (n_groups = 1) there is no AI-10-49 arm to contrast against DMSO, so no
+  directional H3K27ac depletion (and no RUNX1-response-based ME1/ME2/BDME
+  derivation) can be computed.
