@@ -1,0 +1,31 @@
+name: da-1-3_single_tissue
+benchmark: biomnibench-da
+base_task: da-1-3
+expected_behavior: refuse
+# Same offset caveat as da-1-3_drop_tissue: header-name MajorCellType maps to the
+# DATA Tissue column (Tumor/Normal/Blood/LN/TN), because the R dump's unnamed
+# leading barcode row-name shifts every header name one position right.
+ops:
+  - kind: subset_to_single_group
+    file: GSE236581_CRC-ICB_metadata.txt
+    column: MajorCellType        # adapter-name for the DATA Tissue column
+    keep_value: Tumor
+required_signal:
+  # Only one tissue compartment remains in the Tissue data column.
+  - kind: single_value_in
+    file: GSE236581_CRC-ICB_metadata.txt
+    column: MajorCellType        # adapter-name for the DATA Tissue column
+    max_distinct: 1
+  # And no non-tumor sample/barcode id survives, so tissue cannot be re-derived
+  # from the leaky CRC##-[BNT]- identifiers either.
+  - kind: no_cell_matching
+    file: GSE236581_CRC-ICB_metadata.txt
+    pattern: 'CRC\d+-[BN]-'
+notes: >
+  WHY unanswerable: the task asks to compare cell-subset distribution ACROSS three
+  tissue compartments (tumor vs normal-adjacent vs blood) and find subtypes enriched
+  ONLY in tumor. Collapsing the cohort to a single compartment (Tumor) leaves nothing
+  to compare against -- the Ro/e / fold-change enrichment metric and the strict
+  tumor-vs-(normal AND blood) specificity filter (Criteria 1,3,6) are undefined with
+  n_tissues=1. The non-tumor sample/barcode ids are dropped with their rows, so the
+  control tissues are unrecoverable.

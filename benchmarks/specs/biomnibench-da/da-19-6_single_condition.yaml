@@ -1,0 +1,39 @@
+name: da-19-6_single_condition
+benchmark: biomnibench-da
+base_task: da-19-6
+expected_behavior: refuse
+ops:
+  # Collapse the whole cohort to a single arm (DMSO) in both metadata carriers.
+  - kind: subset_to_single_group
+    file: data/sample_sheet_all.tsv
+    column: condition
+    keep_value: DMSO
+  - kind: subset_to_single_group
+    file: processed_data/atacseq/peaks/atacseq_peak_calls.tsv
+    column: condition
+    keep_value: DMSO
+required_signal:
+  - kind: single_value_in
+    file: data/sample_sheet_all.tsv
+    column: condition
+    max_distinct: 1
+  - kind: single_value_in
+    file: processed_data/atacseq/peaks/atacseq_peak_calls.tsv
+    column: condition
+    max_distinct: 1
+  # No AI-10-49 arm survives anywhere, in condition or the leaky title.
+  - kind: no_value_matching
+    file: data/sample_sheet_all.tsv
+    column: treated_with
+    pattern: '(?i)AI-10-49'
+  - kind: no_value_matching
+    file: data/sample_sheet_all.tsv
+    column: geo_sample_title
+    pattern: '(?i)AI-10-49'
+notes: >
+  WHY unanswerable: subsetting both metadata files to condition == DMSO leaves only
+  the two DMSO ATAC replicates (GSM2715541/42) and no AI-10-49 arm anywhere. The
+  question asks whether AI-10-49 changes chromatin accessibility relative to DMSO,
+  which is a two-group comparison; with a single condition (n_groups=1) the
+  DMSO-vs-AI-10-49 contrast cannot be formed. treated_with and the plaintext
+  geo_sample_title are also gated so the dropped arm cannot be recovered.

@@ -1,0 +1,25 @@
+name: da-15-8_drop_csf_proteome
+benchmark: biomnibench-da
+base_task: da-15-8
+expected_behavior: refuse
+ops:
+  # MOESM5 Tabelle1 is the ONLY CSF-proteome result table. Strip both its quantitative
+  # columns (Log2 Ratio + -Log t-test p-value), leaving only protein/gene identifiers.
+  - kind: drop_columns_matching
+    file: 401_2019_2093_MOESM5_ESM.xlsx
+    sheet: Tabelle1
+    header_row: 4
+    pattern: "(?i)log2\\s*ratio|p[\\s.\\-]*value"
+required_signal:
+  - kind: no_column_matching
+    file: 401_2019_2093_MOESM5_ESM.xlsx
+    sheet: Tabelle1
+    header_row: 4
+    pattern: "(?i)log2\\s*ratio|p[\\s.\\-]*value"
+notes: >
+  WHY unanswerable: the question demands genes concordant across ALL THREE levels,
+  the third being the CSF proteome. MOESM5 Tabelle1 is the sole CSF result table; its
+  Log2 Ratio (ALS vs Con) and -Log t-test p-value columns are the only CSF effect-size
+  and significance signal. Without them the CSF arm of the three-way integration (C3)
+  collapses to a bare protein list with no direction or magnitude, so triple-concordance
+  and the CSF-anchored biomarker prioritization (GPNMB/SERPINA3, C4/C5) are impossible.

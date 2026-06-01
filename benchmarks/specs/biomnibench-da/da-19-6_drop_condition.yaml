@@ -1,0 +1,38 @@
+name: da-19-6_drop_condition
+benchmark: biomnibench-da
+base_task: da-19-6
+expected_behavior: refuse
+ops:
+  # Master sample sheet: drop every column that carries the DMSO/AI-10-49 label.
+  # condition + treated_with hold it explicitly; geo_sample_title leaks it as free
+  # text ("ATAC-seq DMSO rep1"), and anonymize_column is h5ad-only, so it must go too.
+  - kind: drop_columns
+    file: data/sample_sheet_all.tsv
+    columns: [condition, treated_with, geo_sample_title]
+  # ATAC peak-calling manifest: this is the file a solver joins peaks/BAMs on, and
+  # its own condition column re-encodes the mapping for the 4 ATAC samples.
+  - kind: drop_columns
+    file: processed_data/atacseq/peaks/atacseq_peak_calls.tsv
+    columns: [condition]
+required_signal:
+  - kind: column_absent
+    file: data/sample_sheet_all.tsv
+    column: condition
+  - kind: column_absent
+    file: data/sample_sheet_all.tsv
+    column: treated_with
+  - kind: column_absent
+    file: data/sample_sheet_all.tsv
+    column: geo_sample_title
+  - kind: column_absent
+    file: processed_data/atacseq/peaks/atacseq_peak_calls.tsv
+    column: condition
+notes: >
+  WHY unanswerable: the rubric requires assigning GSM2715541/42 -> DMSO and
+  GSM2715543/44 -> AI-10-49 and computing DMSO-vs-AI-10-49 accessibility changes.
+  That sample->condition mapping lives only in the metadata: sample_sheet_all.tsv
+  (condition, treated_with, and the plaintext geo_sample_title) and the ATAC
+  manifest atacseq_peak_calls.tsv (condition). With all four carriers removed, the
+  4 ATAC samples can no longer be split into treatment vs control, so no directional
+  fold-change comparison is possible. The headerless narrowPeak/bed/xls peak files
+  carry no condition label.

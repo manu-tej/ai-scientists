@@ -1,0 +1,24 @@
+name: da-26-2_drop_brca_filter
+benchmark: biomnibench-da
+base_task: da-26-2
+expected_behavior: refuse
+ops:
+  - kind: drop_columns
+    file: sub_CCLE_TCGA_ID_meta.csv
+    columns: [disease, lineage]
+required_signal:
+  - kind: column_absent
+    file: sub_CCLE_TCGA_ID_meta.csv
+    column: disease
+  - kind: column_absent
+    file: sub_CCLE_TCGA_ID_meta.csv
+    column: lineage
+notes: >
+  WHY unanswerable: the task is BRCA-specific ("significant in BRCA"; rubric
+  Crit 8 requires precise filtering to Breast Cancer cell lines + patients).
+  BRCA membership is carried by `disease` (Breast Cancer) and the perfectly
+  collinear `lineage` (breast). disease and lineage are 1:1 (breast<->Breast
+  Cancer, blood<->Leukemia, lung<->Lung Cancer), so either alone leaks the other
+  — both must go. The sampleIDs (ACH-*, TCGA-*) carry NO tissue/disease token,
+  so once both columns are removed there is no way to isolate the BRCA cohort
+  and the breast-cancer-specific biomarker analysis is impossible.

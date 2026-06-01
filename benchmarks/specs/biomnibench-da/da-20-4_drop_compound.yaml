@@ -1,0 +1,30 @@
+name: da-20-4_drop_compound
+benchmark: biomnibench-da
+base_task: da-20-4
+expected_behavior: refuse
+ops:
+  # `compound` is the per-sample drug label; `condition` ({cell_line}-{compound}-
+  # {conc}-{tp}) re-encodes it (e.g. "...-Dabrafenib-900-24"); `sample_type` leaks
+  # the DMSO/pos-control identities ("Ginkgo Neg Control - DMSO"). anonymize_column
+  # is h5ad-only, so every carrier must be dropped.
+  - kind: drop_columns
+    file: Metadata.csv
+    header_row: 0
+    columns: ["compound", "condition", "sample_type"]
+required_signal:
+  - kind: column_absent
+    file: Metadata.csv
+    column: compound
+  - kind: column_absent
+    file: Metadata.csv
+    column: condition
+  - kind: column_absent
+    file: Metadata.csv
+    column: sample_type
+notes: >
+  WHY unanswerable: the question asks specifically about dabrafenib's response.
+  The `compound` column is the only per-sample drug label (90 compounds + DMSO);
+  `condition` re-encodes it ("...-Dabrafenib-900-24") and `sample_type` re-encodes
+  the DMSO control identity. With all three carriers dropped, dabrafenib's 1,152
+  samples and the matched DMSO controls can no longer be located, so no
+  dabrafenib-specific DE / GSEA can be run.

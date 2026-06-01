@@ -1,0 +1,30 @@
+name: da-24-3_drop_trait_label
+benchmark: biomnibench-da
+base_task: da-24-3
+expected_behavior: refuse
+ops:
+  - kind: drop_columns
+    file: discovery.summary.gz
+    columns: ["C0"]
+  - kind: drop_columns
+    file: replication.summary.gz
+    columns: ["C0"]
+required_signal:
+  - kind: column_absent
+    file: discovery.summary.gz
+    column: "C0"
+  - kind: column_absent
+    file: replication.summary.gz
+    column: "C0"
+notes: >
+  WHY unanswerable: the GWAS summary files are headerless and whitespace-delimited;
+  the adapter reads the first SNP row (chr1 1719368 T C 0.69275 ... C0) as the
+  header, so the 9th column's token is the trait label "C0". The trait/metabolite
+  column is the ONLY thing that maps each SNP association to a specific metabolite
+  or ratio. The rubric (Criteria 4-5, 8) requires identifying loci shared across
+  MULTIPLE named metabolites (the chr1:~75Mb ACADM region shared by C6, C8, C8/C2,
+  (C3DC+C4-OH)/C10) and reporting those metabolite names in the H4 conclusion.
+  With the trait column removed from both cohorts, every row becomes an anonymous
+  association: you cannot group by metabolite, cannot count phenotypes per locus,
+  and cannot name the shared metabolites. The 266k associations collapse to one
+  unlabeled pile.

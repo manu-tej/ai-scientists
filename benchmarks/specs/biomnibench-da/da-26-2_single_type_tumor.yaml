@@ -1,0 +1,21 @@
+name: da-26-2_single_type_tumor
+benchmark: biomnibench-da
+base_task: da-26-2
+expected_behavior: refuse
+ops:
+  - kind: subset_to_single_group
+    file: sub_CCLE_TCGA_ID_meta.csv
+    column: type
+    keep_value: tumor
+required_signal:
+  - kind: single_value_in
+    file: sub_CCLE_TCGA_ID_meta.csv
+    column: type
+    max_distinct: 1
+notes: >
+  WHY unanswerable: single-group collapse on the comparison axis. The task asks
+  for biomarkers significant in patient (tumor) DepMap scores but NOT in
+  cell-line (CL) models (rubric Crit 6). Subsetting metadata to only `tumor`
+  samples removes every cell-line (CL) sample, leaving one group on the
+  comparison axis — the patient-vs-cell-line significance contrast cannot be
+  computed when no cell-line cohort remains.

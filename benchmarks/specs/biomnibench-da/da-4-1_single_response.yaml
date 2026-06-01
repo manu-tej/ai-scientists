@@ -1,0 +1,30 @@
+name: da-4-1_single_response
+benchmark: biomnibench-da
+base_task: da-4-1
+expected_behavior: refuse
+ops:
+  - kind: subset_to_single_group
+    file: GSE243013_NSCLC_immune_scRNA_metadata.csv.gz
+    column: pathological_response
+    keep_value: non-MPR
+  - kind: drop_columns
+    file: GSE243013_NSCLC_immune_scRNA_metadata.csv.gz
+    columns: [pathological_response_rate, radiological_response]
+required_signal:
+  - kind: single_value_in
+    file: GSE243013_NSCLC_immune_scRNA_metadata.csv.gz
+    column: pathological_response
+    max_distinct: 1
+  - kind: column_absent
+    file: GSE243013_NSCLC_immune_scRNA_metadata.csv.gz
+    column: pathological_response_rate
+  - kind: column_absent
+    file: GSE243013_NSCLC_immune_scRNA_metadata.csv.gz
+    column: radiological_response
+notes: >
+  WHY unanswerable: collapsing pathological_response to a single level (non-MPR)
+  leaves only one response group, so the per-TIME-subtype responder-vs-
+  non-responder comparison the rubric scores (C5) cannot be performed - there is
+  no contrast. pathological_response_rate and radiological_response are dropped
+  because they would otherwise leak a within-group response gradient and let the
+  comparison be reconstructed despite the single-level pathological label.

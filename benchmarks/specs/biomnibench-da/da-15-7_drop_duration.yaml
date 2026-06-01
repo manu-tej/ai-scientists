@@ -1,0 +1,32 @@
+name: da-15-7_drop_duration
+benchmark: biomnibench-da
+base_task: da-15-7
+expected_behavior: refuse
+ops:
+  - kind: drop_columns
+    file: Cervical_Spinal_Cord_metadata.tsv.gz
+    columns: [disease_duration]
+  - kind: drop_columns
+    file: Lumbar_Spinal_Cord_metadata.tsv.gz
+    columns: [disease_duration]
+  - kind: drop_columns
+    file: Thoracic_Spinal_Cord_metadata.tsv.gz
+    columns: [disease_duration]
+required_signal:
+  - kind: column_absent
+    file: Cervical_Spinal_Cord_metadata.tsv.gz
+    column: disease_duration
+  - kind: column_absent
+    file: Lumbar_Spinal_Cord_metadata.tsv.gz
+    column: disease_duration
+  - kind: column_absent
+    file: Thoracic_Spinal_Cord_metadata.tsv.gz
+    column: disease_duration
+notes: >
+  WHY unanswerable: the rubric scores a transcriptome-wide correlation of gene
+  expression against disease_duration (the continuous progression-rate predictor)
+  within ALS patients, culminating in CHIT1 as the strongest negatively-correlated
+  gene. disease_duration is the sole answer-critical variable and is not re-encoded
+  in any sibling column (site_of_motor_onset, age_rounded, subject_group are
+  distinct phenotypes). Dropping it from all three regional metadata files removes
+  the predictor entirely, so no duration-gene association can be fit in any region.

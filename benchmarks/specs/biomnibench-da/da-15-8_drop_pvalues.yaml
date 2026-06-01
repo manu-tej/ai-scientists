@@ -1,0 +1,45 @@
+name: da-15-8_drop_pvalues
+benchmark: biomnibench-da
+base_task: da-15-8
+expected_behavior: refuse
+ops:
+  # Spinal-cord proteome (MOESM2): drop the -Log Student's t-test p-value columns.
+  - kind: drop_columns_matching
+    file: 401_2019_2093_MOESM2_ESM.xlsx
+    sheet: Protein IDs (>3 values)
+    header_row: 5
+    pattern: "(?i)p[\\s.\\-]*value"
+  # CSF proteome (MOESM5): drop the -Log Student's t-test p-value column.
+  - kind: drop_columns_matching
+    file: 401_2019_2093_MOESM5_ESM.xlsx
+    sheet: Tabelle1
+    header_row: 4
+    pattern: "(?i)p[\\s.\\-]*value"
+  # Transcriptome DE table: drop both raw and adjusted p-values.
+  - kind: drop_columns
+    file: Cervical_Spinal_Cord_DE_results.tsv
+    columns: [p_value, adj_p_val]
+required_signal:
+  - kind: no_column_matching
+    file: 401_2019_2093_MOESM2_ESM.xlsx
+    sheet: Protein IDs (>3 values)
+    header_row: 5
+    pattern: "(?i)p[\\s.\\-]*value"
+  - kind: no_column_matching
+    file: 401_2019_2093_MOESM5_ESM.xlsx
+    sheet: Tabelle1
+    header_row: 4
+    pattern: "(?i)p[\\s.\\-]*value"
+  - kind: column_absent
+    file: Cervical_Spinal_Cord_DE_results.tsv
+    column: p_value
+  - kind: column_absent
+    file: Cervical_Spinal_Cord_DE_results.tsv
+    column: adj_p_val
+notes: >
+  WHY unanswerable: the rubric (C2 A-level, C3 A-level) requires keeping only
+  statistically significant candidates -- CSF proteins at FDR < 0.05 and
+  transcriptomic DEGs at adj_p_val < 0.05. Significance derives from the proteomics
+  -Log t-test p-value columns and the TSV p_value/adj_p_val. Removing all of them
+  leaves only point estimates with no way to judge significance, so the
+  high-confidence biomarker shortlist cannot be defended. Mirrors da-13-3_drop_pvalues.

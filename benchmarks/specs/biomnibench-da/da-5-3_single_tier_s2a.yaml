@@ -1,0 +1,28 @@
+name: da-5-3_single_tier_s2a
+benchmark: biomnibench-da
+base_task: da-5-3
+expected_behavior: refuse
+ops:
+  # Collapse the master druggability map to a single tier (T1). With only one
+  # Assigned Tier level present, the required T1..T5 tier stratification is
+  # impossible and druggability becomes a degenerate (single-valued) label.
+  - kind: subset_to_single_group
+    file: mmc2.xlsx
+    sheet: Table S2A
+    header_row: 0
+    column: Assigned Tier
+    keep_value: T1
+required_signal:
+  - kind: single_value_in
+    file: mmc2.xlsx
+    sheet: Table S2A
+    header_row: 0
+    column: Assigned Tier
+    max_distinct: 1
+notes: >
+  WHY unanswerable: Criterion 3 requires a tier-stratified breakdown across all
+  five druggability tiers (T1 ~55 pairs, T2 ~10, T3 ~74, T4 ~72, T5 ~2). After
+  subsetting Table S2A to a single Assigned Tier (T1), only one tier level
+  remains, so no multi-tier stratification is possible and the druggable-target
+  universe is silently truncated to one tier -- the expected tier distribution
+  cannot be reproduced.

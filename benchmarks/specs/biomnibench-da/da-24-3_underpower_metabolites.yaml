@@ -1,0 +1,25 @@
+name: da-24-3_underpower_metabolites
+benchmark: biomnibench-da
+base_task: da-24-3
+expected_behavior: caveat_underpowered
+ops:
+  - kind: reduce_n
+    file: metabolite.gz
+    n: 12
+    seed: 24
+required_signal:
+  - kind: max_rows
+    file: metabolite.gz
+    max: 12
+notes: >
+  WHY underpowered (NOT refuse): the GWAS summary stats are untouched, so the
+  meta-analysis and shared-locus identification (chr1:~75Mb across C6, C8, C8/C2,
+  (C3DC+C4-OH)/C10) remain computable. But coloc.abf (rubric Criteria 6-7) needs a
+  trustworthy per-metabolite sdY estimated from the raw abundance matrix. Cutting
+  the cohort from 8,737 samples to 12 makes every metabolite SD a near-meaningless
+  estimate (huge sampling error, NA-sensitive), so the colocalization posteriors
+  (H0-H4) are numerically unstable and the "shared causal variant" call cannot be
+  made with confidence. The pipeline RUNS end-to-end and emits H4 numbers, but
+  they are statistically uninterpretable -- the correct response is to report the
+  shared-locus candidate with an explicit underpowering caveat, not a clean
+  conclusion.

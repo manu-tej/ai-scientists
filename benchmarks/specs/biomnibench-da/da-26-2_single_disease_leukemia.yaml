@@ -1,0 +1,34 @@
+name: da-26-2_single_disease_leukemia
+benchmark: biomnibench-da
+base_task: da-26-2
+expected_behavior: refuse
+ops:
+  - kind: subset_to_single_group
+    file: sub_CCLE_TCGA_ID_meta.csv
+    column: disease
+    keep_value: Leukemia
+  - kind: subset_to_single_group
+    file: sub_CCLE_TCGA_ID_meta.csv
+    column: lineage
+    keep_value: blood
+required_signal:
+  - kind: single_value_in
+    file: sub_CCLE_TCGA_ID_meta.csv
+    column: disease
+    max_distinct: 1
+  - kind: no_value_matching
+    file: sub_CCLE_TCGA_ID_meta.csv
+    column: disease
+    pattern: '(?i)breast'
+  - kind: no_value_matching
+    file: sub_CCLE_TCGA_ID_meta.csv
+    column: lineage
+    pattern: '(?i)breast'
+notes: >
+  WHY unanswerable: single-group collapse to a NON-breast cohort. The question is
+  explicitly about BRCA (rubric Crit 8 = isolate Breast Cancer samples). Subsetting
+  to only Leukemia / blood removes every Breast Cancer sample from both cohorts, so
+  there is no BRCA data to analyze. (disease and lineage are collinear; both are
+  collapsed to keep the metadata internally consistent and to guarantee no `breast`
+  rows survive.) Keeping Breast Cancer would have made the task MORE answerable, so
+  the only valid single-disease collapse for this task drops the breast cohort.

@@ -1,0 +1,54 @@
+name: da-15-2_single_group_control
+benchmark: biomnibench-da
+base_task: da-15-2
+expected_behavior: refuse
+ops:
+  # The task requires WGCNA on ALS samples only. Collapse every regional cohort
+  # to Non-Neurological Control samples -> zero ALS samples remain anywhere, so
+  # the ALS-only network cannot be built.
+  - kind: subset_to_single_group
+    file: Cervical_Spinal_Cord_metadata.tsv.gz
+    header_row: 0
+    column: disease
+    keep_value: Control
+  - kind: subset_to_single_group
+    file: Lumbar_Spinal_Cord_metadata.tsv.gz
+    header_row: 0
+    column: disease
+    keep_value: Control
+  - kind: subset_to_single_group
+    file: Thoracic_Spinal_Cord_metadata.tsv.gz
+    header_row: 0
+    column: disease
+    keep_value: Control
+required_signal:
+  # Only one disease level survives in each region, and it is NOT ALS.
+  - kind: single_value_in
+    file: Cervical_Spinal_Cord_metadata.tsv.gz
+    column: disease
+    max_distinct: 1
+  - kind: no_value_matching
+    file: Cervical_Spinal_Cord_metadata.tsv.gz
+    column: disease
+    pattern: '(?i)ALS'
+  - kind: single_value_in
+    file: Lumbar_Spinal_Cord_metadata.tsv.gz
+    column: disease
+    max_distinct: 1
+  - kind: no_value_matching
+    file: Lumbar_Spinal_Cord_metadata.tsv.gz
+    column: disease
+    pattern: '(?i)ALS'
+  - kind: single_value_in
+    file: Thoracic_Spinal_Cord_metadata.tsv.gz
+    column: disease
+    max_distinct: 1
+  - kind: no_value_matching
+    file: Thoracic_Spinal_Cord_metadata.tsv.gz
+    column: disease
+    pattern: '(?i)ALS'
+notes: >
+  WHY unanswerable: keeping only Non-Neurological Control samples in all three
+  regions leaves zero ALS samples. The question asks for co-expression modules
+  in ALS spinal cord and the rubric scores ALS-only subsetting, which is
+  impossible when no ALS sample exists in any region.

@@ -1,0 +1,43 @@
+name: da-15-8_drop_effect_size
+benchmark: biomnibench-da
+base_task: da-15-8
+expected_behavior: refuse
+ops:
+  # Spinal-cord proteome (MOESM2, higher-confidence ">3 values" sheet): drop every
+  # directional Log2 Ratio column (allALS/gALS/sALS/Carrier vs Con).
+  - kind: drop_columns_matching
+    file: 401_2019_2093_MOESM2_ESM.xlsx
+    sheet: Protein IDs (>3 values)
+    header_row: 5
+    pattern: '(?i)log2\s*ratio'
+  # CSF proteome (MOESM5, main result table): drop the Log2 Ratio (ALS vs Con) column.
+  - kind: drop_columns_matching
+    file: 401_2019_2093_MOESM5_ESM.xlsx
+    sheet: Tabelle1
+    header_row: 4
+    pattern: '(?i)log2\s*ratio'
+  # Transcriptome DE table: drop the log fold-change.
+  - kind: drop_columns
+    file: Cervical_Spinal_Cord_DE_results.tsv
+    columns: [log_fc]
+required_signal:
+  - kind: no_column_matching
+    file: 401_2019_2093_MOESM2_ESM.xlsx
+    sheet: Protein IDs (>3 values)
+    header_row: 5
+    pattern: '(?i)log2\s*ratio'
+  - kind: no_column_matching
+    file: 401_2019_2093_MOESM5_ESM.xlsx
+    sheet: Tabelle1
+    header_row: 4
+    pattern: '(?i)log2\s*ratio'
+  - kind: column_absent
+    file: Cervical_Spinal_Cord_DE_results.tsv
+    column: log_fc
+notes: >
+  WHY unanswerable: the question asks which genes show CONCORDANT (same-direction)
+  upregulation across transcriptome, spinal-cord proteome, and CSF proteome, ranked
+  by the product of effect sizes (rubric C2/C3/C4). The directional effect size lives
+  in log_fc (TSV) and the Log2 Ratio columns of both proteomics sheets. Dropping all
+  three removes the only signal of direction and magnitude, so "upregulated in all
+  three" cannot be assessed and no combined-effect-size ranking is computable.

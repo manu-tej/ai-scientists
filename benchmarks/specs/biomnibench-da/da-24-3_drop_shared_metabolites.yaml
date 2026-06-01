@@ -1,0 +1,32 @@
+name: da-24-3_drop_shared_metabolites
+benchmark: biomnibench-da
+base_task: da-24-3
+expected_behavior: refuse
+ops:
+  - kind: drop_columns
+    file: metabolite.gz
+    columns: ["C6", "C8", "C8/C2", "(C3DC+C4-OH)/C10"]
+required_signal:
+  - kind: column_absent
+    file: metabolite.gz
+    column: "C6"
+  - kind: column_absent
+    file: metabolite.gz
+    column: "C8"
+  - kind: column_absent
+    file: metabolite.gz
+    column: "C8/C2"
+  - kind: column_absent
+    file: metabolite.gz
+    column: "(C3DC+C4-OH)/C10"
+notes: >
+  WHY unanswerable: colocalization (coloc.abf, rubric Criteria 6-8 = 50/100 pts)
+  needs per-phenotype sdY, which is derived from the raw per-sample metabolite
+  abundances in metabolite.gz. The shared locus the task converges on (chr1:~75Mb,
+  ACADM/medium-chain acyl-CoA dehydrogenase) is shared across exactly C6, C8,
+  C8/C2 and (C3DC+C4-OH)/C10 -- the only metabolites that genome-wide-significantly
+  co-map there. Dropping these four columns removes the abundance data needed to
+  compute their SDs, so coloc cannot be parameterized for the shared-locus
+  metabolites and the H4 ("one shared causal variant") conclusion is unreachable.
+  The summary stats still point at the locus, but the metabolite-level evidence to
+  confirm shared genetics is gone.

@@ -1,0 +1,30 @@
+name: da-20-4_single_cell_type
+benchmark: biomnibench-da
+base_task: da-20-4
+expected_behavior: refuse
+ops:
+  - kind: subset_to_single_group
+    file: Metadata.csv
+    header_row: 0
+    column: cell_line
+    keep_value: human_epithelial_melanocytes
+  # `condition` ({cell_line}-...) re-encodes the cell-type name; drop it so the
+  # collapse to one cell type cannot be undone (anonymize_column is h5ad-only).
+  - kind: drop_columns
+    file: Metadata.csv
+    header_row: 0
+    columns: ["condition"]
+required_signal:
+  - kind: single_value_in
+    file: Metadata.csv
+    column: cell_line
+    max_distinct: 1
+  - kind: column_absent
+    file: Metadata.csv
+    column: condition
+notes: >
+  WHY unanswerable: the question asks whether dabrafenib's response is consistent
+  or divergent ACROSS the four primary cell types. Subsetting to a single cell
+  type (melanocytes) leaves n_cell_types=1, so the cross-cell-type comparison is
+  impossible. `condition` embeds the cell-type name, so it is dropped too; only
+  melanocyte rows remain with no recoverable second group.

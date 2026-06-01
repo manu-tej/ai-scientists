@@ -1,0 +1,23 @@
+name: da-4-1_drop_subtype
+benchmark: biomnibench-da
+base_task: da-4-1
+expected_behavior: refuse
+ops:
+  - kind: drop_columns
+    file: GSE243013_NSCLC_immune_scRNA_metadata.csv.gz
+    columns: [sub_cell_type, major_cell_type]
+required_signal:
+  - kind: column_absent
+    file: GSE243013_NSCLC_immune_scRNA_metadata.csv.gz
+    column: sub_cell_type
+  - kind: column_absent
+    file: GSE243013_NSCLC_immune_scRNA_metadata.csv.gz
+    column: major_cell_type
+notes: >
+  WHY unanswerable: the NMF TIME classification is built from a patient x
+  immune-subtype composition matrix (sampleID x sub_cell_type). Dropping
+  sub_cell_type removes the feature axis entirely, so no composition matrix can
+  be constructed and the rank sweep / module extraction (rubric C1, C2, C4) is
+  impossible. major_cell_type is also dropped because its 3 coarse labels
+  (B cell / Myeloid / T-NK) would leak a degenerate 3-feature surrogate that the
+  51-subtype TIME classification cannot be recovered from.

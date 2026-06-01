@@ -1,0 +1,23 @@
+name: da-15-7_underpower_cervical
+benchmark: biomnibench-da
+base_task: da-15-7
+expected_behavior: caveat_underpowered
+ops:
+  - kind: reduce_n
+    file: Cervical_Spinal_Cord_metadata.tsv.gz
+    n: 4
+    seed: 0
+required_signal:
+  - kind: max_rows
+    file: Cervical_Spinal_Cord_metadata.tsv.gz
+    max: 4
+notes: >
+  WHY uninterpretable: cervical spinal cord is the answer-bearing region (the
+  rubric's CHIT1 finding and "substantial number of significant genes" come from
+  cervical). The required model regresses each gene's expression on disease_duration
+  while adjusting for many covariates (sex, rin, rin^2, pct_mrna_bases, library_prep,
+  site_id, gPC1-gPC5). Subsampling cervical to n=4 makes that model non-estimable
+  (far more covariates than samples) and leaves no power to detect any
+  duration-gene correlation or to recover CHIT1. The regression is still mechanically
+  computable on a stripped formula, so this is underpowered (report caveat), not a
+  hard structural refusal.

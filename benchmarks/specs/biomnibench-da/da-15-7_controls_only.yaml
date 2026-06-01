@@ -1,0 +1,37 @@
+name: da-15-7_controls_only
+benchmark: biomnibench-da
+base_task: da-15-7
+expected_behavior: refuse
+ops:
+  - kind: subset_to_single_group
+    file: Cervical_Spinal_Cord_metadata.tsv.gz
+    column: disease
+    keep_value: Control
+  - kind: subset_to_single_group
+    file: Lumbar_Spinal_Cord_metadata.tsv.gz
+    column: disease
+    keep_value: Control
+  - kind: subset_to_single_group
+    file: Thoracic_Spinal_Cord_metadata.tsv.gz
+    column: disease
+    keep_value: Control
+required_signal:
+  - kind: single_value_in
+    file: Cervical_Spinal_Cord_metadata.tsv.gz
+    column: disease
+    max_distinct: 1
+  - kind: single_value_in
+    file: Lumbar_Spinal_Cord_metadata.tsv.gz
+    column: disease
+    max_distinct: 1
+  - kind: single_value_in
+    file: Thoracic_Spinal_Cord_metadata.tsv.gz
+    column: disease
+    max_distinct: 1
+notes: >
+  WHY unanswerable: the analysis requires the ALS cohort (disease == "ALS") with
+  non-missing disease_duration to correlate expression against progression rate.
+  Subsetting every regional metadata file to disease == "Control" leaves zero ALS
+  patients; controls carry no usable disease_duration (n=1 stray value per region,
+  not a fittable cohort). With a single disease group and no ALS duration spread,
+  the duration-gene correlation cannot be performed in any spinal-cord level.
