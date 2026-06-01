@@ -1,0 +1,31 @@
+name: da-13-5_drop_sex_assoc
+benchmark: biomnibench-da
+base_task: da-13-5
+expected_behavior: refuse
+ops:
+  - kind: drop_columns_matching
+    file: "41591_2025_4023_MOESM2_ESM(Supplementary Table 5).csv"
+    header_row: 3
+    pattern: '(?i)(sex|female)'
+required_signal:
+  - kind: no_column_matching
+    file: "41591_2025_4023_MOESM2_ESM(Supplementary Table 5).csv"
+    header_row: 3
+    pattern: '(?i)(sex|female)'
+notes: >
+  CRITICAL SIGNAL: The question asks whether feminizing-GAHT-altered proteins overlap with
+  SEX-ASSOCIATED proteins from the general population. The sex-association signal lives ONLY in
+  Supplementary Table 5 (Sun et al. Nature 2023 stats), in three columns: Sex_log10_p (the ranking
+  metric the rubric requires for selecting the top-100 sex-associated proteins, Criterion 2),
+  Beta__females (the female-vs-male effect direction used for directional concordance, Criterion 4),
+  and sex_SE (its standard error). Dropping only Sex_log10_p would NOT work: a model can reconstruct
+  the same ranking from the z-statistic Beta__females/sex_SE (a near-monotone surrogate of -log10 p).
+  So all three must go. The op drops exactly {Beta__females, sex_SE, Sex_log10_p} (verified: the regex
+  matches those three and nothing else; Age_*, BMI_*, GAHT_effect, estimate_CPA/SPIRO, adj.p.value_*
+  are untouched). REDUNDANCY HAZARD audit: (1) Supplementary Table 1 holds only GAHT timepoint stats
+  (protein_id, estimate/adj.p.value/n for CPA & SPIRO) - no sex column - so it cannot re-encode the
+  signal and needs no edit. (2) GAHT_effect in Table 5 is a 0/1 GAHT-altered flag, not a sex metric.
+  (3) Protein_name is descriptive text, not a sex statistic. There is no second sheet or sibling file
+  carrying sex-association values. With the three sex columns removed, top-100 sex-protein selection,
+  hypergeometric overlap enrichment, and directional concordance are all impossible -> unanswerable.
+  The no_column_matching check asserts no sex/female column survives in the only file that ever held one.

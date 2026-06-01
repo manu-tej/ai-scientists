@@ -1,0 +1,55 @@
+name: da-18-5_drop_therapy_group
+benchmark: biomnibench-da
+base_task: da-18-5
+expected_behavior: refuse
+ops:
+  - kind: drop_columns
+    file: data_clinical_sample.txt
+    header_row: 4
+    columns:
+      - SAMPLE_TYPE
+      - SAMPLE_SITE
+required_signal:
+  - kind: column_absent
+    file: data_clinical_sample.txt
+    header_row: 4
+    column: SAMPLE_TYPE
+  - kind: column_absent
+    file: data_clinical_sample.txt
+    header_row: 4
+    column: SAMPLE_SITE
+  - kind: no_value_matching
+    file: data_clinical_sample.txt
+    header_row: 4
+    column: TUMOR_TISSUE_ORIGIN
+    pattern: '(?i)metasta|naive|post.?treat|post.?neo'
+notes: >
+  ANSWER-CRITICAL SIGNAL: the question asks for MAPK-alteration frequency in
+  "post-hormonal-therapy HR+/HER2-" tumors, and the rubric's whole comparison
+  (Criteria 1,4,6) requires splitting the cohort into treatment-naive (primary)
+  vs post-therapy (metastatic) groups. That pre/post-hormonal-therapy axis is
+  carried by the sample-level primary-vs-metastatic classification. There is NO
+  drug/regimen/line-of-therapy column anywhere; the only operationalization of
+  "post-hormonal therapy" in this dataset is metastatic sample == post-therapy.
+  REDUNDANCY HAZARD: that classification is re-encoded in TWO sibling columns of
+  data_clinical_sample.txt -- SAMPLE_TYPE (Primary/Metastasis) AND SAMPLE_SITE
+  ("Treatment Naive Primary"/"Post-Treatment Primary"/"Post-Neo Primary" for the
+  918 primaries, and metastatic site names Liver/Bone/Lymph Node/... for the 1000
+  mets, which themselves imply metastasis). Dropping only one leaves the other as
+  a perfect proxy, so both must go. I scanned every clinical column for
+  primary/metastasis/treatment/naive tokens: ONLY SAMPLE_TYPE and SAMPLE_SITE
+  carry them (TUMOR_TISSUE_ORIGIN is constant "Breast"; the *_PRIMARY receptor
+  columns say "primary" only in their description comment-row and refer to the
+  primary-tumor receptor read, not sample timing). drop_columns removes the
+  columns positionally across the 4 cBioPortal comment rows too, so the display
+  name ("Sample Type"/"Site of Sample") and the description ("normal, primary,
+  met, recurrence") re-encodings in the header preamble are deleted as well. The
+  genomic files (data_mutations.txt MAF, data_cna.txt matrix) contain only
+  Tumor_Sample_Barcode / SAMPLE_ID + variant/CN fields -- no clinical, receptor,
+  therapy, or primary/met columns -- so the signal cannot leak there. CHECKS:
+  column_absent on both columns proves removal; no_value_matching on
+  TUMOR_TISSUE_ORIGIN proves the surviving origin column did not absorb the
+  primary/met/treatment labels. With both columns gone, samples cannot be
+  classified as treatment-naive vs post-hormonal-therapy, so the requested
+  post-therapy MAPK frequency and the naive-vs-post comparison are undefinable
+  -> refuse.

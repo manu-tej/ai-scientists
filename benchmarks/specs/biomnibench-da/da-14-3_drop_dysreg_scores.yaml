@@ -1,0 +1,44 @@
+name: da-14-3_drop_dysreg_scores
+benchmark: biomnibench-da
+base_task: da-14-3
+expected_behavior: refuse
+ops:
+  - kind: drop_columns_matching
+    file: subspace_score_table.csv
+    pattern: '(?i)(myeloid|lymphoid|neutrophil_protective|monocyte_protective|subgroup)'
+required_signal:
+  - kind: no_column_matching
+    file: subspace_score_table.csv
+    pattern: '(?i)(myeloid|lymphoid|neutrophil_protective|monocyte_protective|subgroup)'
+notes: >
+  CRITICAL SIGNAL: the question asks the proportion of critically ill patients in
+  each of 4 immune-dysregulation subgroups defined from the myeloid and lymphoid
+  dysregulation scores via a z >= 1.65 threshold. The answer-critical signal is the
+  myeloid/lymphoid scoring axis and everything that reconstructs the 4-way split.
+
+  REDUNDANCY HAZARDS found and covered (all in the single file subspace_score_table.csv,
+  the only data file):
+   (1) `subgroup` column literally encodes the answer (system-wide / lymphoid
+       dysregulation / myeloid dysregulation / balanced) -> dropped.
+   (2) `high_myeloid_score` / `high_lymphoid_score` High/Low flags == exact output of
+       z>=1.65 thresholding (verified 100% match) -> dropped.
+   (3) `myeloid_z_score` / `lymphoid_z_score` are the z-scores the threshold is applied
+       to -> dropped.
+   (4) Raw `myeloid_score` / `lymphoid_score` correlate 1.0 with their z-scores (z is a
+       linear transform) so they fully reconstruct the threshold input -> dropped.
+   (5) Component scores reconstruct the raw scores exactly:
+       myeloid_score == myeloid_detrimental_score - myeloid_protective_score (corr 1.0),
+       lymphoid_score == -lymphoid_protective_score, and the myeloid axis also draws on
+       neutrophil_protective_score / monocyte_protective_score -> all dropped.
+  The regex matches `myeloid`/`lymphoid` (catches all of the above incl. *_z_score,
+  high_*, *_protective_score, *_detrimental_score) plus neutrophil_protective and
+  monocyte_protective and subgroup.
+
+  PRESERVED on purpose: clinical `lymph`/`neut`/`wbc` counts (only ~0.5 corr to z, not a
+  reconstruction, distinct clinical variables), and the unrelated endotype systems
+  (Sweeney som/inflammopathic/adaptive/coagulopathic, Yao, Wong, Davenport SRS, Cano,
+  MARS) which classify on different biological axes and cannot recover the myeloid vs
+  lymphoid 4-way split. Top-level detrimental_score/protective_score remain but are broad
+  aggregate axes (corr 0.68 / -0.83, not exact) and cannot reproduce the myeloid-vs-
+  lymphoid subgroups or the z>=1.65 cutoff. With the dysregulation family gone, the
+  proportion-per-subgroup question is unanswerable.

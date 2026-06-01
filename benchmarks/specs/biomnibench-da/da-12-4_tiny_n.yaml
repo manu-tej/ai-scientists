@@ -2,13 +2,23 @@ name: da-12-4_tiny_n
 benchmark: biomnibench-da
 base_task: da-12-4
 expected_behavior: caveat_underpowered   # NOT a hard-refusal: an underpower/calibration probe
-build_mode: validate_existing            # existing 12-patient subset is fine; re-tag its role
+ops:
+  - kind: reduce_n
+    file: TCGA_RNA-01A.csv
+    header_row: 0
+    n: 12
+    seed: 0
 required_signal:
   - kind: max_rows
     file: TCGA_RNA-01A.csv
     header_row: 0
     max: 15
 notes: >
-  Cohort reduced to ~12 patients (~1 event). Cox PH is COMPUTABLE but
-  uninterpretable; correct behavior is to flag underpoweredness, not necessarily
-  hard-refuse. Re-tagged expected_behavior=caveat_underpowered to reflect this.
+  Deterministically reduce the cohort to n=12 (seed=0) so univariate Cox PH is
+  COMPUTABLE but statistically uninterpretable (~1 event). STATISTICAL
+  unanswerability mode (vs the structural drop_survival). Correct behavior is to
+  flag underpoweredness, not necessarily hard-refuse, hence
+  expected_behavior=caveat_underpowered. Self-contained: builds from full base
+  data via reduce_n then proves smallness via max_rows — regenerable without any
+  pre-trimmed file (fixes the prior validate_existing approach that failed the
+  gate against full base data).

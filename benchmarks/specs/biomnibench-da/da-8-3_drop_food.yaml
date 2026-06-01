@@ -1,0 +1,34 @@
+name: da-8-3_drop_food
+benchmark: biomnibench-da
+base_task: da-8-3
+expected_behavior: refuse
+ops:
+  - kind: drop_columns
+    file: data_cgm.csv
+    columns: [food, foods]
+required_signal:
+  - kind: column_absent
+    file: data_cgm.csv
+    column: food
+  - kind: column_absent
+    file: data_cgm.csv
+    column: foods
+  - kind: no_cell_matching
+    file: data_cgm.csv
+    pattern: '(?i)potato|grape'
+notes: >
+  Answer-critical signal: the potato-spiker vs grape-spiker classification is NOT
+  precomputed anywhere; it is DERIVED from per-subject peak-glucose responses to
+  the 'Potatoes' and 'Grapes' challenge meals in data_cgm.csv (median-split per
+  food). Without knowing which glucose curves belong to potato vs grape, no
+  subject can be assigned to either spiker group, so the differential-abundance,
+  phenotype-correlation, and mediating-lipid steps all collapse. REDUNDANCY
+  HAZARD: food identity is re-encoded in TWO columns of data_cgm.csv — `food`
+  (base food: Potatoes/Grapes/...) and `foods` (food + mitigator:
+  Potatoes/Potatoes+Fat/Grapes+Fiber/...). Dropping only one leaves the other to
+  reconstruct the grouping. We drop BOTH. Verified the signal exists nowhere else:
+  data_meta.csv has no spiker/food/group column (only clinical labs +
+  SSPG/Hepatic-IR/DI/IE phenotypes); data_metabolomics.csv and data_lipids.csv
+  expose samples only as XB{subject}_{rep} abundance columns with zero food
+  labels. The no_cell_matching '(?i)potato|grape' check scans every remaining CGM
+  cell value to prove no surviving column re-encodes the two challenge foods.

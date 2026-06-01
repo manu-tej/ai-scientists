@@ -1,0 +1,45 @@
+name: da-12-2_drop_overlap
+benchmark: biomnibench-da
+base_task: da-12-2
+expected_behavior: refuse
+ops:
+  - kind: drop_columns
+    file: TS7.xlsx
+    sheet: Sheet1
+    header_row: 1
+    columns:
+      - "Genes overlapped with DEGs of KD groups"
+      - "Genes overlapped with DEGs of OP groups"
+      - "Gene name"
+      - "log2FC"
+required_signal:
+  - kind: no_column_matching
+    file: TS7.xlsx
+    scope: all_sheets
+    header_row: 1
+    pattern: '(?i)overlap'
+  - kind: no_column_matching
+    file: TS7.xlsx
+    scope: all_sheets
+    header_row: 1
+    pattern: '(?i)gene\s*name'
+  - kind: no_cell_matching
+    file: TS7.xlsx
+    scope: all_sheets
+    pattern: '(?i)^\s*v\s*$'
+notes: >
+  Answer-critical signal = the "v" overlap flag that marks the 1,543 DEGs shared
+  between the overexpression (A549) and knockdown (H1299) experiments; the whole
+  question (G2M enrichment among SHARED DEGs) is unanswerable without knowing
+  which genes overlap. REDUNDANCY HAZARDS in the single Sheet1 (raw 8-col layout,
+  header on row index 1): (1) the OP-side flag column "Genes overlapped with DEGs
+  of KD groups" (1,543 v's) AND (2) the mirror KD-side flag column "Genes
+  overlapped with DEGs of OP groups" (1,543 v's) each independently re-encode the
+  shared set; (3) the shared set is ALSO reconstructable by intersecting the two
+  "Gene name" lists (col0 ∩ col4 = 1,545 ≈ 1,543), so dropping only the flag
+  columns leaves the signal derivable. Fix: drop BOTH unique flag columns AND
+  BOTH (duplicate-named) "Gene name"/"log2FC" columns by raw header value so the
+  KD gene list is gone and no intersection is possible. Checks prove: no column
+  matches /overlap/ or /gene name/ on any sheet, and no standalone "v" cell
+  survives anywhere (the v flag was verified to occur ONLY in the two flag
+  columns, 0 elsewhere), so every re-encoding path is closed.

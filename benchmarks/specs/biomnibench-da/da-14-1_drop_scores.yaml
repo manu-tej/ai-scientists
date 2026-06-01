@@ -1,0 +1,34 @@
+name: da-14-1_drop_scores
+benchmark: biomnibench-da
+base_task: da-14-1
+expected_behavior: refuse
+ops:
+  - kind: drop_columns_matching
+    file: subspace_score_table.csv
+    header_row: 0
+    pattern: '(?i)(score|prob|srsq|endotype|subgroup)'
+required_signal:
+  - kind: no_column_matching
+    file: subspace_score_table.csv
+    header_row: 0
+    pattern: '(?i)(score|prob|srsq|endotype|subgroup)'
+notes: >
+  The question asks which endotyping SIGNATURES cluster together based on their
+  per-patient score correlations; the rubric requires a 21x21 Spearman
+  correlation matrix + hierarchical clustering over the continuous endotype
+  scores. The answer-critical signal is therefore the set of continuous
+  endotype-score columns themselves. REDUNDANCY HAZARDS in the single CSV (no
+  sibling sheets/files): (1) lymphoid_z_score / myeloid_z_score are perfect
+  monotonic re-encodings (Spearman = 1.0) of lymphoid_score / myeloid_score;
+  (2) high_myeloid_score / high_lymphoid_score are High/Low binnings of the same
+  scores; (3) *_prob and *_SRSq are the probabilistic forms of the Sweeney /
+  Davenport / Cano endotypes; (4) sweeney/davenport/cano_endotype are categorical
+  labels of the same axes; (5) subgroup ('myeloid/lymphoid dysregulation',
+  'balanced','system-wide') is a per-patient label derived from the myeloid/
+  lymphoid scores. A single name-pattern drop removes ALL 43 score/prob/SRSq/
+  endotype/subgroup columns in one pass, so no continuous endotype signature
+  remains to correlate or cluster. Remaining columns are only clinical covariates
+  (age, sex, wbc, crp, sofa, ...) and outcome fields; their max |Spearman| with
+  any dropped score is ~0.77 (lymph vs an SRS prob) — a single clinical lab
+  cannot reconstruct 21 distinct signatures or their correlation structure. The
+  check asserts the pattern matches no surviving column, covering every hazard.

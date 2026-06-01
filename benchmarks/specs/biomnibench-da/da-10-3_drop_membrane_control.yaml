@@ -1,0 +1,39 @@
+name: da-10-3_drop_membrane_control
+benchmark: biomnibench-da
+base_task: da-10-3
+expected_behavior: refuse
+ops:
+  - kind: drop_columns_matching
+    file: List_of_proteins_for_comparing_MLO_enrichment.xlsx
+    scope: all_sheets
+    header_row: 1
+    pattern: '(?i)mitochond|membrane|membrane-?bound'
+required_signal:
+  - kind: no_column_matching
+    file: List_of_proteins_for_comparing_MLO_enrichment.xlsx
+    scope: all_sheets
+    header_row: 1
+    pattern: '(?i)mitochond|membrane|membrane-?bound'
+  - kind: no_cell_matching
+    file: List_of_proteins_for_comparing_MLO_enrichment.xlsx
+    scope: all_sheets
+    pattern: '(?i)mitochond|membrane-?bound'
+notes: >
+  ANSWER-CRITICAL SIGNAL: the task's central question (rubric Criterion 5) is
+  whether PS predictors discriminate MLO participants BETTER than membrane-bound
+  organelle CONTROLS. The membrane-bound control group is encoded by exactly ONE
+  dataset-membership column, "Proteomics of human mitochondri", in
+  List_of_proteins_for_comparing_MLO_enrichment.xlsx. The other five flag columns
+  (OpenCell nuclear punctae, DACT1-particulate proteome, G3BP1 proximity
+  labeling, PhaSepDB high-throughput, Amyloid fiber-forming proteins) are all
+  MLO/PS-participant sets. Removing the mitochondrial column leaves NO membrane-
+  bound control group, so the MLO-vs-control comparison is unanswerable and the
+  predictors-better-on-MLO conclusion cannot be reached.
+  REDUNDANCY HAZARDS COVERED: (1) header is on row 2 (row 1 is a title banner),
+  so header_row=1. (2) the column is duplicated across BOTH sheets ('Original
+  data' AND 'Training proteins removed') -> scope=all_sheets removes it from
+  both. (3) h_combined_with_flags.xlsx carries only PS-class flags
+  (hSaPS/hPdPS/hNoPS) and predictor scores, with NO mitochondrial/membrane/
+  organelle column or cell value (verified) -> the control signal is not
+  re-encoded there. The no_cell_matching scan additionally guards against the
+  membership being re-encoded as a stray cell value anywhere in the workbook.

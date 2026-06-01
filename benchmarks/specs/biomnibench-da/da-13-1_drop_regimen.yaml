@@ -1,0 +1,42 @@
+name: da-13-1_drop_regimen
+benchmark: biomnibench-da
+base_task: da-13-1
+expected_behavior: refuse
+ops:
+  - kind: drop_columns
+    file: GAHT_pregnancy_metadata_SDRF.tsv
+    columns:
+      - "characteristics[phenotype]"
+      - "factor value[phenotype]"
+required_signal:
+  - kind: column_absent
+    file: GAHT_pregnancy_metadata_SDRF.tsv
+    column: "characteristics[phenotype]"
+  - kind: column_absent
+    file: GAHT_pregnancy_metadata_SDRF.tsv
+    column: "factor value[phenotype]"
+  - kind: no_cell_matching
+    file: GAHT_pregnancy_metadata_SDRF.tsv
+    pattern: '(?i)(cpa|spiro)[ _]?(gaht|baseline|6[ _]?month)'
+  - kind: no_cell_matching
+    file: Olink_CPA_SPIRO_GAHT_and_pregnancy.npx.csv
+    pattern: '(?i)(cpa|spiro)[ _]?(gaht|baseline|6[ _]?month)'
+notes: >
+  The question is two-part and inherently regimen-comparative: identify proteins
+  significantly altered at 6mo of feminizing GAHT AND determine whether the
+  changes differ between the CPA and SPIRO antiandrogen arms. The answer-critical
+  signal is the per-participant REGIMEN assignment (CPA vs SPIRO). It is encoded
+  ONLY in the two SDRF columns characteristics[phenotype] and factor
+  value[phenotype] (tokens CPA_GAHT_* / SPIRO_GAHT_*). REDUNDANCY HAZARDS checked:
+  (1) factor value[phenotype] is a verbatim duplicate of characteristics[phenotype]
+  -> both dropped. (2) The SampleID / source name strings (AA03_0m, AA03_6m) encode
+  the participant and the TIMEPOINT suffix (_0m/_6m) but NOT the regimen: CPA and
+  SPIRO participant numbers are fully interleaved (CPA 3-65, SPIRO 2-63, no
+  separable pattern, no shared prefix beyond AA), so regimen cannot be recovered
+  from IDs. (3) The NPX file (joined on SampleID) contains protein assays whose
+  symbols include the substring 'CPA' (ECPAS, CPA1/2/4 carboxypeptidases) but the
+  regimen-label token GAHT appears 0 times in the NPX; the no_cell_matching regex
+  requires a (cpa|spiro)+(gaht|baseline|6month) co-occurrence so it ignores those
+  protein names and would only fire on a leaked regimen label. With both phenotype
+  columns gone, no file lets an analyst partition the 41 participants into CPA vs
+  SPIRO, so the regimen-difference half of the question is unanswerable.

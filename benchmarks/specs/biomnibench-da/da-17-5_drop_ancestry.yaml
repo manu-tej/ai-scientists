@@ -1,0 +1,42 @@
+name: da-17-5_drop_ancestry
+benchmark: biomnibench-da
+base_task: da-17-5
+expected_behavior: refuse
+ops:
+  - kind: drop_columns_matching
+    file: 4118e166-34f5-4c1f-9eed-c64b90a3dace.h5ad
+    pattern: '(?i)ethnicity'
+required_signal:
+  - kind: no_column_matching
+    file: 4118e166-34f5-4c1f-9eed-c64b90a3dace.h5ad
+    pattern: '(?i)ethnicity'
+  - kind: no_column_matching
+    file: 4118e166-34f5-4c1f-9eed-c64b90a3dace.h5ad
+    pattern: '(?i)ancestry|hancestro|race'
+  - kind: no_value_matching
+    file: 4118e166-34f5-4c1f-9eed-c64b90a3dace.h5ad
+    column: donor_id
+    pattern: '(?i)asian|european|african|hispanic|HANCESTRO|EA|EUR|ASN|AFR'
+  - kind: no_value_matching
+    file: 4118e166-34f5-4c1f-9eed-c64b90a3dace.h5ad
+    column: ind_cov
+    pattern: '(?i)asian|european|african|hispanic|HANCESTRO|EA|EUR|ASN|AFR'
+notes: >
+  Answer-critical signal: donor self-reported ancestry. The question asks whether
+  SLE-associated immune-cell (CD4+ T) changes DIFFER between Asian vs European
+  ancestry patients (Criterion 1/4/5 of the rubric all hinge on stratifying donors
+  by ancestry and contrasting per-ancestry SLE-vs-control fold changes). Remove the
+  ancestry axis and the between-ancestry comparison is undefined -> unanswerable.
+  REDUNDANCY HAZARDS found and covered: the dataset re-encodes ancestry in TWO obs
+  columns: (1) self_reported_ethnicity (human-readable: 'Asian', 'European American',
+  'African American', 'Hispanic or Latin'); (2) self_reported_ethnicity_ontology_term_id
+  (HANCESTRO codes: HANCESTRO:0568=Asian, 0590, 0612, 0847 — a 1:1 re-encoding of the
+  same ancestry labels). The single (?i)ethnicity column-drop removes BOTH (asserted
+  by no_column_matching on '(?i)ethnicity' AND a defensive no_column_matching on
+  '(?i)ancestry|hancestro|race' to catch any differently-named ancestry column).
+  Donor identifiers (donor_id, ind_cov) are numeric ('1004', '1004_1004') and do NOT
+  prefix-encode ancestry — verified by two no_value_matching checks that would fail on
+  any ancestry token leaking through the donor labels. disease/disease_state and
+  cell_type/author_cell_type are intentionally left intact so the task is unanswerable
+  ONLY because the ancestry axis is gone, not because the SLE contrast or cell typing
+  is missing.

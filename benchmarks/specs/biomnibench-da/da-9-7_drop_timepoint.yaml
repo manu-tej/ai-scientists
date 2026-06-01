@@ -1,0 +1,45 @@
+name: da-9-7_drop_timepoint
+benchmark: biomnibench-da
+base_task: da-9-7
+expected_behavior: refuse
+ops:
+  - kind: drop_columns
+    file: NatureMed_CyTOF_metadata.csv
+    columns: ["timepoint.id"]
+  - kind: drop_columns
+    file: NatureMed_Olink_metadata.csv
+    columns: ["timepoint.id"]
+required_signal:
+  - kind: column_absent
+    file: NatureMed_CyTOF_metadata.csv
+    column: "timepoint.id"
+  - kind: column_absent
+    file: NatureMed_Olink_metadata.csv
+    column: "timepoint.id"
+  - kind: no_cell_matching
+    file: NatureMed_CyTOF_metadata.csv
+    pattern: '(?i)c2\s*d1'
+  - kind: no_cell_matching
+    file: NatureMed_Olink_metadata.csv
+    pattern: '(?i)c2\s*d1'
+notes: >
+  The question asks whether circulating immune-cell frequencies correlate with
+  serum protein levels ON-TREATMENT AT C2D1. The single answer-critical signal is
+  the sample timepoint: matching CyTOF and Olink samples to the same patient at the
+  C2D1 on-treatment visit (and filtering OUT the C1D1 baseline / C1D15 / C3D1 / C4D1
+  visits) is the entire premise. The timepoint lives ONLY in the `timepoint.id`
+  column of the two metadata files (NatureMed_CyTOF_metadata.csv and
+  NatureMed_Olink_metadata.csv); dropping it from both makes the C2D1 filter and
+  cross-platform patient matching impossible, so the correlation cannot be scoped to
+  the requested visit -> refuse.
+  REDUNDANCY HAZARDS RULED OUT: (1) timepoint is not re-encoded in the `sample.id`
+  strings -- each sample.id maps to exactly one timepoint and the A0x plate/well token
+  is NOT a deterministic timepoint proxy (toks A01-A08 each span 2-4 different
+  timepoints in both files), so a generated lookup cannot recover C2D1. (2) The `ms`
+  column carries only platform labels ('Blood: CyTOF %leuk/%par', 'Blood: Olink'),
+  not visit. (3) No timepoint-like token (CxDy) appears in any data CSV
+  (cell_populations, select_proteins, select_MSI) nor in the clinical file -- a regex
+  scan of every cell across all four returned zero matches. The two column_absent
+  checks confirm the column is gone from both metadata files; the two no_cell_matching
+  checks confirm the literal C2D1 visit value is not re-encoded as a cell value
+  anywhere in either metadata file.

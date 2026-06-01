@@ -1,0 +1,39 @@
+name: da-25-1_drop_oncogenicity
+benchmark: biomnibench-da
+base_task: da-25-1
+expected_behavior: refuse
+ops:
+  - kind: drop_columns_matching
+    file: data_mutations_TCGA.txt
+    header_row: 0
+    pattern: '(?i)CGC|MUTSIG|COSMIC|ONCOMAP|Tumorscape|TCGAscape|Hotspot|DNARepairGenes|FamilialCancer|DrugBank'
+required_signal:
+  - kind: no_column_matching
+    file: data_mutations_TCGA.txt
+    header_row: 0
+    pattern: '(?i)CGC|MUTSIG|COSMIC|ONCOMAP|Tumorscape|TCGAscape|Hotspot|DNARepairGenes|FamilialCancer|DrugBank'
+notes: >
+  Answer-critical signal: the in-data oncogenicity / cancer-driver annotation.
+  Part 1 of the question ("for Pathogenic/Oncogenic alterations, what are the
+  top mutated genes?") drives rubric Criteria 2 and 3 (32 pts). The MAF carries
+  NO explicit pathogenic/oncogenic label (Hotspot is all 0, per Criterion 1), so
+  the reference proxy defines oncogenicity by intersecting functional variant
+  classes with genes flagged in the Cancer Gene Census (CGC_*) and
+  MUTSIG_Published_Results. The top-gene ranking (TP53, SPOP, SYNE1, LRP1B, ATM,
+  CSMD3, PTEN) comes from that filtered set.
+  REDUNDANCY HAZARD audited: "is this a known cancer driver" is re-encoded across
+  many sibling annotation columns, not just CGC/MUTSIG. A column scan found 20
+  driver/recurrence-in-cancer fields: the five CGC_* columns, MUTSIG_Published_
+  Results, the four COSMIC_* recurrence fields, both CCLE_ONCOMAP_* fields, the
+  Tumorscape_/TCGAscape_ amplification & deletion peak columns, Hotspot,
+  DNARepairGenes_Role, FamilialCancerDatabase_Syndromes, and DrugBank. Any one of
+  these lets a model re-derive an oncogenic-gene filter. The single regex drops
+  ALL 20 in one pass; core analysis columns (Hugo_Symbol, Variant_Classification,
+  Variant_Type, Tumor_Sample_Barcode, HGVSp_Short) are preserved so the file
+  stays loadable but the oncogenicity criterion is gone. The matching
+  no_column_matching check asserts none of these columns survive, so the
+  pathogenic/oncogenic gene ranking is unanswerable from the data.
+  (Note: the natural alternative target, clinical T stage, is on the
+  comma-contaminated comment-prefixed data_clinical_patient_TCGA.txt, whose
+  delimiter the TabularAdapter mis-sniffs as ',', so column drops there do not
+  take effect; the MAF is cleanly tab-delimited and builds correctly.)
