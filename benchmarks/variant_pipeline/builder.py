@@ -1,6 +1,7 @@
 """Build a variant: copy base data -> apply ops -> validate -> emit (or refuse)."""
 from __future__ import annotations
 
+import os
 import shutil
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -48,8 +49,36 @@ def build_variant(spec: VariantSpec, base_data: Path, out_data: Path,
             return BuildResult(spec.name, emitted=False, error="output exists (overwrite=False)")
         shutil.rmtree(out_data)
     out_data.parent.mkdir(parents=True, exist_ok=True)
-    # Copy base data (symlinks resolved to real files so edits don't touch base).
-    shutil.copytree(base_data, out_data, symlinks=False)
+    # HARDLINK the base tree instead of copying bytes: a variant that drops one
+    # column from one file must not duplicate an 11GB sibling matrix. Hardlinks
+    # share inodes (≈0 disk). We then COPY-ON-WRITE only the files an op touches
+    # (below), so writes never corrupt the shared base inode. Falls back to a
+    # real copy across filesystems where hardlinks aren't possible.
+    def _link_tree(src: Path, dst: Path):
+        dst.mkdir(parents=True, exist_ok=True)
+        for item in src.iterdir():
+            d = dst / item.name
+            if item.is_dir():
+                _link_tree(item, d)
+            else:
+                try:
+                    os.link(item, d)
+                except OSError:
+                    shutil.copy2(item, d)
+    _link_tree(base_data, out_data)
+
+    # Break the hardlink for every file an op will modify (copy-on-write), so
+    # the op edits a private copy, never the shared base inode.
+    for op in spec.ops:
+        rel = op.params.get("file")
+        if not rel:
+            continue
+        target = out_data / rel
+        if target.exists():
+            tmp = target.with_suffix(target.suffix + ".cow")
+            shutil.copy2(target, tmp)
+            target.unlink()
+            tmp.rename(target)
 
     try:
         for op in spec.ops:

@@ -90,6 +90,11 @@ def main() -> None:
     ap.add_argument("--specs", type=Path, default=SPECS_DIR)
     ap.add_argument("--no-verify-revision", action="store_true",
                     help="skip the HF dataset-revision provenance check")
+    ap.add_argument("--skip-heavy-mb", type=int, default=0,
+                    help="if >0: build+gate every variant, but for variants whose data "
+                         "exceeds this many MB (e.g. 11GB h5ad), record the gate proof then "
+                         "DELETE the built data — it is regenerated on demand via "
+                         "materialize_variant.py. Keeps disk lean; gate proof preserved.")
     args = ap.parse_args()
     args.out.mkdir(parents=True, exist_ok=True)
 
@@ -125,6 +130,16 @@ def main() -> None:
             entry["checksum"] = _dir_checksum(out_dir)
             manifest["summary"]["emitted"] += 1
             status = "OK"
+            # On-demand: if this variant's data is heavy, keep the gate proof but
+            # drop the bytes — regenerable deterministically from the spec.
+            if args.skip_heavy_mb > 0:
+                mb = sum(f.stat().st_size for f in out_dir.rglob("*") if f.is_file()) / 1e6
+                if mb > args.skip_heavy_mb:
+                    import shutil as _sh
+                    _sh.rmtree(args.out / spec.name)
+                    entry["materialize_on_demand"] = True
+                    entry["data_mb"] = round(mb)
+                    status = f"OK (on-demand, {round(mb)}MB not stored)"
         else:
             err = r.error or ""
             key = ("validation_failed" if "validation_failed" in err else
