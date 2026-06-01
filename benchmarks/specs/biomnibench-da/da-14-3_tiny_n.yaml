@@ -1,0 +1,35 @@
+name: da-14-3_tiny_n
+benchmark: biomnibench-da
+base_task: da-14-3
+expected_behavior: caveat_underpowered   # NOT a hard-refusal: an underpower/calibration probe
+ops:
+  - kind: reduce_n
+    file: subspace_score_table.csv
+    header_row: 0
+    n: 12
+    seed: 0
+required_signal:
+  - kind: max_rows
+    file: subspace_score_table.csv
+    header_row: 0
+    max: 15
+notes: >
+  STATISTICAL UNDERPOWERING mode (distinct from the Pass-1 drop_dysreg_scores,
+  which is a structural DROP-COLUMN of the myeloid/lymphoid dysregulation family).
+
+  The question asks the PROPORTION of critically ill patients in each of 4 immune-
+  dysregulation subgroups. The subgroups are defined by thresholding the myeloid /
+  lymphoid z-scores at z >= 1.65 (~95th-percentile upper-tail cutoff). All scoring
+  columns and the threshold logic are LEFT INTACT here — the defect is that the
+  cohort is deterministically reduced to n=12 (seed=0). At n=12:
+   (1) Proportions across 4 subgroups are estimated from at most 12 patients, so each
+       subgroup proportion has a standard error on the order of tens of percentage
+       points and the smallest subgroups (myeloid dysregulation is ~7% of the full
+       cohort) will frequently have 0 or 1 patients — the per-subgroup proportions
+       and the largest/smallest ranking are not estimable.
+   (2) If z-scores are recomputed within the subsetted cohort (mean/std over n=12),
+       the z=1.65 threshold and the resulting 4-way split become unstable noise.
+  The computation is COMPUTABLE but statistically uninterpretable, so correct
+  behavior is to FLAG the underpoweredness (caveat_underpowered), not necessarily a
+  hard refusal. Self-contained: builds from the full base data via reduce_n, then
+  proves smallness via max_rows (no pre-trimmed file required).

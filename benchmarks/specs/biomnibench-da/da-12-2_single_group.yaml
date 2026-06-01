@@ -1,0 +1,61 @@
+name: da-12-2_single_group
+benchmark: biomnibench-da
+base_task: da-12-2
+expected_behavior: refuse
+ops:
+  # SINGLE-GROUP COLLAPSE: the question ("DEGs SHARED between the overexpression
+  # and knockdown experiments") is intrinsically a two-arm comparison. The two
+  # arms live as side-by-side COLUMN BLOCKS in Sheet1: OP arm = cols 0-2
+  # (Gene name, log2FC, "...overlapped with DEGs of KD groups"); KD arm = cols
+  # 4-6 (Gene name.1, log2FC.1, "...overlapped with DEGs of OP groups").
+  # We KEEP the full OP arm gene list (Gene name + log2FC) but remove the entire
+  # KD arm, collapsing the data to a SINGLE experimental group. We also drop BOTH
+  # "v" overlap-flag columns, because each flag standalone re-encodes the shared
+  # set without the partner list. Result: one usable group, no second group, no
+  # precomputed overlap -> "shared between OP and KD" is uncomputable.
+  - kind: drop_columns
+    file: TS7.xlsx
+    sheet: Sheet1
+    header_row: 1
+    columns:
+      - "Gene name.1"                                   # KD-arm gene list (the second group)
+      - "log2FC.1"                                      # KD-arm fold change
+      - "Genes overlapped with DEGs of OP groups"       # KD-side v flag (re-encodes shared set)
+      - "Genes overlapped with DEGs of KD groups"       # OP-side v flag (re-encodes shared set)
+required_signal:
+  # (1) Only ONE "Gene name" column may survive: the single surviving group.
+  #     The KD arm's "Gene name.1" must be gone so no second list exists to
+  #     intersect (OP ∩ KD = 1545 was a re-encoding path).
+  - kind: column_absent
+    file: TS7.xlsx
+    scope: all_sheets
+    column: "Gene name.1"
+  # (2) No overlap-flag column survives on any sheet (kills both v re-encodings).
+  - kind: no_column_matching
+    file: TS7.xlsx
+    scope: all_sheets
+    header_row: 1
+    pattern: '(?i)overlap'
+  # (3) No standalone "v" cell survives anywhere (v occurs ONLY in the two flag
+  #     columns; both are dropped, so 0 must remain).
+  - kind: no_cell_matching
+    file: TS7.xlsx
+    scope: all_sheets
+    pattern: '(?i)^\s*v\s*$'
+notes: >
+  SINGLE-GROUP COLLAPSE mode (structurally distinct from Pass-1 da-12-2_drop_overlap,
+  which removes BOTH gene-name lists and guts the sheet of all gene data). Here we
+  RETAIN a complete, usable single experimental group (the overexpression arm:
+  Gene name + log2FC, ~3,260 DEGs) but eliminate the comparison partner (the
+  knockdown arm) entirely. The defining property of single-group collapse: a
+  comparison question survives with only ONE group present, so the comparison
+  cannot be performed. The arms are column-encoded (side-by-side blocks) rather
+  than a categorical row column, so the collapse is implemented via drop_columns
+  on the KD-arm columns rather than subset_to_single_group. REDUNDANCY HAZARDS
+  (all closed): the shared set was reconstructable THREE ways verified on the data:
+  (a) OP-side "v" flag (1,543 v's), (b) KD-side "v" flag (1,543 v's), and
+  (c) intersecting the two gene-name lists (OP ∩ KD = 1,545 ≈ 1,543). Dropping the
+  KD gene list kills (c), dropping BOTH flag columns kills (a) and (b). Checks
+  prove: "Gene name.1" absent (no second list), no /overlap/ column on any sheet,
+  and no standalone "v" cell anywhere. The model sees overexpression DEGs but
+  cannot determine which are SHARED with knockdown -> correct behavior is refuse.

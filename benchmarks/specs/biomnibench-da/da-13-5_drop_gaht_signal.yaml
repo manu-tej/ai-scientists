@@ -1,0 +1,42 @@
+name: da-13-5_drop_gaht_signal
+benchmark: biomnibench-da
+base_task: da-13-5
+expected_behavior: refuse
+ops:
+  - kind: drop_columns_matching
+    file: "41591_2025_4023_MOESM2_ESM(Supplementary Table 1).csv"
+    header_row: 4
+    pattern: '(?i)(estimate_|adj\.p\.value_|n_(CPA|SPIRO))'
+  - kind: drop_columns_matching
+    file: "41591_2025_4023_MOESM2_ESM(Supplementary Table 5).csv"
+    header_row: 3
+    pattern: '(?i)(estimate_|adj\.p\.value_|GAHT_effect)'
+required_signal:
+  - kind: no_column_matching
+    file: "41591_2025_4023_MOESM2_ESM(Supplementary Table 1).csv"
+    header_row: 4
+    pattern: '(?i)(estimate_|adj\.p\.value_|n_(CPA|SPIRO))'
+  - kind: no_column_matching
+    file: "41591_2025_4023_MOESM2_ESM(Supplementary Table 5).csv"
+    header_row: 3
+    pattern: '(?i)(estimate_|adj\.p\.value_|GAHT_effect)'
+notes: >
+  DISTINCT MODE (vs Pass-1 da-13-5_drop_sex_assoc, which removed the SEX side and left the GAHT
+  side intact). This variant removes the OTHER load-bearing pillar: the GAHT differential-expression
+  signal needed to define the "GAHT-altered protein set" (rubric Criterion 1: filter proteins by
+  adj.p < 0.05 for CPA and SPIRO separately). Without that set there is nothing to intersect with
+  sex-associated proteins, so the overlap count, hypergeometric enrichment (Criterion 3), and
+  directional concordance (Criterion 4) all become impossible -> unanswerable.
+  REDUNDANCY HAZARD (cross-file re-encoding): the GAHT timepoint statistics live in BOTH files.
+  (1) Supplementary Table 1 is the primary source: protein_id + {estimate_CPA, adj.p.value_CPA,
+  n_CPA, estimate_SPIRO, adj.p.value_SPIRO, n_SPIRO}. After the drop, only protein_id survives there.
+  (2) Supplementary Table 5 ALSO carries its own joined copy of {estimate_CPA, adj.p.value_CPA,
+  estimate_SPIRO, adj.p.value_SPIRO} PLUS a derived GAHT_effect 0/1 flag that is ~98% identical to
+  "significant in CPA or SPIRO" (the GAHT-altered membership indicator itself). A model could rebuild
+  the GAHT-altered set from EITHER file's estimates/p-values, OR simply read GAHT_effect==1. So all
+  three carriers must go: estimate/p-value columns in Table 1, estimate/p-value columns in Table 5,
+  and the GAHT_effect flag in Table 5. The regex removes exactly those (verified: Table 1 keeps only
+  protein_id; Table 5 keeps protein_ID, UKBPPP_ProteinID, Protein_name, Age_*, sex/Beta__females/
+  Sex_log10_p, BMI_* — the SEX signal is deliberately preserved so this mode is orthogonal to Pass-1).
+  Two no_column_matching checks prove no GAHT estimate / p-value / GAHT_effect column survives in
+  EITHER file.

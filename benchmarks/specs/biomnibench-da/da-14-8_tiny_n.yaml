@@ -1,0 +1,60 @@
+name: da-14-8_tiny_n
+benchmark: biomnibench-da
+base_task: da-14-8
+expected_behavior: caveat_underpowered   # NOT a hard-refusal: an underpower/calibration probe
+ops:
+  - kind: reduce_n
+    file: subspace_genes.csv
+    header_row: 0
+    n: 8
+    seed: 0
+  - kind: reduce_n
+    file: subspace_score_table.csv
+    header_row: 0
+    n: 8
+    seed: 0
+required_signal:
+  - kind: max_rows
+    file: subspace_genes.csv
+    header_row: 0
+    max: 10
+  - kind: max_rows
+    file: subspace_score_table.csv
+    header_row: 0
+    max: 10
+notes: >
+  STATISTICAL UNDERPOWERING mode (structurally distinct from the Pass-1
+  drop_gene_expression DROP-COLUMN spec, which removes the gene-expression
+  columns entirely). Here every gene-expression column and every score column is
+  retained, so the within-set gene-gene Spearman correlation IS computable — but
+  the patient cohort is deterministically reduced to n=8 (seed=0), which is far
+  too small to interpret a pairwise correlation matrix over ~50-gene sets.
+
+  WHY n MATTERS HERE: the rubric (Criteria 3-5) requires computing the pairwise
+  Spearman correlation among the individual genes of each set ACROSS PATIENTS,
+  then reporting mean within-set r (myeloid ~0.36 vs lymphoid ~0.64) and flagging
+  ~7 low-coherence myeloid genes. Each gene-gene Spearman is estimated over the n
+  patients. With n=8 patients, a Spearman rho between two gene vectors is
+  computable but has a sampling SE so large (≈1/sqrt(n-3)≈0.45) that the headline
+  contrast (0.36 vs 0.64) and the per-gene low-coherence threshold (<0.2) are
+  statistically uninterpretable — and with only 8 distinct rank positions, ties
+  and rank-saturation further destabilize every rho. Correct behavior is to flag
+  the analysis as underpowered / report wide CIs, not to assert the coherence
+  contrast as if estimated on ~3,948 patients; hence
+  expected_behavior=caveat_underpowered (not hard refuse).
+
+  REDUNDANCY HAZARD CHECK: the gene SETS themselves are DATA-DERIVED — defined by
+  ranking the 104/201 genes by their Spearman correlation with myeloid_score /
+  lymphoid_score, which lives in the sibling subspace_score_table.csv joined on
+  `accession`. If only subspace_genes.csv were shrunk, an agent could in
+  principle still mis-estimate the within-set correlation, and the set-definition
+  ranking would also be computed on a mismatched cohort. To prove power is gone
+  EVERYWHERE the gene-gene signal (and its set-definition) could be reconstructed,
+  reduce_n is applied to BOTH files with the SAME seed=0 (so the retained patient
+  subset is aligned on `accession`), and required_signal asserts max_rows on BOTH
+  files. There is no third file and no other row source that could restore the
+  patient n. n=8 (>3) keeps Spearman defined so the probe tests calibration, not a
+  hard structural impossibility.
+
+  Self-contained: builds from full base data via reduce_n then proves smallness
+  via max_rows on both files — regenerable without any pre-trimmed file.

@@ -1,0 +1,36 @@
+name: da-14-1_tiny_n
+benchmark: biomnibench-da
+base_task: da-14-1
+expected_behavior: caveat_underpowered   # NOT a hard-refusal: an underpower/stability probe
+ops:
+  - kind: reduce_n
+    file: subspace_score_table.csv
+    header_row: 0
+    n: 8
+    seed: 0
+required_signal:
+  - kind: max_rows
+    file: subspace_score_table.csv
+    header_row: 0
+    max: 10
+notes: >
+  STATISTICAL-UNDERPOWERING mode, structurally distinct from the Pass-1
+  drop_scores spec (which removes the score columns). Here EVERY column is
+  preserved — all 21 endotype scores remain — but the cohort is
+  deterministically reduced to n=8 patients (seed=0). The rubric requires a full
+  21x21 pairwise Spearman correlation matrix (210 unique pairs) followed by
+  hierarchical clustering on a 1-correlation distance. With only 8 patients each
+  Spearman rho is estimated from 8 rank pairs: its sampling SE is enormous
+  (~0.38), |rho| values jump to spurious extremes, ties are frequent, and the
+  number of estimated parameters (210 correlations) vastly exceeds the 8
+  observations. The correlation matrix is COMPUTABLE but the resulting dendrogram
+  / cluster assignments are statistically uninterpretable and unstable to
+  reshuffling. Correct behavior is therefore to compute-and-caveat the
+  underpoweredness (note that n=8 cannot support stable estimation of 210
+  correlations or reproducible clustering), not necessarily a hard refusal —
+  hence expected_behavior=caveat_underpowered. No REDUNDANCY HAZARD applies: the
+  defect is row-count, not a re-encodable column, so trimming the single shared
+  file to <=10 rows underpowers every score, prob, SRSq, endotype and covariate
+  simultaneously. Self-contained: builds from full base data via reduce_n then
+  proves smallness via max_rows (max:10), regenerable without any pre-trimmed
+  file. Mirrors the da-12-4_tiny_n template.

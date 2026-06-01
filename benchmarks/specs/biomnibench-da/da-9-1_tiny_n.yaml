@@ -1,0 +1,41 @@
+name: da-9-1_tiny_n
+benchmark: biomnibench-da
+base_task: da-9-1
+expected_behavior: caveat_underpowered   # NOT a hard-refusal: an underpower/calibration probe
+ops:
+  - kind: reduce_n
+    file: NatureMed_CyTOF_metadata.csv
+    header_row: 0
+    n: 30
+    seed: 0
+required_signal:
+  - kind: max_rows
+    file: NatureMed_CyTOF_metadata.csv
+    header_row: 0
+    max: 30
+notes: >
+  STATISTICAL UNDERPOWERING mode (distinct from the Pass-1 structural
+  drop_survival). The rubric's analysis assembles its cohort by merging the
+  CyTOF metadata (filtered to baseline timepoint.id=='C1D1', ms=='Blood: CyTOF
+  %leuk', and Actual Arm=='A1') with the clinical and cell-population tables,
+  yielding 27 patients / 16 OS events on which a per-feature median-split KM +
+  log-rank test is run (NKT p~0.009, Tbet+ p~0.011, Tbet+TCRgd+ p~0.025, Ki-67+
+  p~0.027). The number of usable patients is GATED by how many qualifying rows
+  exist in NatureMed_CyTOF_metadata.csv: every cohort sample is one metadata row
+  that survives the baseline/%leuk/A1 filters. Deterministically reducing the
+  metadata to n=30 rows (seed=0) shrinks the post-filter A1 baseline cohort to a
+  handful of patients (well under the already-marginal 27), so the log-rank test
+  remains COMPUTABLE but statistically uninterpretable (a few events, CIs
+  spanning the null). Correct behavior is to flag the cohort as underpowered for
+  any biomarker-survival claim, not necessarily a hard refusal, hence
+  expected_behavior=caveat_underpowered.
+  REDUNDANCY HAZARD: the cohort size is the joint product of three tables, but
+  the metadata table is the binding gate — the clinical table (108 patients) and
+  the cell-population table (1633 long rows) only contribute samples that already
+  appear in the metadata via sample.id / Deidentified.ID. Shrinking metadata
+  alone therefore caps the achievable n everywhere; there is no sibling table
+  that can re-supply the dropped samples because a sample with no metadata row
+  cannot be mapped to a timepoint, measurement scale, or arm. The max_rows check
+  proves the metadata is small directly from the perturbed file; it is
+  self-contained and regenerable from full base data via reduce_n (no
+  pre-trimmed file required).

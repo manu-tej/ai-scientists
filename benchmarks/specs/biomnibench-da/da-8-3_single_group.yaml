@@ -1,0 +1,44 @@
+name: da-8-3_single_group
+benchmark: biomnibench-da
+base_task: da-8-3
+expected_behavior: refuse
+ops:
+  - kind: subset_to_single_group
+    file: data_cgm.csv
+    column: food
+    keep_value: Potatoes
+required_signal:
+  - kind: single_value_in
+    file: data_cgm.csv
+    column: food
+    max_distinct: 1
+  - kind: no_value_matching
+    file: data_cgm.csv
+    column: foods
+    pattern: '(?i)grape'
+  - kind: no_cell_matching
+    file: data_cgm.csv
+    pattern: '(?i)grape'
+notes: >
+  SINGLE-GROUP COLLAPSE mode (structurally distinct from Pass-1 da-8-3_drop_food,
+  which removed the food-identity columns entirely). The task compares TWO derived
+  phenotype groups — 'potato-spiker' vs 'grape-spiker' — where membership is NOT a
+  stored categorical column but is DERIVED from each subject's peak-glucose
+  response to the 'Potatoes' and 'Grapes' challenge meals in data_cgm.csv
+  (per-food median split). Here we KEEP the food labels intact but subset the CGM
+  to a SINGLE challenge food (Potatoes), so the Grapes challenge curves no longer
+  exist. With only one food's responses present, the grape-spiker group cannot be
+  constructed at all, collapsing the comparison to a single group: no two-group
+  differential abundance, no phenotype correlation, no mediating-lipid step.
+  REDUNDANCY HAZARD: food identity is re-encoded in TWO CGM columns — `food`
+  (Potatoes/Grapes/...) and `foods` (food + mitigator, e.g. Grapes+Fat). Because
+  every CGM row carries both fields consistently, subsetting food==Potatoes also
+  eliminates every Grapes row from `foods` (verified: surviving `foods` values are
+  only Potatoes/Potatoes+Fat/Potatoes+Fiber/Potatoes+Protein). The checks prove
+  the collapse holds everywhere: single_value_in on `food` (max_distinct:1),
+  no_value_matching '(?i)grape' on `foods`, and a global no_cell_matching
+  '(?i)grape' scan so no surviving CGM cell can reconstruct the grape group.
+  Verified the grape-spiker signal exists nowhere else: data_meta.csv has no
+  spiker/food/group column (only clinical labs + SSPG/DI/IE/Hepatic-IR
+  phenotypes); data_metabolomics.csv and data_lipids.csv expose samples only as
+  XB{subject}_{rep} abundance columns with zero food labels.

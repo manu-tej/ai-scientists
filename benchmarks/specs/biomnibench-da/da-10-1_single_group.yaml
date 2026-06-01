@@ -1,0 +1,56 @@
+name: da-10-1_single_group
+benchmark: biomnibench-da
+base_task: da-10-1
+expected_behavior: refuse
+ops:
+  - kind: drop_rows_by_value
+    file: sequence_prediction_filtered.xlsx
+    sheet: sheet1
+    header_row: 0
+    column: NoPS
+    keep_values: [1]
+required_signal:
+  - kind: single_value_in
+    file: sequence_prediction_filtered.xlsx
+    sheet: sheet1
+    column: SaPS
+    max_distinct: 1
+  - kind: single_value_in
+    file: sequence_prediction_filtered.xlsx
+    sheet: sheet1
+    column: PdPS
+    max_distinct: 1
+  - kind: single_value_in
+    file: sequence_prediction_filtered.xlsx
+    sheet: sheet1
+    column: hSaPS
+    max_distinct: 1
+  - kind: single_value_in
+    file: sequence_prediction_filtered.xlsx
+    sheet: sheet1
+    column: hPdPS
+    max_distinct: 1
+notes: >
+  STRUCTURALLY DISTINCT FROM Pass-1 (da-10-1_drop_pslabels): that variant DROPS
+  the label/classifier columns entirely (DROP-COLUMN mode). This is SINGLE-GROUP
+  COLLAPSE: the columns are LEFT IN PLACE but the table is row-subset to only the
+  non-phase-separating class (NoPS == 1), so every phase-separating positive
+  group vanishes. The whole task is a battery of two-group comparisons —
+  SaPS-vs-NoPS, PdPS-vs-NoPS, and the human-proteome replicas hSaPS-vs-hNoPS,
+  hPdPS-vs-hNoPS (rubric criteria 2-9: dataset construction, AA-composition
+  contrast, fold-change vs NoPS, human replication, per-class predictor AUC).
+  Keeping only NoPS==1 rows leaves a single group: the SaPS/PdPS/hSaPS/hPdPS
+  positive sets are now empty, so no positive-vs-negative set can be constructed,
+  no fold-change ratio has a numerator, and no ROC/AUC has two classes.
+  Base data verified: SaPS/PdPS/NoPS are mutually exclusive flags (SaPS&NoPS=0,
+  SaPS&PdPS=0); of 48,504 rows, 48,158 are NoPS==1. After the op, SaPS, PdPS,
+  hSaPS, hPdPS all collapse to the single value {0}.
+  REDUNDANCY HAZARD: the workbook also carries the trained class scores
+  SaPS-8fea/PdPS-8fea/SaPS-10fea/PdPS-10fea (+ _rnk) which are separable by class
+  and could in principle re-encode group membership by thresholding — BUT here
+  the PS-positive ROWS themselves are deleted, so those scores survive only on
+  NoPS proteins and cannot reconstruct any positive group. The checks therefore
+  assert single-value collapse on ALL FOUR positive-class label columns (SaPS,
+  PdPS, hSaPS, hPdPS), proving every comparison group is gone everywhere, not
+  just one. idr_ranges.xlsx holds only UniProt/start/end (no class membership),
+  so it cannot restore the groups.

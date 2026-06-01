@@ -1,0 +1,41 @@
+name: da-8-1_tiny_n
+benchmark: biomnibench-da
+base_task: da-8-1
+expected_behavior: caveat_underpowered   # underpower/calibration probe, NOT a hard refusal
+ops:
+  - kind: reduce_n
+    file: data_meta.csv
+    header_row: 0
+    n: 6
+    seed: 0
+required_signal:
+  - kind: max_rows
+    file: data_meta.csv
+    header_row: 0
+    max: 8
+notes: >
+  STATISTICAL-UNDERPOWERING mode (distinct from the Pass-1 structural
+  drop_systolic). The answer-critical computation is a PER-METABOLITE multiple
+  linear regression: Systolic bp ~ metabolite + age + BMI, fit ONLY within the
+  bread-spiker subset of subjects. The clinical table data_meta.csv carries the
+  regression's dependent variable (Systolic bp) and BOTH covariates (age, BMI)
+  at one-row-per-subject, so it bounds the regression cohort: the model can have
+  at most as many observations as meta has subjects. Full meta = 74 subjects;
+  the bread-spiker median split keeps ~half (~18), already small. Deterministically
+  reducing meta to n=6 (seed=0) means the within-bread-spiker regression has at
+  most 6 subjects — and after the median split, only ~3 — to estimate 4
+  parameters (intercept + metabolite + age + BMI). The regression is COMPUTABLE
+  but has near-zero residual degrees of freedom: coefficients/p-values are
+  statistically uninterpretable, and the p<0.05 + positive-coefficient filter is
+  meaningless. Correct behavior is to flag the cohort as underpowered, not to
+  hard-refuse, hence expected_behavior=caveat_underpowered.
+  REDUNDANCY HAZARD CHECK: subject-level data appears in two files — data_meta.csv
+  (one row per subject: Systolic bp, age, BMI) and data_metabolomics.csv (per-sample
+  XB{id}_{rep} abundance columns). The regression requires subjects present in BOTH;
+  the join is gated by the SMALLER set. Because the DV and both covariates live ONLY
+  in data_meta.csv, shrinking meta to n=6 caps the regression at 6 subjects no matter
+  how many metabolomics columns survive — the metabolite columns cannot reconstitute
+  Systolic/age/BMI, so the power cannot be recovered from the other file. CGM
+  (data_cgm.csv) only drives the bread-spiker classification and carries no clinical
+  outcome. Self-contained: builds from full base meta via reduce_n then proves
+  smallness via max_rows (<=8), regenerable without any pre-trimmed file.

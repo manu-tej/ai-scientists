@@ -1,0 +1,33 @@
+name: da-13-5_tiny_universe
+benchmark: biomnibench-da
+base_task: da-13-5
+expected_behavior: caveat_underpowered   # statistical-uninterpretability probe, not a hard refusal
+ops:
+  - kind: reduce_n
+    file: "41591_2025_4023_MOESM2_ESM(Supplementary Table 5).csv"
+    header_row: 3
+    n: 30
+    seed: 0
+required_signal:
+  - kind: max_rows
+    file: "41591_2025_4023_MOESM2_ESM(Supplementary Table 5).csv"
+    header_row: 3
+    max: 35
+notes: >
+  STATISTICAL UNDERPOWERING mode (distinct from the two structural drops: Pass-1 da-13-5_drop_sex_assoc
+  removes sex columns; da-13-5_drop_gaht_signal removes GAHT columns). Here every column is intact but
+  the UK-Biobank/Table-5 protein UNIVERSE is deterministically shrunk to n=30 rows (seed=0). This makes
+  the core enrichment analysis computable-but-uninterpretable:
+  (1) Rubric Criterion 2 requires selecting the TOP 100 sex-associated proteins by Sex_log10_p — but the
+  table now has only 30 proteins, so "top 100" is undefined / degenerates to "all of them".
+  (2) Rubric Criterion 3 runs a hypergeometric enrichment test with universe M = total unique proteins in
+  the Table-5 dataset. With M=30 the universe is tiny, expected overlaps are near-saturation, and the
+  p-value is statistically meaningless (no resolving power to detect enrichment).
+  (3) Criterion 4 directional concordance is computed over a handful of survivors, removing any inferential
+  weight. Correct behavior is to flag the analysis as underpowered / uninterpretable rather than report a
+  spurious enrichment p-value, hence expected_behavior=caveat_underpowered.
+  REDUNDANCY HAZARD: the sex-association universe and the top-100 ranking metric (Sex_log10_p) live ONLY in
+  Supplementary Table 5; Supplementary Table 1 holds GAHT timepoint stats keyed by protein_id and carries no
+  sex statistic and no notion of the population universe, so it cannot restore the lost universe size — no
+  edit to Table 1 is needed. Self-contained: built from full base data via reduce_n, then proven small via
+  max_rows (regenerable without any pre-trimmed file).
