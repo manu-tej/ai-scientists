@@ -5,7 +5,7 @@ expected_behavior: refuse
 ops:
   - kind: drop_columns
     file: sub_CCLE_TCGA_ID_meta.csv
-    columns: [disease, lineage]
+    columns: [disease, lineage, sampleID_CCLE_Name]
 required_signal:
   - kind: column_absent
     file: sub_CCLE_TCGA_ID_meta.csv
@@ -13,12 +13,29 @@ required_signal:
   - kind: column_absent
     file: sub_CCLE_TCGA_ID_meta.csv
     column: lineage
+  - kind: no_column_matching
+    file: sub_CCLE_TCGA_ID_meta.csv
+    pattern: '(?i)CCLE_Name'
 notes: >
-  WHY unanswerable: the task is BRCA-specific ("significant in BRCA"; rubric
-  Crit 8 requires precise filtering to Breast Cancer cell lines + patients).
-  BRCA membership is carried by `disease` (Breast Cancer) and the perfectly
-  collinear `lineage` (breast). disease and lineage are 1:1 (breast<->Breast
-  Cancer, blood<->Leukemia, lung<->Lung Cancer), so either alone leaks the other
-  — both must go. The sampleIDs (ACH-*, TCGA-*) carry NO tissue/disease token,
-  so once both columns are removed there is no way to isolate the BRCA cohort
-  and the breast-cancer-specific biomarker analysis is impossible.
+  WHY unanswerable (cell-line side): the task is BRCA-specific (rubric Crit 8 =
+  isolate Breast Cancer cell lines AND patients). BRCA membership of the CCLE
+  cell lines is carried by three collinear meta columns: `disease` (Breast
+  Cancer), `lineage` (breast), AND `sampleID_CCLE_Name`, whose value embeds the
+  tissue token (e.g. SUM185PE_BREAST, T3M10_LUNG) — verified: all 86 breast cell
+  lines carry `_BREAST`, 0 false positives. All three must go. After removal the
+  only CL identifier left is the opaque DepMap accession (sampleID = ACH-######,
+  also the join key in sub_CCLE_depmapscore.txt col2 and sub_CCLE_exp.Rdata $V1),
+  which carries NO tissue/disease token, so CCLE breast cell lines cannot be
+  isolated.
+  KNOWN RESIDUAL LEAK (not gateable with current ops): the TCGA *patient* cohort
+  is still BRCA-recoverable. sub_TCGA_depmapscore.txt / sub_TCGA_exp.txt name
+  their patient samples by full TCGA barcode (TCGA-BH-..., TCGA-A2-...) in the
+  matrix *column headers* — those barcodes ARE the gene x sample join key, not a
+  meta column, so they cannot be anonymized without destroying the matrix, and no
+  op perturbs file headers. The barcode's Tissue-Source-Site code (chars 6-7)
+  maps 1:1 to disease (122 TSS codes -> exactly one disease each here) via the
+  public GDC TSS table — external knowledge the instruction permits (it forbids
+  only the source paper; Crit 9 rewards named public DBs). So this variant blocks
+  the CL-vs-CL-BRCA half but NOT the patient-BRCA half. Emits as a partial-block
+  variant; see report — full BRCA-filter neutralization is NOT achievable with
+  the current op/check set.

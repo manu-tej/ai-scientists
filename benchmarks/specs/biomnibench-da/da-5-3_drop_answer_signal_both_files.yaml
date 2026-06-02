@@ -1,0 +1,94 @@
+name: da-5-3_drop_answer_signal_both_files
+benchmark: biomnibench-da
+base_task: da-5-3
+expected_behavior: refuse
+ops:
+  # Comprehensive: remove EVERY carrier of the scored answer across BOTH files.
+  # ---- mmc4.xlsx Table S4A (the true answer table) ----
+  # 1) the activating-site filter (Criterion 1)
+  # 2) the 8 per-cancer joint tumour-up + dependency flags + CancerTypeCount
+  #    (Criterion 2 pair generation, Criterion 3 per-cancer distribution; the
+  #    rowsum CancerTypeCount leaks the 90-site set and 213-pair total -> drop)
+  # 3) the S4A-internal druggability signal: the `Tier` label AND the redundant
+  #    Tier1..Tier5 membership flags (the rubric's primary druggable filter is
+  #    `sum(Tier1..Tier5) > 0` and the Tier column drives tier stratification —
+  #    EITHER reconstructs druggability, so both must go)
+  - kind: drop_columns
+    file: mmc4.xlsx
+    sheet: Table S4A
+    header_row: 0
+    columns: [ActivatingSite, CCRCC, COAD, HNSCC, LSCC, LUAD, OV, PDAC, UCEC, CancerTypeCount, Tier, Tier1, Tier2, Tier3, Tier4, Tier5]
+  # ---- mmc2.xlsx Table S2A (the OPTIONAL alternative druggability route) ----
+  # Criterion 1 allows restricting to druggable proteins "OR by joining to S2A
+  # with a valid Assigned Tier". Close that route too: drop Assigned Tier and the
+  # leaky Possible Tiers (which lists candidate tiers incl. the assigned one).
+  - kind: drop_columns
+    file: mmc2.xlsx
+    sheet: Table S2A
+    header_row: 0
+    columns: [Assigned Tier, Possible Tiers]
+required_signal:
+  # S4A carriers gone
+  - kind: column_absent
+    file: mmc4.xlsx
+    sheet: Table S4A
+    header_row: 0
+    column: ActivatingSite
+  - kind: column_absent
+    file: mmc4.xlsx
+    sheet: Table S4A
+    header_row: 0
+    column: CCRCC
+  - kind: column_absent
+    file: mmc4.xlsx
+    sheet: Table S4A
+    header_row: 0
+    column: UCEC
+  - kind: column_absent
+    file: mmc4.xlsx
+    sheet: Table S4A
+    header_row: 0
+    column: CancerTypeCount
+  - kind: column_absent
+    file: mmc4.xlsx
+    sheet: Table S4A
+    header_row: 0
+    column: Tier
+  - kind: column_absent
+    file: mmc4.xlsx
+    sheet: Table S4A
+    header_row: 0
+    column: Tier1
+  - kind: column_absent
+    file: mmc4.xlsx
+    sheet: Table S4A
+    header_row: 0
+    column: Tier5
+  # S2A alternative druggability route gone
+  - kind: column_absent
+    file: mmc2.xlsx
+    sheet: Table S2A
+    header_row: 0
+    column: Assigned Tier
+  - kind: column_absent
+    file: mmc2.xlsx
+    sheet: Table S2A
+    header_row: 0
+    column: Possible Tiers
+notes: >
+  WHY unanswerable (blocks the answer across BOTH files): the scored answer is
+  built end-to-end inside mmc4.xlsx Table S4A — filter ActivatingSite == 1,
+  restrict to druggable via sum(Tier1..Tier5) > 0 (or the Tier label), then melt
+  the 8 per-cancer flags (CCRCC..UCEC) to phosphosite-cancer pairs. This variant
+  removes every one of those carriers in S4A: the ActivatingSite filter
+  (Criterion 1), all 8 cohort flags plus their exact rowsum CancerTypeCount
+  (Criterion 2 pair generation + Criterion 3 per-cancer distribution; nothing is
+  left to count or melt), and the entire druggability signal Tier + Tier1..Tier5
+  (Criterion 1 druggable restriction + Criterion 3 tier stratification). With all
+  three signals gone S4A cannot yield any candidate hit. The only alternative
+  druggability route the rubric allows is joining to mmc2.xlsx Table S2A's
+  Assigned Tier — also dropped here (with the leaky Possible Tiers) — but even an
+  intact S2A could not rescue the answer, because the tumour-up + dependency
+  evidence and the activating-site annotation exist ONLY in S4A and have no
+  counterpart in mmc2.xlsx. Hence the answer is recoverable from neither mmc4 nor
+  mmc2.

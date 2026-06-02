@@ -1,0 +1,76 @@
+name: da-5-3_drop_cohort_flags_s4a
+benchmark: biomnibench-da
+base_task: da-5-3
+expected_behavior: refuse
+ops:
+  # The SCORED answer (90 phosphosites, 213 phosphosite-cancer pairs, the per-cancer
+  # distribution) is built ENTIRELY inside mmc4.xlsx Table S4A by melting the 8
+  # per-cancer joint-indicator flags (CCRCC..UCEC). These flags are the primary
+  # answer signal (Criterion 2 = 30 pts) — each == 1 encodes BOTH tumour-up AND
+  # matched-lineage DepMap dependency at adj-p<=0.01, and cannot be recomputed
+  # from anything in the local data. CancerTypeCount is the exact rowsum of the 8
+  # flags, so it leaks both the 90-site set (CancerTypeCount>0) and the 213 pair
+  # total (sum) — drop it too or the answer survives.
+  - kind: drop_columns
+    file: mmc4.xlsx
+    sheet: Table S4A
+    header_row: 0
+    columns: [CCRCC, COAD, HNSCC, LSCC, LUAD, OV, PDAC, UCEC, CancerTypeCount]
+required_signal:
+  - kind: column_absent
+    file: mmc4.xlsx
+    sheet: Table S4A
+    header_row: 0
+    column: CCRCC
+  - kind: column_absent
+    file: mmc4.xlsx
+    sheet: Table S4A
+    header_row: 0
+    column: COAD
+  - kind: column_absent
+    file: mmc4.xlsx
+    sheet: Table S4A
+    header_row: 0
+    column: HNSCC
+  - kind: column_absent
+    file: mmc4.xlsx
+    sheet: Table S4A
+    header_row: 0
+    column: LSCC
+  - kind: column_absent
+    file: mmc4.xlsx
+    sheet: Table S4A
+    header_row: 0
+    column: LUAD
+  - kind: column_absent
+    file: mmc4.xlsx
+    sheet: Table S4A
+    header_row: 0
+    column: OV
+  - kind: column_absent
+    file: mmc4.xlsx
+    sheet: Table S4A
+    header_row: 0
+    column: PDAC
+  - kind: column_absent
+    file: mmc4.xlsx
+    sheet: Table S4A
+    header_row: 0
+    column: UCEC
+  - kind: column_absent
+    file: mmc4.xlsx
+    sheet: Table S4A
+    header_row: 0
+    column: CancerTypeCount
+notes: >
+  WHY unanswerable: the question asks which activating phosphosites are tumour-up
+  AND CRISPR-dependency-supported in matched cell lines. That joint evidence lives
+  ONLY in S4A's 8 per-cancer flags (CCRCC..UCEC), and the answer is produced by
+  melting those flags to phosphosite-cancer pairs. With all 8 flags gone there is
+  no per-cancer evidence to test or melt, so no candidate pair can be formed and
+  the per-cancer distribution (Criterion 3) is impossible. CancerTypeCount is the
+  exact rowsum of the 8 flags and is dropped in the same op so the 90-site set
+  (count>0) and the 213-pair total (sum) cannot be back-derived. The signal does
+  NOT live in mmc2.xlsx — S2A only supplies druggability tiers, which alone cannot
+  answer the tumour-up + dependency question — so perturbing S4A's cohort flags
+  blocks the answer across both files (mmc2 carries no joint-indicator signal).

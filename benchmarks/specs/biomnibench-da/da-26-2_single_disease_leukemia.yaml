@@ -25,10 +25,21 @@ required_signal:
     column: lineage
     pattern: '(?i)breast'
 notes: >
-  WHY unanswerable: single-group collapse to a NON-breast cohort. The question is
-  explicitly about BRCA (rubric Crit 8 = isolate Breast Cancer samples). Subsetting
-  to only Leukemia / blood removes every Breast Cancer sample from both cohorts, so
-  there is no BRCA data to analyze. (disease and lineage are collinear; both are
-  collapsed to keep the metadata internally consistent and to guarantee no `breast`
-  rows survive.) Keeping Breast Cancer would have made the task MORE answerable, so
-  the only valid single-disease collapse for this task drops the breast cohort.
+  WHY unanswerable (cell-line side): single-group collapse of the metadata to a
+  NON-breast cohort. The question is explicitly about BRCA (rubric Crit 8 =
+  isolate Breast Cancer samples). Subsetting the ID-meta to only Leukemia / blood
+  removes every Breast Cancer row, so the metadata can no longer label any CCLE
+  cell line as breast. disease and lineage are collinear and both are collapsed;
+  collapsing also eliminates the `sampleID_CCLE_Name` tissue-token leak (verified:
+  0 `_BREAST` values survive the Leukemia collapse). The only remaining CL key is
+  the opaque ACH-###### accession, so CCLE breast cell lines cannot be isolated.
+  KNOWN RESIDUAL LEAK (not gateable with current ops): subset_to_single_group
+  edits ONLY this CSV; the builder hardlinks the data tree and copy-on-writes only
+  files an op names, so sub_TCGA_depmapscore.txt / sub_TCGA_exp.txt keep ALL
+  patient samples, and their matrix *column headers* are full TCGA barcodes
+  (TCGA-BH-..., TCGA-A2-...). Those barcodes are the gene x sample join key (not a
+  meta column) and the TSS code (chars 6-7) maps 1:1 to disease via the public GDC
+  TSS table, so a model can still isolate BRCA *patients* with external knowledge
+  the instruction permits. Blocks the CL-BRCA half only; full BRCA neutralization
+  is NOT achievable with the current op/check set (would need a row-subset op that
+  also prunes matrix columns, or barcode anonymization that preserves the join).
