@@ -11,6 +11,16 @@ from pathlib import Path
 
 import pandas as pd
 
+# Read xlsx via calamine (Rust) when available — ~3x faster than openpyxl on
+# large sheets (6s vs 19s on a 279k-row supplement), identical values. Writes
+# still use openpyxl (only structure-preserving writer). engine=None => pandas
+# default, so this degrades gracefully if calamine isn't installed.
+try:
+    import python_calamine as _pc  # noqa: F401
+    _XLSX_READ_ENGINE = "calamine"
+except ImportError:
+    _XLSX_READ_ENGINE = None
+
 
 class UnsupportedFormat(Exception):
     pass
@@ -79,13 +89,15 @@ class TabularAdapter:
 
     def list_columns(self, sheet=None, header_row=0) -> list:
         if self.is_excel:
-            return list(pd.read_excel(self.path, sheet_name=self._sheet(sheet), header=header_row, nrows=1).columns)
+            return list(pd.read_excel(self.path, sheet_name=self._sheet(sheet), header=header_row,
+                                      nrows=1, engine=_XLSX_READ_ENGINE).columns)
         rows = self._rows()
         return [c for c in rows[header_row] if c != ""] if len(rows) > header_row else []
 
     def column_values(self, column, sheet=None, header_row=0) -> list:
         if self.is_excel:
-            df = pd.read_excel(self.path, sheet_name=self._sheet(sheet), header=header_row)
+            df = pd.read_excel(self.path, sheet_name=self._sheet(sheet), header=header_row,
+                               engine=_XLSX_READ_ENGINE)
             return df[column].dropna().astype(str).tolist() if column in df.columns else []
         rows = self._rows()
         header = rows[header_row]
@@ -96,11 +108,12 @@ class TabularAdapter:
 
     def n_rows(self, sheet=None, header_row=0) -> int:
         if self.is_excel:
-            return len(pd.read_excel(self.path, sheet_name=self._sheet(sheet), header=header_row))
+            return len(pd.read_excel(self.path, sheet_name=self._sheet(sheet), header=header_row,
+                                     engine=_XLSX_READ_ENGINE))
         return max(0, len(self._rows()) - header_row - 1)
 
     def sheet_names(self) -> list:
-        return pd.ExcelFile(self.path).sheet_names if self.is_excel else ["<csv>"]
+        return pd.ExcelFile(self.path, engine=_XLSX_READ_ENGINE).sheet_names if self.is_excel else ["<csv>"]
 
     # ---- writes ---- #
     def drop_columns(self, columns, sheet=None, header_row=0) -> None:
@@ -147,9 +160,18 @@ class TabularAdapter:
         gcol = next((cell.column for cell in ws[hdr] if cell.value == column), None)
         if gcol is None:
             raise KeyError(f"column {column!r} not found in sheet {sheet!r}")
-        for r in range(ws.max_row, hdr, -1):
-            if str(ws.cell(row=r, column=gcol).value) not in keep:
-                ws.delete_rows(r, 1)
+        # Deleting rows one-at-a-time is O(n^2) and hangs on large sheets (a 279k-row
+        # supplement took effectively forever). Instead: snapshot the data rows once,
+        # keep the matching ones, clear the whole data region in a single delete, and
+        # append the survivors back. Title rows (1..header_row) + header stay intact.
+        first_data = hdr + 1
+        kept_rows = [tuple(c.value for c in row)
+                     for row in ws.iter_rows(min_row=first_data, max_row=ws.max_row)
+                     if str(row[gcol - 1].value) in keep]
+        if ws.max_row >= first_data:
+            ws.delete_rows(first_data, ws.max_row - first_data + 1)
+        for vals in kept_rows:
+            ws.append(vals)
         wb.save(self.path)
 
     def reduce_rows(self, n, seed=0, sheet=None, header_row=0) -> None:

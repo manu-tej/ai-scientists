@@ -1,0 +1,32 @@
+name: da-6-5_drop_feature_key
+benchmark: biomnibench-da
+base_task: da-6-5
+expected_behavior: refuse
+ops:
+  - kind: drop_columns
+    file: paper_deg.xlsx
+    sheet: "2 - Training-regulated features"
+    header_row: 18
+    columns: [feature, feature_ID, non_redundant_feature_ID]
+required_signal:
+  - kind: column_absent
+    file: paper_deg.xlsx
+    sheet: "2 - Training-regulated features"
+    header_row: 18
+    column: feature
+  - kind: column_absent
+    file: paper_deg.xlsx
+    sheet: "2 - Training-regulated features"
+    header_row: 18
+    column: feature_ID
+  - kind: column_absent
+    file: paper_deg.xlsx
+    sheet: "2 - Training-regulated features"
+    header_row: 18
+    column: non_redundant_feature_ID
+notes: >
+  WHY unanswerable: Criteria 3 (per-(tissue,assay) de-duplication by feature ID) and 4
+  (set-similarity Jaccard/overlap on training-regulated feature SETS) both require a
+  feature identifier to define set membership and to de-duplicate across sex/timepoint.
+  Dropping feature, feature_ID and non_redundant_feature_ID leaves rows with no key to
+  form or intersect feature sets, so no tissue x tissue set-similarity can be computed.

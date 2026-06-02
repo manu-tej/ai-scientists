@@ -54,7 +54,8 @@ def _file_content_hash(f: Path) -> bytes:
     if f.suffix.lower() in (".xlsx", ".xls"):
         try:
             import pandas as pd
-            xl = pd.ExcelFile(f)
+            from benchmarks.variant_pipeline.adapters import _XLSX_READ_ENGINE
+            xl = pd.ExcelFile(f, engine=_XLSX_READ_ENGINE)
             parts = []
             for sheet in sorted(xl.sheet_names):
                 df = xl.parse(sheet, header=None, dtype=str)

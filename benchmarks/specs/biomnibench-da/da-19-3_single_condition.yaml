@@ -1,0 +1,32 @@
+name: da-19-3_single_condition
+benchmark: biomnibench-da
+base_task: da-19-3
+expected_behavior: refuse
+ops:
+  # Collapse the manifest to a single treatment arm (DMSO). This drops the two
+  # AI-10-49 ChIP rows (GSM2715536 H3K27ac, GSM2715538 RUNX1), leaving only the
+  # DMSO arm so no RUNX1 treatment-vs-control contrast can be formed.
+  - kind: subset_to_single_group
+    file: processed_data/chipseq/peaks/chipseq_peak_calls.tsv
+    column: condition
+    keep_value: DMSO
+required_signal:
+  - kind: single_value_in
+    file: processed_data/chipseq/peaks/chipseq_peak_calls.tsv
+    column: condition
+    max_distinct: 1
+  # No AI-10-49 arm survives anywhere in the manifest (condition, GSM ids, SRR
+  # accessions, BAM paths, peak prefixes, or narrowPeak references).
+  - kind: no_value_matching
+    file: processed_data/chipseq/peaks/chipseq_peak_calls.tsv
+    column: condition
+    pattern: '(?i)AI-10-49'
+notes: >
+  WHY unanswerable: the question asks how RUNX1 chromatin occupancy CHANGES upon
+  CBFB-SMMHC inhibition (AI-10-49) relative to DMSO -- inherently a two-group
+  comparison yielding gained/lost/unchanged peak clusters. Subsetting the manifest
+  to condition == DMSO retains only the DMSO RUNX1 sample (GSM2715537) and DMSO
+  H3K27ac sample (GSM2715535); both AI-10-49 ChIP samples (GSM2715536, GSM2715538)
+  are removed. With a single condition (n_groups = 1) there is no AI-10-49 RUNX1
+  arm to contrast against DMSO, so no directional occupancy change and no
+  promoter-enrichment of gained sites can be computed.

@@ -1,0 +1,33 @@
+name: da-4-7_drop_response
+benchmark: biomnibench-da
+base_task: da-4-7
+expected_behavior: refuse
+ops:
+  - kind: drop_columns
+    file: mmc1.csv
+    columns: [response, "Pathological Response", "Pathological Response Rate", response_rate]
+required_signal:
+  - kind: column_absent
+    file: mmc1.csv
+    column: response
+  - kind: column_absent
+    file: mmc1.csv
+    column: "Pathological Response"
+  - kind: column_absent
+    file: mmc1.csv
+    column: "Pathological Response Rate"
+  - kind: column_absent
+    file: mmc1.csv
+    column: response_rate
+notes: >
+  WHY unanswerable: rubric C6 (15pt) requires joining MPR / pCR labels from
+  mmc1.csv to the candidate TCRs and prioritising clones enriched in responders.
+  The categorical label lives in two mutually-leaky columns — `response`
+  (pCR/MPR/nPR/pPR) and `Pathological Response` (pCR/MPR/non-MPR), which map onto
+  each other near-perfectly (nPR+pPR -> non-MPR) — so both are dropped. The two
+  numeric columns `Pathological Response Rate` and `response_rate` are byte-for-byte
+  identical and each is a near-perfect proxy (rate >= 0.9 separates MPR/pCR
+  responders from non-MPR with the rate==1.00 rows being exactly the 141 pCR
+  patients), the same response-rate leak seen in da-4-1; both are dropped. With no
+  response label or rate proxy, candidates cannot be tied to or prioritised by
+  pathological response.

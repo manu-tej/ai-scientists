@@ -1,0 +1,37 @@
+name: da-6-5_drop_tissue
+benchmark: biomnibench-da
+base_task: da-6-5
+expected_behavior: refuse
+ops:
+  - kind: drop_columns
+    file: paper_deg.xlsx
+    sheet: "2 - Training-regulated features"
+    header_row: 18
+    columns: [tissue, tissue_code, feature]
+required_signal:
+  - kind: column_absent
+    file: paper_deg.xlsx
+    sheet: "2 - Training-regulated features"
+    header_row: 18
+    column: tissue
+  - kind: column_absent
+    file: paper_deg.xlsx
+    sheet: "2 - Training-regulated features"
+    header_row: 18
+    column: tissue_code
+  - kind: column_absent
+    file: paper_deg.xlsx
+    sheet: "2 - Training-regulated features"
+    header_row: 18
+    column: feature
+  - kind: no_cell_matching
+    file: paper_deg.xlsx
+    scope: all_sheets
+    pattern: '(?i)\b(t\d+-[a-z]+|HEART|LIVER|LUNG|KIDNEY|HIPPOC|CORTEX|HYPOTH|SPLEEN|SKM-GN|SKM-VL|gastroc|WAT-SC|BAT|ADRNL|SMLINT|COLON|OVARY|TESTES|BLOOD|PLASMA|VENACV|ADIPOSE)\b'
+notes: >
+  WHY unanswerable: The tissue dimension is the axis of the entire question — Criteria
+  1, 4 (tissue x tissue similarity matrix), 5 (tissue x assay coverage gaps) and 6 all
+  require the tissue label. Dropping tissue + the sibling tissue_code (e.g. t58-heart)
+  removes it; the 'feature' column (format [assay];[tissue];[feature_ID]) also leaks the
+  tissue and is dropped. no_cell_matching proves no surviving cell carries a tissue token,
+  so a tissue x tissue similarity matrix cannot be built.

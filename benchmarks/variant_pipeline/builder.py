@@ -27,8 +27,10 @@ class BuildResult:
 def _preflight_formats(spec: VariantSpec, base_data: Path) -> None:
     """Fail fast if any op targets a file we have no adapter for."""
     for op in spec.ops:
-        f = base_data / op.params["file"]
-        get_adapter(f)  # raises UnsupportedFormat
+        rel = op.params.get("file")
+        if not rel:           # file-level op (e.g. anonymize_filenames) — no single target
+            continue
+        get_adapter(base_data / rel)  # raises UnsupportedFormat
 
 
 def build_variant(spec: VariantSpec, base_data: Path, out_data: Path,

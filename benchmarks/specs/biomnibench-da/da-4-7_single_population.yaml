@@ -1,0 +1,35 @@
+name: da-4-7_single_population
+benchmark: biomnibench-da
+base_task: da-4-7
+expected_behavior: refuse
+ops:
+  - kind: drop_rows_by_value
+    file: GSE243013_T_with_TCR_annotation.csv.gz
+    column: T_new_name
+    keep_values: [other]
+  - kind: drop_columns
+    file: GSE243013_T_with_TCR_annotation.csv.gz
+    columns: [sub_cell_type, expansion]
+required_signal:
+  - kind: single_value_in
+    file: GSE243013_T_with_TCR_annotation.csv.gz
+    column: T_new_name
+    max_distinct: 1
+  - kind: no_value_matching
+    file: GSE243013_T_with_TCR_annotation.csv.gz
+    column: T_new_name
+    pattern: "(?i)terminal_?Tex"
+  - kind: column_absent
+    file: GSE243013_T_with_TCR_annotation.csv.gz
+    column: sub_cell_type
+  - kind: column_absent
+    file: GSE243013_T_with_TCR_annotation.csv.gz
+    column: expansion
+notes: >
+  WHY unanswerable: collapsing T_new_name to the single residual level "other"
+  deletes every expanded_terminal_Tex (and CD8Texp / Treg) cell from the cohort,
+  so the target population the rubric mines for public TCRs (C1) simply does not
+  exist in the data — zero rows to subset. sub_cell_type and expansion are dropped
+  alongside because CD8T_terminal_Tex_LAYN ∩ expanded reconstructs the exact same
+  8,718-cell population (verified 100% agreement) and would otherwise re-introduce
+  the group that the single-level collapse was meant to remove.

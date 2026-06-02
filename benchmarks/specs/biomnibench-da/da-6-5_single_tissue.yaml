@@ -1,0 +1,23 @@
+name: da-6-5_single_tissue
+benchmark: biomnibench-da
+base_task: da-6-5
+expected_behavior: refuse
+ops:
+  - kind: subset_to_single_group
+    file: paper_deg.xlsx
+    sheet: "2 - Training-regulated features"
+    header_row: 18
+    column: tissue
+    keep_value: LIVER
+required_signal:
+  - kind: single_value_in
+    file: paper_deg.xlsx
+    sheet: "2 - Training-regulated features"
+    header_row: 18
+    column: tissue
+    max_distinct: 1
+notes: >
+  WHY unanswerable: The question asks which TISSUES exhibit the most similar changes —
+  a between-tissue comparison (Criteria 4-6 build a tissue x tissue similarity matrix).
+  Subsetting to a single tissue (LIVER) leaves n_tissues=1, so no tissue pair exists and
+  no cross-tissue coordination can be assessed.

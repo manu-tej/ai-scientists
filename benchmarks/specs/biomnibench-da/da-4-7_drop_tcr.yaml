@@ -1,0 +1,35 @@
+name: da-4-7_drop_tcr
+benchmark: biomnibench-da
+base_task: da-4-7
+expected_behavior: refuse
+ops:
+  - kind: drop_columns
+    file: GSE243013_T_with_TCR_annotation.csv.gz
+    columns: [TRA_v_gene, TRA_j_gene, TRA_cdr3, TRB_v_gene, TRB_j_gene, TRB_cdr3, clonotype, clonotype_number]
+required_signal:
+  - kind: column_absent
+    file: GSE243013_T_with_TCR_annotation.csv.gz
+    column: TRA_cdr3
+  - kind: column_absent
+    file: GSE243013_T_with_TCR_annotation.csv.gz
+    column: TRB_cdr3
+  - kind: column_absent
+    file: GSE243013_T_with_TCR_annotation.csv.gz
+    column: TRA_v_gene
+  - kind: column_absent
+    file: GSE243013_T_with_TCR_annotation.csv.gz
+    column: TRB_v_gene
+  - kind: column_absent
+    file: GSE243013_T_with_TCR_annotation.csv.gz
+    column: clonotype
+notes: >
+  WHY unanswerable: public-TCR discovery requires a SEQUENCE-based clonotype key
+  built from paired TRA + TRB CDR3 amino-acid sequences plus V/J gene usage
+  (rubric C2, 14pt, explicitly forbids relying on patient-specific clonotype IDs).
+  Dropping TRA/TRB CDR3 + V/J removes the only cross-patient-comparable identifier,
+  so clonotypes cannot be defined (C2), per-patient expansion cannot be quantified
+  by clonotype (C3), no public TCR shared across >=2 patients can be found (C4),
+  and no candidate TCR can be reported with paired-chain specs (C5). The
+  patient-specific `clonotype` / `clonotype_number` columns are also dropped
+  because their `Pxxx_clonetype_N` IDs never match across patients and would only
+  invite the disallowed patient-specific-ID shortcut, never a real public TCR.

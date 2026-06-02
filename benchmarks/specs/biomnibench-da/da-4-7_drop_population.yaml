@@ -1,0 +1,27 @@
+name: da-4-7_drop_population
+benchmark: biomnibench-da
+base_task: da-4-7
+expected_behavior: refuse
+ops:
+  - kind: drop_columns
+    file: GSE243013_T_with_TCR_annotation.csv.gz
+    columns: [T_new_name, sub_cell_type, expansion]
+required_signal:
+  - kind: column_absent
+    file: GSE243013_T_with_TCR_annotation.csv.gz
+    column: T_new_name
+  - kind: column_absent
+    file: GSE243013_T_with_TCR_annotation.csv.gz
+    column: sub_cell_type
+  - kind: column_absent
+    file: GSE243013_T_with_TCR_annotation.csv.gz
+    column: expansion
+notes: >
+  WHY unanswerable: the entire analysis is anchored on the expanded terminal-Tex
+  population. The rubric (C1, 19pt, and the backbone of C2-C6) requires subsetting
+  to cells where T_new_name == "expanded_terminal_Tex". That label is a perfect
+  intersection of sub_cell_type == "CD8T_terminal_Tex_LAYN" AND expansion ==
+  "expanded" (verified: 8,718 cells, 100% agreement), so all three columns are
+  mutually leaky and must be dropped together. With no population/exhaustion-state
+  /expansion annotation, the target CD8 terminal-Tex clones cannot be identified
+  and there is no defensible population from which to mine public TCRs.

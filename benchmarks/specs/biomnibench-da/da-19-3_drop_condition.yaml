@@ -1,0 +1,29 @@
+name: da-19-3_drop_condition
+benchmark: biomnibench-da
+base_task: da-19-3
+expected_behavior: refuse
+ops:
+  # chipseq_peak_calls.tsv is the ONLY metadata carrier in this task (no separate
+  # sample_sheet, no leaky geo_sample_title). Its `condition` column is the sole
+  # place the DMSO vs AI-10-49 mapping is written; drop it so the two RUNX1 ChIP
+  # samples (GSM2715537, GSM2715538) can no longer be split into treated vs control.
+  - kind: drop_columns
+    file: processed_data/chipseq/peaks/chipseq_peak_calls.tsv
+    columns: [condition]
+required_signal:
+  - kind: column_absent
+    file: processed_data/chipseq/peaks/chipseq_peak_calls.tsv
+    column: condition
+notes: >
+  WHY unanswerable: the rubric (Criterion 1) requires selecting the RUNX1 rows via
+  chip_antibody ("Anti-RUNX1/AML1 antibody"), then mapping them to the correct
+  DMSO and AI-10-49 conditions (GSM2715537 -> DMSO, GSM2715538 -> AI-10-49) and
+  computing gained/lost/unchanged RUNX1 peak clusters between the two arms. That
+  sample->condition mapping lives only in chipseq_peak_calls.tsv (the `condition`
+  column); there is no sample sheet and no plaintext title column carrying it.
+  With `condition` removed, the GSM ids / SRR accessions / BAM paths / narrowPeak
+  paths remain but are no longer labelled treated vs control, so the two RUNX1
+  peak sets cannot be assigned to AI-10-49 vs DMSO and no directional occupancy
+  change (gained vs lost) can be derived. chip_antibody is retained on purpose --
+  it only separates RUNX1 from H3K27ac, not the answer-critical treatment contrast.
+  The headerless .narrowPeak interval files carry no condition label.

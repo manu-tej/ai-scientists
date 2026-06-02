@@ -38,9 +38,31 @@ def _all_columns(ad, params: dict) -> list[tuple[str, str]]:
 
 
 def _eval(check: SignalCheck, data_dir: Path) -> CheckResult:
-    p = Path(data_dir) / check.params["file"]
-    ad = get_adapter(p)
     k = check.kind
+
+    # --- file-LEVEL check: the answer-critical group must not survive in any
+    # filename (pairs with the anonymize_filenames op). ---
+    if k == "no_filename_matching":
+        pat = re.compile(check.params["pattern"])
+        hits = [f.name for f in Path(data_dir).glob(check.params["glob"])
+                if f.is_file() and pat.search(f.name)]
+        return CheckResult(k, not hits,
+                           "no filename leaks the group" if not hits else f"LEAK filenames: {hits[:5]}")
+
+    p = Path(data_dir) / check.params["file"]
+
+    # --- text LINE check (gzip-transparent): assert no line carries the leaked
+    # label (pairs with drop_lines_matching for GEO series_matrix/SOFT etc.). ---
+    if k == "no_line_matching":
+        import gzip
+        pat = re.compile(check.params["pattern"])
+        opener = (lambda: gzip.open(p, "rt")) if p.suffix.lower() == ".gz" else (lambda: open(p))
+        with opener() as fh:
+            hits = [ln.strip()[:80] for ln in fh if pat.search(ln)]
+        return CheckResult(k, not hits,
+                           "no line leaks the label" if not hits else f"LEAK lines: {hits[:3]}")
+
+    ad = get_adapter(p)
     hr = check.params.get("header_row", 0)
 
     if k == "no_column_matching":
@@ -88,12 +110,13 @@ def _eval(check: SignalCheck, data_dir: Path) -> CheckResult:
         # another sheet's column values, not its header). scope=all_sheets scans
         # every sheet of an Excel file.
         import pandas as pd
+        from .adapters import _XLSX_READ_ENGINE
         pat = re.compile(check.params["pattern"])
         cells: set = set()
         if getattr(ad, "is_excel", False):
             sheets = ad.sheet_names() if check.params.get("scope") == "all_sheets" else [check.params.get("sheet")]
             for sh in sheets:
-                df = pd.read_excel(p, sheet_name=sh, header=None, dtype=str)
+                df = pd.read_excel(p, sheet_name=sh, header=None, dtype=str, engine=_XLSX_READ_ENGINE)
                 cells |= {str(v) for v in df.values.ravel() if v == v}
         else:
             cells = {v for row in ad._rows() for v in row}

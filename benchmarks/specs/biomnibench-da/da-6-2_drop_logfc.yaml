@@ -1,0 +1,30 @@
+name: da-6-2_drop_logfc
+benchmark: biomnibench-da
+base_task: da-6-2
+expected_behavior: refuse
+ops:
+  - kind: drop_columns
+    file: paper_deg.xlsx
+    sheet: "2 - Training-regulated features"
+    header_row: 18
+    columns: [timewise_logFC, timewise_logFC_se, timewise_zscore]
+required_signal:
+  - kind: column_absent
+    file: paper_deg.xlsx
+    sheet: "2 - Training-regulated features"
+    header_row: 18
+    column: timewise_logFC
+  - kind: column_absent
+    file: paper_deg.xlsx
+    sheet: "2 - Training-regulated features"
+    header_row: 18
+    column: timewise_zscore
+notes: >
+  WHY unanswerable: the rubric requires a directional 4-state encoding per sex
+  (Up/Down per timepoint from a |logFC| threshold, Criterion 3) and matching
+  directional state for the shared-vs-sex-specific categorisation (Criterion 4).
+  timewise_logFC is the only per-timepoint effect-size/direction signal; the
+  sibling logFC_se (just its standard error) and timewise_zscore (signed test
+  statistic that re-encodes direction) are dropped too, so neither magnitude nor
+  Up/Down direction can be recovered. p-values/q-values remain, so significance
+  is still assessable, but no per-timepoint Up/Down pattern can be built.
