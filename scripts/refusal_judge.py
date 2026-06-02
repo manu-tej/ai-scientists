@@ -24,7 +24,7 @@ from dotenv import load_dotenv
 from rich.console import Console
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_JUDGE_MODEL = "claude-opus-4-7"
+DEFAULT_JUDGE_MODEL = "claude-haiku-4-5"
 
 
 REFUSAL_DESCRIPTIONS = {

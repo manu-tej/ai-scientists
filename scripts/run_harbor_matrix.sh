@@ -33,7 +33,7 @@ run_one() {
         harbor run --path "$path" --agent codex --model gpt-5.5 \
         --disable-verification -n 1 -o "$OUT" >>"/tmp/hm_${agent}_${task}.log" 2>&1 ;;
     gemini-cli) env -u ANTHROPIC_API_KEY -u OPENAI_API_KEY -u GEMINI_API_KEY GEMINI_FORCE_OAUTH=1 \
-        harbor run --path "$path" --agent gemini-cli --model gemini/gemini-3-pro-preview \
+        harbor run --path "$path" --agent gemini-cli --model gemini/gemini-3.1-pro-preview \
         --disable-verification -n 1 -o "$OUT" >>"/tmp/hm_${agent}_${task}.log" 2>&1 ;;
   esac
 }

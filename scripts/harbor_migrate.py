@@ -43,8 +43,19 @@ def migrate_toml(src_toml: Path, dst_toml: Path, name: str) -> None:
     # GEMINI_API_KEY would force a key into the container and defeat subscription auth.
     venv = ""
     allow = old.get("environment", {}).get("allow_internet", True)
+    # Capture the agent's in-container deliverables to the host BEFORE teardown.
+    # The agent (per instruction.md) and the BiomniBench verifier both use
+    # /app/answer.txt + /app/trace.md as canonical outputs; without an explicit
+    # `artifacts` array Harbor's default capture (/logs/artifacts) is empty and
+    # the answer is lost on teardown, which breaks our refusal scoring. Harbor's
+    # ArtifactConfig accepts only source/destination/exclude; a missing source is
+    # recorded in the manifest without raising, so a refusing agent that writes
+    # nothing is fine.
     dst_toml.write_text(f'''schema_version = "1.3"
-artifacts = []
+artifacts = [
+    {{ source = "/app/answer.txt", destination = "answer.txt" }},
+    {{ source = "/app/trace.md", destination = "trace.md" }},
+]
 
 [task]
 name = "biomnibench-da/{name}"
