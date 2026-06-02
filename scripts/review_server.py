@@ -110,14 +110,14 @@ textarea{width:100%;background:#0a0d13;color:var(--fg);border:1px solid var(--li
 <script>
 const $=s=>document.querySelector(s);
 let DATA=null, STATE={}, fMode='all', fStatus='all', OPEN={};
-let me=localStorage.getItem('annotator')||'';
+let me=localStorage.getItem('annotator')||'me';            // default so solo review just works
 function mine(){return STATE[me]||{}}                       // current reviewer's verdicts
 function others(name){let a=0,f=0;for(const k in STATE){if(k===me)continue;const v=STATE[k][name]?.verdict;if(v==='approved')a++;else if(v==='flagged')f++;}return{a,f};}
 async function load(){
  DATA=await(await fetch('/api/bundle',{cache:'no-store'})).json();
  STATE=await(await fetch('/api/state',{cache:'no-store'})).json();
  const w=$('#who'); w.value=me;
- w.onchange=()=>{me=w.value.trim();localStorage.setItem('annotator',me);render();};
+ w.onchange=()=>{me=w.value.trim()||'me';w.value=me;localStorage.setItem('annotator',me);render();};
  $('#whohint').textContent=Object.keys(STATE).length>1?`· ${Object.keys(STATE).length} reviewers on record`:'';
  const s=DATA.summary;
  const extra=[]; if(s.rejected)extra.push(`${s.rejected} gate✗`); if(s.ungenerated)extra.push(`${s.ungenerated} not-generated`);
@@ -225,12 +225,12 @@ function togT(t){OPEN[t]=!OPEN[t];$('#t-'+CSS.escape(t)).classList.toggle('open'
 function togV(n){$('#b-'+CSS.escape(n)).classList.toggle('open')}
 function togR(t){const e=$('#r-'+CSS.escape(t)),b=$('#rt-'+CSS.escape(t));const sh=e.style.display==='none';e.style.display=sh?'block':'none';b.textContent=sh?'▾ hide':'▸ show'}
 function esc(s){return(s==null?'':String(s)).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))}
-function needName(){ if(!me){$('#who').focus(); $('#whohint').textContent='· enter your name first'; return true;} return false; }
-async function verdict(n,v){ if(needName())return; const cur=mine()[n]?.verdict; const nv=cur===v?null:v;
+async function verdict(n,v){ const cur=mine()[n]?.verdict; const nv=cur===v?null:v;
  (STATE[me]=STATE[me]||{})[n]={...(mine()[n]||{}),verdict:nv};
- await fetch('/api/state',{method:'POST',body:JSON.stringify({annotator:me,name:n,verdict:nv})}); render();}
-async function comment(n,c){ if(needName())return; (STATE[me]=STATE[me]||{})[n]={...(mine()[n]||{}),comment:c};
- await fetch('/api/state',{method:'POST',body:JSON.stringify({annotator:me,name:n,comment:c})});}
+ try{await fetch('/api/state',{method:'POST',body:JSON.stringify({annotator:me,name:n,verdict:nv})});}catch(e){console.error('save failed',e);}
+ render();}
+async function comment(n,c){ (STATE[me]=STATE[me]||{})[n]={...(mine()[n]||{}),comment:c};
+ try{await fetch('/api/state',{method:'POST',body:JSON.stringify({annotator:me,name:n,comment:c})});}catch(e){console.error('save failed',e);}}
 load();
 </script></body></html>"""
 
