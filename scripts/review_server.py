@@ -68,6 +68,9 @@ h1{font-size:18px;margin:0 0 4px}.sub{color:var(--mut);font-size:12px;margin-bot
 .rev.flagged{background:#2a0f0f;border-color:#5d2020;color:var(--bad)}
 .vbody{display:none;padding:0 12px 12px;border-top:1px solid var(--line)}
 .vbody.open{display:block}
+.v.cur{outline:2px solid var(--ac);outline-offset:-1px}
+.kb{font-size:11px;color:var(--mut);margin-bottom:12px}
+.kb kbd{background:#0a0d13;border:1px solid var(--line);border-radius:4px;padding:0 5px;color:var(--fg);font-size:10px}
 .op{font-size:12px;padding:4px 8px;background:#0a0d13;border:1px solid var(--line);border-radius:5px;margin:3px 0}
 .chk{font-size:12px;padding:3px 8px;border-radius:5px;margin:3px 0}
 .chk.p{background:#0f2417;color:var(--ok)}.chk.f{background:#2a0f0f;color:var(--bad)}
@@ -79,6 +82,7 @@ textarea{width:100%;background:#0a0d13;color:var(--fg);border:1px solid var(--li
 <div class=sub id=sub>loading…</div>
 <div class=bar id=modebar></div>
 <div class=bar id=statusbar></div>
+<div class=kb><kbd>j</kbd>/<kbd>k</kbd> next/prev · <kbd>o</kbd> or <kbd>Enter</kbd> expand · <kbd>a</kbd> approve · <kbd>f</kbd> flag · <kbd>u</kbd> next unreviewed · <kbd>c</kbd> comment · <kbd>r</kbd> rubric of current task</div>
 <div id=list></div>
 </div>
 <script>
@@ -125,14 +129,47 @@ function render(){
     ${vs.map(v=>varRow(v)).join('')}</div>
    </div></div>`;
  }).join('')||'<div class=sub>no tasks match the current filter</div>';
+ FLAT=[...$('#list').querySelectorAll('.v')].map(e=>e.dataset.v);  // shown order
+ if(cur>=FLAT.length)cur=FLAT.length-1; if(cur<0)cur=0;
+ applyCursor(false);
 }
+// --- keyboard-driven review (stay on the keyboard; never reach for the mouse) ---
+let FLAT=[], cur=0;
+function curName(){return FLAT[cur]}
+function applyCursor(scroll){
+ $('#list').querySelectorAll('.v.cur').forEach(e=>e.classList.remove('cur'));
+ const n=curName(); if(!n)return;
+ const el=$('#list').querySelector(`.v[data-v="${CSS.escape(n)}"]`);
+ if(el){el.classList.add('cur'); if(scroll)el.scrollIntoView({block:'center',behavior:'smooth'});}
+}
+function moveCur(d){ if(!FLAT.length)return; cur=Math.max(0,Math.min(FLAT.length-1,cur+d));
+ const n=curName(), el=$('#list').querySelector(`.v[data-v="${CSS.escape(n)}"]`);
+ if(el){const t=el.dataset.task; if(!OPEN[t]){OPEN[t]=true; $('#t-'+CSS.escape(t)).classList.add('open');}}
+ applyCursor(true);}
+function nextUnreviewed(){ if(!FLAT.length)return;
+ for(let i=1;i<=FLAT.length;i++){const j=(cur+i)%FLAT.length; if(!STATE[FLAT[j]]?.verdict){cur=j;break;}}
+ const n=curName(), el=$('#list').querySelector(`.v[data-v="${CSS.escape(n)}"]`);
+ if(el){const t=el.dataset.task; if(!OPEN[t]){OPEN[t]=true; $('#t-'+CSS.escape(t)).classList.add('open');}}
+ applyCursor(true);}
+document.addEventListener('keydown',e=>{
+ if(e.target.tagName==='TEXTAREA'){ if(e.key==='Escape')e.target.blur(); return; }
+ const n=curName();
+ if(e.key==='j'||e.key==='ArrowDown'){e.preventDefault();moveCur(1);}
+ else if(e.key==='k'||e.key==='ArrowUp'){e.preventDefault();moveCur(-1);}
+ else if(e.key==='o'||e.key==='Enter'){e.preventDefault(); if(n)togV(n);}
+ else if(e.key==='a'){e.preventDefault(); if(n)verdict(n,'approved');}
+ else if(e.key==='f'){e.preventDefault(); if(n)verdict(n,'flagged');}
+ else if(e.key==='u'){e.preventDefault();nextUnreviewed();}
+ else if(e.key==='r'){e.preventDefault(); const el=n&&$('#list').querySelector(`.v[data-v="${CSS.escape(n)}"]`); if(el)togR(el.dataset.task);}
+ else if(e.key==='c'){e.preventDefault(); if(n){const b=$('#b-'+CSS.escape(n)); if(!b.classList.contains('open'))togV(n); const ta=b.querySelector('textarea'); if(ta)ta.focus();}}
+});
 function varRow(v){
  const r=STATE[v.name]||{};
  const gate = v.emitted===true ? '<span class="pill ok">gate ✓</span>'
             : v.emitted===false ? '<span class="pill bad">gate ✗</span>'
             : '<span class="pill pend" title="in a spec but not in MANIFEST.json — re-run generate_variants">not generated</span>';
  const av=r.verdict==='approved'?'approved':'', fv=r.verdict==='flagged'?'flagged':'';
- return `<div class=v><div class=vh onclick="togV('${v.name}')">
+ return `<div class=v data-v="${v.name}" data-task="${v.base_task}"><div class=vh onclick="togV('${v.name}')">
    <span class=nm>${v.name.replace(v.base_task+'_','')}</span>
    <span class="tag ${mtag(v.mode)}">${v.mode}</span>
    <span class=st>${gate}
