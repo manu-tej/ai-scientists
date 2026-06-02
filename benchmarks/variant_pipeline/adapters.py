@@ -115,26 +115,55 @@ class TabularAdapter:
     def sheet_names(self) -> list:
         return pd.ExcelFile(self.path, engine=_XLSX_READ_ENGINE).sheet_names if self.is_excel else ["<csv>"]
 
-    # ---- legacy .xls round-trip (openpyxl is xlsx-only; use xlrd+xlwt) ---- #
-    def _xls_read_all(self) -> dict:
-        """Every sheet of an .xls as raw row-lists (preserves all cells, order)."""
-        import xlrd
-        book = xlrd.open_workbook(self.path)
-        return {sh.name: [[sh.cell_value(r, c) for c in range(sh.ncols)]
-                          for r in range(sh.nrows)] for sh in book.sheets()}
+    # ---- Excel read-all / write-all (whole-workbook round-trip) ---- #
+    # openpyxl is pathologically slow on large sheets (a 279k-row supplement took
+    # ~77s/edit; its per-row delete is O(n^2)). Instead read raw with the fast
+    # engines (calamine for .xlsx, xlrd for legacy .xls), edit in memory, and write
+    # a fresh workbook with the fast streaming writers (xlsxwriter / xlwt). Values
+    # only (formatting/formulas dropped) — correct for our data-perturbation use.
+    def _excel_read_all_raw(self) -> dict:
+        """Every sheet as raw row-lists. {sheet_name: [[cell, ...], ...]}."""
+        if self.ext == ".xls":
+            import xlrd
+            book = xlrd.open_workbook(self.path)
+            return {sh.name: [[sh.cell_value(r, c) for c in range(sh.ncols)]
+                              for r in range(sh.nrows)] for sh in book.sheets()}
+        import python_calamine as pc
+        wb = pc.CalamineWorkbook.from_path(str(self.path))
+        return {name: wb.get_sheet_by_name(name).to_python() for name in wb.sheet_names}
 
-    def _xls_write_all(self, sheets: dict) -> None:
-        """Write {sheet_name: rows} back to a fresh .xls (xlwt). Other sheets are
-        passed through unchanged so a single-sheet edit preserves the workbook."""
-        import xlwt
-        wb = xlwt.Workbook()
+    @staticmethod
+    def _cell(val):
+        """Coerce a value to something the writers accept (skip blanks)."""
+        if val is None or val == "":
+            return None
+        return val if isinstance(val, (str, int, float, bool)) else str(val)
+
+    def _excel_write_all(self, sheets: dict) -> None:
+        """Write {sheet_name: rows} to a fresh workbook (streaming, fast). Other
+        sheets pass through unchanged so a single-sheet edit preserves the book."""
+        if self.ext == ".xls":
+            import xlwt
+            wb = xlwt.Workbook()
+            for name, rows in sheets.items():
+                ws = wb.add_sheet(name[:31], cell_overwrite_ok=True)
+                for r, row in enumerate(rows):
+                    for c, val in enumerate(row):
+                        v = self._cell(val)
+                        if v is not None:
+                            ws.write(r, c, v)
+            wb.save(str(self.path))
+            return
+        import xlsxwriter
+        wb = xlsxwriter.Workbook(str(self.path), {"constant_memory": True, "nan_inf_to_errors": True})
         for name, rows in sheets.items():
-            ws = wb.add_sheet(name[:31], cell_overwrite_ok=True)
+            ws = wb.add_worksheet(name[:31])
             for r, row in enumerate(rows):
                 for c, val in enumerate(row):
-                    if val != "" and val is not None:
-                        ws.write(r, c, val)
-        wb.save(str(self.path))
+                    v = self._cell(val)
+                    if v is not None:
+                        ws.write(r, c, v)
+        wb.close()
 
     # ---- writes ---- #
     def drop_columns(self, columns, sheet=None, header_row=0) -> None:
@@ -145,21 +174,11 @@ class TabularAdapter:
             drop_pos = {i for i, h in enumerate(header) if h in targets}
             self._write_rows([[v for i, v in enumerate(r) if i not in drop_pos] for r in rows])
             return
-        if self.ext == ".xls":
-            sheets = self._xls_read_all()
-            rows = sheets[sheet]
-            drop = {i for i, h in enumerate(rows[header_row]) if h in targets}
-            sheets[sheet] = [[v for i, v in enumerate(r) if i not in drop] for r in rows]
-            self._xls_write_all(sheets)
-            return
-        from openpyxl import load_workbook
-        wb = load_workbook(self.path)
-        ws = wb[sheet]
-        hdr = header_row + 1  # openpyxl is 1-based
-        idxs = [cell.column for cell in ws[hdr] if cell.value in targets]
-        for idx in sorted(idxs, reverse=True):
-            ws.delete_cols(idx, 1)
-        wb.save(self.path)
+        sheets = self._excel_read_all_raw()
+        rows = sheets[sheet]
+        drop = {i for i, h in enumerate(rows[header_row]) if h in targets}
+        sheets[sheet] = [[v for i, v in enumerate(r) if i not in drop] for r in rows]
+        self._excel_write_all(sheets)
 
     def drop_columns_matching(self, pattern, sheet=None, header_row=0) -> None:
         import re
@@ -177,46 +196,28 @@ class TabularAdapter:
             kept = [r for r in rows[header_row + 1:] if len(r) > i and r[i] in keep]
             self._write_rows(rows[:header_row + 1] + kept)
             return
-        if self.ext == ".xls":
-            sheets = self._xls_read_all()
-            rows = sheets[sheet]
-            gi = rows[header_row].index(column)
-            kept = [r for r in rows[header_row + 1:] if len(r) > gi and str(r[gi]) in keep]
-            sheets[sheet] = rows[:header_row + 1] + kept
-            self._xls_write_all(sheets)
-            return
-        from openpyxl import load_workbook
-        wb = load_workbook(self.path)
-        ws = wb[sheet]
-        hdr = header_row + 1
-        gcol = next((cell.column for cell in ws[hdr] if cell.value == column), None)
-        if gcol is None:
-            raise KeyError(f"column {column!r} not found in sheet {sheet!r}")
-        # Deleting rows one-at-a-time is O(n^2) and hangs on large sheets (a 279k-row
-        # supplement took effectively forever). Instead: snapshot the data rows once,
-        # keep the matching ones, clear the whole data region in a single delete, and
-        # append the survivors back. Title rows (1..header_row) + header stay intact.
-        first_data = hdr + 1
-        kept_rows = [tuple(c.value for c in row)
-                     for row in ws.iter_rows(min_row=first_data, max_row=ws.max_row)
-                     if str(row[gcol - 1].value) in keep]
-        if ws.max_row >= first_data:
-            ws.delete_rows(first_data, ws.max_row - first_data + 1)
-        for vals in kept_rows:
-            ws.append(vals)
-        wb.save(self.path)
+        sheets = self._excel_read_all_raw()
+        rows = sheets[sheet]
+        gi = rows[header_row].index(column)
+        kept = [r for r in rows[header_row + 1:] if len(r) > gi and str(r[gi]) in keep]
+        sheets[sheet] = rows[:header_row + 1] + kept
+        self._excel_write_all(sheets)
 
     def reduce_rows(self, n, seed=0, sheet=None, header_row=0) -> None:
-        if self.is_excel and self.ext == ".xls":
-            raise UnsupportedFormat(".xls is read-only; cannot subsample rows")
-        if self.is_excel:
-            df = pd.read_excel(self.path, sheet_name=sheet, header=header_row)
-            df.sample(n=min(n, len(df)), random_state=seed).to_excel(self.path, sheet_name=sheet, index=False)
-            return
         import random
+        rnd = random.Random(seed)
+        if self.is_excel:
+            # Read raw (preserves title rows + sibling sheets), deterministically
+            # subsample the DATA rows, write back via the fast streaming writer.
+            sheets = self._excel_read_all_raw()
+            rows = sheets[sheet]
+            data = rows[header_row + 1:]
+            keep = rnd.sample(data, k=min(n, len(data)))
+            sheets[sheet] = rows[:header_row + 1] + keep
+            self._excel_write_all(sheets)
+            return
         rows = self._rows()
         data = rows[header_row + 1:]
-        rnd = random.Random(seed)
         keep = rnd.sample(data, k=min(n, len(data)))
         self._write_rows(rows[:header_row + 1] + keep)
 
