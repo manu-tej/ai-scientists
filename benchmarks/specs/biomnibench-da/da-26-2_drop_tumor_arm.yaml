@@ -1,0 +1,35 @@
+name: da-26-2_drop_tumor_arm
+benchmark: biomnibench-da
+base_task: da-26-2
+expected_behavior: refuse
+ops:
+  # Remove the entire patient/tumor arm. The cell-line-vs-tumor axis is encoded
+  # by WHICH FILE a sample lives in (sub_TCGA_* = patients, sub_CCLE_* = cell
+  # lines), so no column edit alone can sever it — but deleting the whole TCGA
+  # arm makes the between-arm comparison impossible.
+  - kind: drop_files_matching
+    glob: sub_TCGA_*
+  - kind: subset_to_single_group
+    file: sub_CCLE_TCGA_ID_meta.csv
+    column: type
+    keep_value: CL
+required_signal:
+  - kind: no_filename_matching
+    glob: '*'
+    pattern: 'sub_TCGA_'
+  - kind: single_value_in
+    file: sub_CCLE_TCGA_ID_meta.csv
+    column: type
+    max_distinct: 1
+notes: >
+  da-26-2 asks for biomarkers significant in PATIENT (TCGA) DepMap dependency but
+  NOT in CELL-LINE (CCLE) models — an inherently two-arm comparison. The tumor arm
+  lives in sub_TCGA_depmapscore.txt + sub_TCGA_exp.txt (and the type=='tumor' rows
+  of the ID-meta). Earlier column-only variants left this arm recoverable because
+  CL-vs-tumor is re-encoded by file membership + TCGA barcodes in the matrix
+  headers (not gateable by editing meta columns). This variant deletes the entire
+  TCGA arm (both data files) and collapses the ID-meta to CL-only, so there is no
+  patient/tumor data to compare against — the task is structurally unanswerable.
+  Gated by no_filename_matching (no sub_TCGA_* file survives) + single_value_in
+  (ID-meta type has one value, CL). Uses the file-group drop op added for exactly
+  this "arm encoded by file membership" defect mode.

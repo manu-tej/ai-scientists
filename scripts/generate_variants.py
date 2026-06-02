@@ -84,6 +84,35 @@ def _current_revision() -> str | None:
         return None
 
 
+def _hf_files_by_task() -> dict | None:
+    """Map task_id -> set of environment/data files HF ships at the pinned rev.
+
+    Lets us catch a PARTIAL local pull (1-of-N files): a variant built on
+    incomplete base data can EMIT the gate yet leave the answer recoverable in a
+    file that was never downloaded. Returns None if HF is unreachable.
+    """
+    try:
+        from huggingface_hub import HfApi
+        files = HfApi(token=os.environ.get("HF_TOKEN")).list_repo_files(
+            DATASET_REPO, repo_type="dataset", revision=PINNED_REVISION)
+    except Exception:
+        return None
+    out: dict[str, set] = {}
+    for f in files:
+        if "/environment/data/" in f:
+            task = f.split("/", 1)[0]
+            out.setdefault(task, set()).add(f.split("/environment/data/", 1)[-1])
+    return out
+
+
+def _incomplete(base_task_dir: Path, expected: set | None) -> set:
+    """Files HF ships for this task that are missing locally (empty if complete/unknown)."""
+    if not expected:
+        return set()
+    local = {str(p.relative_to(base_task_dir)) for p in base_task_dir.rglob("*") if p.is_file()}
+    return expected - local
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", type=Path, default=ROOT / "runs/variants")
@@ -109,6 +138,13 @@ def main() -> None:
     specs = sorted(args.specs.glob("*.yaml"))
     print(f"generating {len(specs)} variants from {args.base} (pinned rev {PINNED_REVISION[:12]})")
 
+    # --- completeness guard: a variant built on a PARTIAL local pull can pass the
+    # per-file gate while the answer survives in a never-downloaded file. Index
+    # what HF ships so we can flag (and skip) such variants instead of shipping
+    # silently-invalid ones. Skipped when --no-verify-revision (offline).
+    hf_index = None if args.no_verify_revision else _hf_files_by_task()
+    incomplete_seen = set()
+
     manifest = {
         "dataset_repo": DATASET_REPO,
         "pinned_revision": PINNED_REVISION,
@@ -116,13 +152,25 @@ def main() -> None:
         "revision_match": rev_ok,
         "n_specs": len(specs),
         "variants": {},
-        "summary": {"emitted": 0, "validation_failed": 0, "unsupported": 0, "error": 0},
+        "summary": {"emitted": 0, "validation_failed": 0, "unsupported": 0, "error": 0, "incomplete_base": 0},
     }
 
     for sp in specs:
         spec = VariantSpec.from_dict(yaml.safe_load(sp.read_text()))
         base_task_dir = args.base / spec.base_task / "environment" / "data"
         out_dir = args.out / spec.name / "environment" / "data"
+
+        missing = _incomplete(base_task_dir, hf_index.get(spec.base_task) if hf_index else None)
+        if missing:
+            incomplete_seen.add(spec.base_task)
+            manifest["summary"]["incomplete_base"] += 1
+            manifest["variants"][spec.name] = {
+                "base_task": spec.base_task, "expected_behavior": spec.expected_behavior,
+                "emitted": False, "error": "incomplete_base_data",
+                "missing_files": sorted(missing)[:8], "checks": []}
+            print(f"  ⚠ {spec.name:30} SKIP — base task missing {len(missing)} HF file(s): {sorted(missing)[:3]}")
+            continue
+
         r = build_variant(spec, base_task_dir, out_dir)
         checks = [{"kind": c.kind, "passed": c.passed, "detail": c.detail} for c in (r.checks or [])]
         entry = {"base_task": spec.base_task, "expected_behavior": spec.expected_behavior,
@@ -153,8 +201,13 @@ def main() -> None:
     (args.out / "MANIFEST.json").write_text(json.dumps(manifest, indent=2))
     s = manifest["summary"]
     print(f"\nemitted {s['emitted']}/{len(specs)}  "
-          f"(validation_failed={s['validation_failed']} unsupported={s['unsupported']} error={s['error']})")
+          f"(validation_failed={s['validation_failed']} unsupported={s['unsupported']} "
+          f"error={s['error']} incomplete_base={s['incomplete_base']})")
     print(f"manifest: {args.out / 'MANIFEST.json'}")
+    if incomplete_seen:
+        print(f"WARNING: {len(incomplete_seen)} task(s) had INCOMPLETE local data and were skipped: "
+              f"{sorted(incomplete_seen)}. Re-pull with scripts/download_robust.py "
+              f"(verify via scripts/audit_completeness.py).", file=sys.stderr)
     if rev_ok is False:
         print("NOTE: generated against a non-pinned dataset revision — see warning above.")
 

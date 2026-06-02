@@ -1,0 +1,89 @@
+name: da-3-5_drop_response_and_enrichment
+benchmark: biomnibench-da
+base_task: da-3-5
+expected_behavior: refuse
+build_mode: rebuild
+ops:
+  # --- kill every per-patient RESPONSE label (blocks the S1D recompute path) ---
+  # S1A irRECIST is the source-of-truth clinical response (Complete/Partial
+  # Response, Progressive Disease). Drop it so responders cannot be defined.
+  - kind: drop_columns
+    file: supplementary_tables.xls
+    sheet: S1A
+    header_row: 2
+    columns: [irRECIST]
+  # S1B carries the derived R/NR label AND a per-patient BRCA2-mutation flag.
+  # Either alone leaks the answer: Response + BRCA2mutant? is a ready-made 2x2.
+  # Drop both.
+  - kind: drop_columns
+    file: supplementary_tables.xls
+    sheet: S1B
+    header_row: 2
+    columns: [Response, "BRCA2mutant?"]
+  # --- kill the pre-computed RESPONDER-enrichment read-off (S1E) ---
+  # S1E states the answer outright: BRCA2 row PvalR=0.0018, pAdjR=0.0437,
+  # NumHitsR=6, RatioRtoNR=4.86, LorR=6.25 — recoverable with NO response label
+  # at all. Drop the entire responder-direction block. The surviving NR-direction
+  # columns (PvalNR/pAdjNR/NumHitsNR) are uninformative about responder-enrichment
+  # (BRCA2 NR p=1.0), so they cannot reconstruct the finding.
+  - kind: drop_columns
+    file: supplementary_tables.xls
+    sheet: S1E
+    header_row: 2
+    columns: [RatioRtoNR, NumHitsR, PvalR, pAdjR, LorR]
+required_signal:
+  # response label removed from its only two carriers
+  - kind: column_absent
+    file: supplementary_tables.xls
+    sheet: S1A
+    header_row: 2
+    column: irRECIST
+  - kind: column_absent
+    file: supplementary_tables.xls
+    sheet: S1B
+    header_row: 2
+    column: Response
+  - kind: column_absent
+    file: supplementary_tables.xls
+    sheet: S1B
+    header_row: 2
+    column: "BRCA2mutant?"
+  # responder-enrichment read-off removed from S1E
+  - kind: column_absent
+    file: supplementary_tables.xls
+    sheet: S1E
+    header_row: 2
+    column: PvalR
+  - kind: column_absent
+    file: supplementary_tables.xls
+    sheet: S1E
+    header_row: 2
+    column: pAdjR
+  - kind: column_absent
+    file: supplementary_tables.xls
+    sheet: S1E
+    header_row: 2
+    column: NumHitsR
+  # cross-sheet proof: NO per-patient response label value survives ANYWHERE.
+  # R/NR live only in S1B Response; irRECIST classes only in S1A irRECIST.
+  # README prose ("...categorized as Responders (R)...") is full sentences, not
+  # a bare label cell, so it does not match these anchored patterns.
+  - kind: no_cell_matching
+    file: supplementary_tables.xls
+    scope: all_sheets
+    pattern: '^(R|NR|Progressive Disease|Partial Response|Complete Response|Stable Disease)$'
+notes: >
+  WHY unanswerable: the rubric scores "BRCA2 significantly enriched in
+  responders," recoverable three ways, all inside supplementary_tables.xls.
+  (1) S1D recompute: per-mutation Gene=BRCA2 + Sample joined to a per-patient
+  response label, Fisher + BH-FDR. (2) S1B shortcut: per-patient BRCA2mutant?
+  flag x Response, a direct 2x2. (3) S1E read-off: pre-computed BRCA2 responder
+  stats (PvalR/pAdjR/NumHitsR). This spec removes the response label from BOTH
+  carriers (S1A irRECIST, S1B Response) — killing (1) and the response half of
+  (2) — drops S1B BRCA2mutant? (the carrier half of (2)), and drops the entire
+  S1E responder-direction block — killing (3). After this, no sheet lets you
+  partition patients into R vs NR and no sheet states a responder p-value, so
+  the BRCA2-responder finding is unrecoverable. S1D's BRCA2 calls survive but are
+  inert without any response grouping; S1E's NR-direction columns survive but say
+  nothing about responder-enrichment (BRCA2 NR p=1.0). The README documents the
+  R/NR mapping recipe in prose but holds no per-patient labels or stats.

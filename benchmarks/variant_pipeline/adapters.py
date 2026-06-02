@@ -115,6 +115,27 @@ class TabularAdapter:
     def sheet_names(self) -> list:
         return pd.ExcelFile(self.path, engine=_XLSX_READ_ENGINE).sheet_names if self.is_excel else ["<csv>"]
 
+    # ---- legacy .xls round-trip (openpyxl is xlsx-only; use xlrd+xlwt) ---- #
+    def _xls_read_all(self) -> dict:
+        """Every sheet of an .xls as raw row-lists (preserves all cells, order)."""
+        import xlrd
+        book = xlrd.open_workbook(self.path)
+        return {sh.name: [[sh.cell_value(r, c) for c in range(sh.ncols)]
+                          for r in range(sh.nrows)] for sh in book.sheets()}
+
+    def _xls_write_all(self, sheets: dict) -> None:
+        """Write {sheet_name: rows} back to a fresh .xls (xlwt). Other sheets are
+        passed through unchanged so a single-sheet edit preserves the workbook."""
+        import xlwt
+        wb = xlwt.Workbook()
+        for name, rows in sheets.items():
+            ws = wb.add_sheet(name[:31], cell_overwrite_ok=True)
+            for r, row in enumerate(rows):
+                for c, val in enumerate(row):
+                    if val != "" and val is not None:
+                        ws.write(r, c, val)
+        wb.save(str(self.path))
+
     # ---- writes ---- #
     def drop_columns(self, columns, sheet=None, header_row=0) -> None:
         targets = set(columns)
@@ -125,7 +146,12 @@ class TabularAdapter:
             self._write_rows([[v for i, v in enumerate(r) if i not in drop_pos] for r in rows])
             return
         if self.ext == ".xls":
-            raise UnsupportedFormat(".xls is read-only; cannot drop columns (use the existing variant file)")
+            sheets = self._xls_read_all()
+            rows = sheets[sheet]
+            drop = {i for i, h in enumerate(rows[header_row]) if h in targets}
+            sheets[sheet] = [[v for i, v in enumerate(r) if i not in drop] for r in rows]
+            self._xls_write_all(sheets)
+            return
         from openpyxl import load_workbook
         wb = load_workbook(self.path)
         ws = wb[sheet]
@@ -152,7 +178,13 @@ class TabularAdapter:
             self._write_rows(rows[:header_row + 1] + kept)
             return
         if self.ext == ".xls":
-            raise UnsupportedFormat(".xls is read-only; cannot filter rows")
+            sheets = self._xls_read_all()
+            rows = sheets[sheet]
+            gi = rows[header_row].index(column)
+            kept = [r for r in rows[header_row + 1:] if len(r) > gi and str(r[gi]) in keep]
+            sheets[sheet] = rows[:header_row + 1] + kept
+            self._xls_write_all(sheets)
+            return
         from openpyxl import load_workbook
         wb = load_workbook(self.path)
         ws = wb[sheet]

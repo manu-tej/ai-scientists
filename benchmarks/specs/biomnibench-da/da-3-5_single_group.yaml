@@ -2,35 +2,79 @@ name: da-3-5_single_group
 benchmark: biomnibench-da
 base_task: da-3-5
 expected_behavior: refuse
-build_mode: validate_existing   # .xls write unsupported (openpyxl cannot rewrite .xls); proven by audit
+build_mode: rebuild
+ops:
+  # --- collapse the cohort to a SINGLE response group (Non-Responders only) ---
+  # S1B Response is the derived R/NR grouping variable: keep only NR rows, so the
+  # responder arm vanishes and an R-vs-NR enrichment comparison has n_groups=1.
+  - kind: subset_to_single_group
+    file: supplementary_tables.xls
+    sheet: S1B
+    header_row: 2
+    column: Response
+    keep_value: NR
+  # S1A irRECIST is the source clinical response (could re-derive the grouping).
+  # Keep only the Non-Responder class "Progressive Disease"; the Complete/Partial
+  # Response (responder) patients are dropped, so S1A also yields one group only.
+  - kind: subset_to_single_group
+    file: supplementary_tables.xls
+    sheet: S1A
+    header_row: 2
+    column: irRECIST
+    keep_value: Progressive Disease
+  # --- neutralize the S1E read-off, which bypasses any group comparison ---
+  # S1E pre-computes BRCA2's responder enrichment (PvalR/pAdjR/NumHitsR) directly,
+  # so a single-group cohort alone would NOT block the answer. Drop the entire
+  # responder-direction block.
+  - kind: drop_columns
+    file: supplementary_tables.xls
+    sheet: S1E
+    header_row: 2
+    columns: [RatioRtoNR, NumHitsR, PvalR, pAdjR, LorR]
 required_signal:
-  # Single-group collapse: subset the cohort to Responders only, so the R-vs-NR
-  # enrichment comparison has n_groups=1 and is uncomputable. To genuinely block
-  # the answer this must hold across EVERY sheet of supplementary_tables.xls:
-  #   - no Non-Responder label survives anywhere (S1A irRECIST "Progressive
-  #     Disease"/"Stable Disease"; S1B Response "NR"), AND
-  #   - the S1E pre-computed enrichment (which states BRCA2's responder p-value
-  #     outright, bypassing any need for a two-group comparison) is also gone —
-  #     i.e. the BRCA2 gene label must not appear.
-  # Subsetting only S1D/S1B but leaving S1A's irRECIST or S1E's BRCA2 row intact
-  # would leak the grouping or the answer, so the gate scans all cells of all
-  # sheets.
+  # only one response level survives in each labeled sheet => n_groups = 1
+  - kind: single_value_in
+    file: supplementary_tables.xls
+    sheet: S1B
+    header_row: 2
+    column: Response
+    max_distinct: 1
+  - kind: single_value_in
+    file: supplementary_tables.xls
+    sheet: S1A
+    header_row: 2
+    column: irRECIST
+    max_distinct: 1
+  # the pre-computed responder read-off is gone
+  - kind: column_absent
+    file: supplementary_tables.xls
+    sheet: S1E
+    header_row: 2
+    column: PvalR
+  - kind: column_absent
+    file: supplementary_tables.xls
+    sheet: S1E
+    header_row: 2
+    column: pAdjR
+  # cross-sheet proof: NO responder label survives in ANY sheet (the responder
+  # arm is truly gone, not just hidden). "NR" is intentionally allowed (the one
+  # surviving group); only responder-class labels are forbidden.
   - kind: no_cell_matching
     file: supplementary_tables.xls
     scope: all_sheets
-    pattern: '(?i)^(NR|Progressive Disease|Stable Disease|irRECIST|BRCA2)$'
+    pattern: '^(R|Complete Response|Partial Response|Stable Disease)$'
 notes: >
-  KNOWN-INVALID (EXCLUDED from the refusal metric). Same root cause as
-  da-3-5_drop_response_and_brca2: every answer-critical carrier (S1A irRECIST
-  response, S1D per-mutation calls, S1E pre-computed BRCA2 enrichment) is inside
-  supplementary_tables.xls, which is read-only in the pipeline — adapters.py
-  raises UnsupportedFormat on any .xls write (keep_rows_where, used by
-  subset_to_single_group, rejects). Even a hypothetical single-group subset of
-  S1D/S1B would not block the answer because S1A still lists every patient's
-  irRECIST class (the R/NR grouping is fully reconstructable) and S1E states
-  BRCA2's responder p-value directly without needing any two-group test. The only
-  writable files (CGAN_mmc3.xlsx, Hodis_mmc2.txt) hold no answer-critical signal
-  (background cohorts only). No clean gated variant is achievable until an
-  .xls-write (or xls->xlsx) adapter exists. Flagged invalid; EXCLUDED. Verify the
-  gate with:
-  uv run python scripts/build_variants.py --only da-3-5_single_group
+  WHY unanswerable: a between-group (Responder vs Non-Responder) enrichment test
+  is impossible when only one group exists. This collapses the cohort to
+  Non-Responders in BOTH response carriers — S1B Response -> NR only, S1A
+  irRECIST -> Progressive Disease only — so no responder patient remains to form
+  the second arm (the gate proves no responder label survives in any sheet).
+  Because S1E pre-computes BRCA2's responder p-value outright (a read-off that
+  needs no two-group comparison), the responder-direction block is also dropped.
+  S1D's per-mutation BRCA2 calls survive but are uninterpretable for enrichment:
+  there is no responder arm to compare against, and the responder patient IDs no
+  longer appear in any labeled sheet, so they cannot be re-grouped. Distinct from
+  the drop-column variant: the response COLUMN still exists (single-valued),
+  modeling a cohort that genuinely enrolled only non-responders rather than one
+  with the label stripped. expected_behavior=refuse (n_groups=1 is uncomputable,
+  not merely underpowered).

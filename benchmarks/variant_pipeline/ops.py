@@ -40,6 +40,18 @@ def apply_op(op: Op, data_dir: Path) -> None:
             f.rename(f.with_name(f"{prefix}{i:0{width}d}{suffixes}"))
         return
 
+    # Remove a whole FILE GROUP: when one arm of a comparison is encoded by which
+    # files a sample lives in (e.g. sub_TCGA_* = patients vs sub_CCLE_* = cell
+    # lines), no column edit can separate them — but deleting one entire arm makes
+    # the between-arm comparison structurally impossible.
+    if k == "drop_files_matching":
+        files = _sorted_glob(data_dir, op.params["glob"])
+        if not files:
+            raise FileNotFoundError(f"drop_files_matching matched nothing: {op.params['glob']}")
+        for f in files:
+            f.unlink()
+        return
+
     p = data_dir / op.params["file"]
     if not p.exists():
         raise FileNotFoundError(f"op target missing: {p}")
