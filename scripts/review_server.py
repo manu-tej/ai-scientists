@@ -155,7 +155,7 @@ function render(){
    </div>
    <div class="tbody ${op}" id="t-${t.base_task}">
     ${srcLine(t.source)}
-    <div class=sec><h4>original question</h4><div class=q>${esc(t.question)}</div></div>
+    <div class=sec><h4>original question <a class=toggle href="/file?path=data/biomnibench-da/${t.base_task}/instruction.md" target=_blank>↗ open instruction.md</a></h4><div class=q>${esc(t.question)}</div></div>
     <div class=sec><h4>rubric <span class=toggle onclick="togR('${t.base_task}')" id="rt-${t.base_task}">▸ show</span></h4>
       <div class=rubric id="r-${t.base_task}" style="display:none">${esc(t.rubric)}</div></div>
     <div class=sec><h4>variants derived from this task (${vs.length})</h4>
@@ -229,7 +229,7 @@ function varRow(v){
      <div class=sec><h4>perturbation · expects: ${v.expected_behavior}</h4>${dropped.map(d=>`<div class=op>✂ ${esc(d)}</div>`).join('')||'<div class=bt>(validate_existing / none)</div>'}</div>
      <div class=sec><h4>gate proof (signal provably gone)</h4>${(v.gate_checks.length?v.gate_checks:v.checks).map(c=>`<div class="chk ${c.passed===false?'f':'p'}">${c.passed===false?'✗':'✓'} ${esc(JSON.stringify(c))}</div>`).join('')}${v.gate_error?`<div class="chk f">${esc(v.gate_error)}</div>`:''}</div>
      <div class=sec><h4>why unanswerable (author notes)</h4><div class=notes>${esc(v.notes||'—')}</div></div>
-     <div class=sec><span class=cs>checksum ${v.checksum||'—'} · ${v.spec_path}</span>
+     <div class=sec><span class=cs>checksum ${v.checksum||'—'} · <a href="/file?path=${encodeURIComponent(v.spec_path)}" target=_blank style="color:var(--ac)">${v.spec_path}</a></span>
        <textarea placeholder="review comment…" onchange="comment('${v.name}',this.value)">${esc(r.comment||'')}</textarea></div>
    </div></div>`;
 }
@@ -255,6 +255,11 @@ class H(BaseHTTPRequestHandler):
     def _send(self, body, ctype="application/json"):
         b = body if isinstance(body, bytes) else body.encode()
         self.send_response(200); self.send_header("Content-Type", ctype)
+        # Never let the browser cache the page/JS — otherwise a normal reload re-runs
+        # STALE rendering logic after the server is updated (the "perturbation is gone"
+        # / "buttons dead" class of bug), and only a hard-reload fixes it.
+        self.send_header("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0")
+        self.send_header("Pragma", "no-cache"); self.send_header("Expires", "0")
         self.send_header("Content-Length", str(len(b))); self.end_headers(); self.wfile.write(b)
 
     def do_GET(self):
@@ -263,6 +268,16 @@ class H(BaseHTTPRequestHandler):
             self._send(BUNDLE.read_text() if BUNDLE.exists() else '{"summary":{},"variants":[]}')
         elif self.path.startswith("/api/state"):
             self._send(json.dumps(_load_state()))
+        elif self.path.startswith("/file"):
+            # Serve a repo file as plain text so the review page can hyperlink to it
+            # (browsers block file:// from an http page). Path-traversal guarded.
+            from urllib.parse import urlparse, parse_qs, unquote
+            rel = unquote(parse_qs(urlparse(self.path).query).get("path", [""])[0])
+            target = (ROOT / rel).resolve()
+            if ROOT in target.parents and target.is_file():
+                self._send(target.read_text(errors="replace"), "text/plain; charset=utf-8")
+            else:
+                self.send_response(404); self.end_headers()
         else:
             self._send(PAGE, "text/html; charset=utf-8")
 
