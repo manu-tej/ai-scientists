@@ -117,6 +117,7 @@ const FR=['','still-answerable (signal survives elsewhere)','unfair / trivial','
 let ROOT='';                                                // repo abs path (from bundle) for vscode:// links
 // Open a repo-relative path in VS Code (handles huge files the in-browser preview can't).
 function vscodeUrl(p){const enc=s=>s.split('/').map(encodeURIComponent).join('/'); return 'vscode://file'+enc(ROOT)+'/'+enc(p);}
+function reveal(p){fetch('/reveal?path='+encodeURIComponent(p)).catch(e=>console.error('reveal failed',e));return false;}  // open in macOS Finder
 let me=localStorage.getItem('annotator')||'me';            // default so solo review just works
 function mine(){return STATE[me]||{}}                       // current reviewer's verdicts
 function others(name){let a=0,f=0;for(const k in STATE){if(k===me)continue;const v=STATE[k][name]?.verdict;if(v==='approved')a++;else if(v==='flagged')f++;}return{a,f};}
@@ -162,8 +163,8 @@ function render(){
     <div class=sec><h4>original question <a class=toggle href="${vscodeUrl('data/biomnibench-da/'+t.base_task+'/instruction.md')}">↗ open instruction.md in VS Code</a></h4><div class=q>${esc(t.question)}</div></div>
     <div class=sec><h4>rubric <span class=toggle onclick="togR('${t.base_task}')" id="rt-${t.base_task}">▸ show</span></h4>
       <div class=rubric id="r-${t.base_task}" style="display:none">${esc(t.rubric)}</div></div>
-    <div class=sec><h4>data files (${(t.files||[]).length})</h4>
-      ${(t.files||[]).map(f=>`<div class=op><a href="${vscodeUrl(f.path)}" style="color:var(--ac)">${esc(f.name)}</a> <span class=bt>${f.mb} MB</span></div>`).join('')||'<div class=bt>(no local data files)</div>'}</div>
+    <div class=sec><h4>data files (${(t.files||[]).length}) <a class=toggle href="#" onclick="return reveal('data/biomnibench-da/${t.base_task}/environment/data')">📁 reveal folder in Finder</a></h4>
+      ${(t.files||[]).map(f=>`<div class=op><a href="${vscodeUrl(f.path)}" style="color:var(--ac)">${esc(f.name)}</a> <span class=bt>${f.mb} MB</span> <a class=toggle href="#" onclick="return reveal('${f.path}')" title="reveal in Finder">📁</a></div>`).join('')||'<div class=bt>(no local data files)</div>'}</div>
     <div class=sec><h4>variants derived from this task (${vs.length})</h4>
     ${vs.map(v=>varRow(v)).join('')}</div>
    </div></div>`;
@@ -276,6 +277,25 @@ class H(BaseHTTPRequestHandler):
             self._send(BUNDLE.read_text() if BUNDLE.exists() else '{"summary":{},"variants":[]}')
         elif self.path.startswith("/api/state"):
             self._send(json.dumps(_load_state()))
+        elif self.path.startswith("/reveal"):
+            # Reveal a file/folder in macOS Finder (server runs locally). `open -R`
+            # selects a file in its folder; `open` opens a directory. Guarded to ROOT.
+            from urllib.parse import urlparse, parse_qs, unquote
+            import subprocess
+            rel = unquote(parse_qs(urlparse(self.path).query).get("path", [""])[0])
+            target = (ROOT / rel).resolve()
+            if target == ROOT or ROOT in target.parents:
+                if target.exists():
+                    subprocess.Popen(["open", "-R", str(target)] if target.is_file() else ["open", str(target)])
+                    self._send('{"ok":true}')
+                else:  # not on disk (e.g. on-demand heavy variant) — reveal the parent that exists
+                    p = target
+                    while p != ROOT and not p.exists():
+                        p = p.parent
+                    subprocess.Popen(["open", str(p)])
+                    self._send('{"ok":true,"note":"target absent; opened nearest existing folder"}')
+            else:
+                self.send_response(404); self.end_headers()
         elif self.path.startswith("/file"):
             # Serve a repo file as plain text so the review page can hyperlink to it
             # (browsers block file:// from an http page). Path-traversal guarded.
