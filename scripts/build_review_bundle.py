@@ -30,7 +30,32 @@ def question_of(base_task: str) -> str:
         return "(instruction.md not found locally)"
     txt = f.read_text(errors="replace")
     m = re.search(r"##\s*Question\s*\n(.+?)(?:\n##|\Z)", txt, re.S)
-    return (m.group(1).strip()[:700] if m else txt[:500])
+    return (m.group(1).strip() if m else txt[:800])
+
+
+def title_of(base_task: str) -> str:
+    """Human title from instruction.md's '# Task: ...' line."""
+    f = DATA / base_task / "instruction.md"
+    if not f.exists():
+        return base_task
+    for line in f.read_text(errors="replace").splitlines():
+        m = re.match(r"#\s*Task:\s*(.+)", line)
+        if m:
+            return m.group(1).strip()
+    return base_task
+
+
+def rubric_of(base_task: str) -> str:
+    """Full grading rubric (tests/rubric.txt) so the reviewer can see exactly what
+    the original task is scored on — the variant must remove that scorable signal."""
+    f = DATA / base_task / "tests" / "rubric.txt"
+    return f.read_text(errors="replace").strip() if f.exists() else "(rubric.txt not found locally)"
+
+
+def _tasknum(t: str):
+    """Natural sort key for da-<a>-<b>."""
+    parts = re.findall(r"\d+", t)
+    return tuple(int(p) for p in parts) if parts else (0,)
 
 
 def mode_of(spec: dict) -> str:
@@ -61,7 +86,6 @@ def main():
             "base_task": spec["base_task"],
             "mode": mode_of(spec),
             "expected_behavior": spec.get("expected_behavior", "refuse"),
-            "question": question_of(spec["base_task"]),
             "ops": [{"kind": o["kind"], **{k: v for k, v in o.items() if k != "kind"}} for o in spec.get("ops", [])],
             "checks": [{"kind": c["kind"], **{k: v for k, v in c.items() if k != "kind"}} for c in spec.get("required_signal", [])],
             "notes": spec.get("notes", "").strip(),
@@ -72,9 +96,26 @@ def main():
             "spec_path": str(sp.relative_to(ROOT)),
         })
 
-    by_task = {}
+    # Group variants under their base task, with that task's question + rubric, so
+    # the reviewer reads the original task once then assesses all its variants.
+    by_task: dict[str, list] = {}
     for r in rows:
-        by_task.setdefault(r["base_task"], []).append(r["name"])
+        by_task.setdefault(r["base_task"], []).append(r)
+    tasks = []
+    for t in sorted(by_task, key=_tasknum):
+        vs = sorted(by_task[t], key=lambda r: r["name"])
+        tasks.append({
+            "base_task": t,
+            "title": title_of(t),
+            "question": question_of(t),
+            "rubric": rubric_of(t),
+            "n_variants": len(vs),
+            "n_emitted": sum(1 for v in vs if v["emitted"]),
+            "n_rejected": sum(1 for v in vs if v["emitted"] is False),
+            "modes": sorted({v["mode"] for v in vs}),
+            "variants": vs,
+        })
+
     summary = {
         "total_specs": len(rows),
         "emitted": sum(1 for r in rows if r["emitted"]),
@@ -89,7 +130,7 @@ def main():
     for r in rows:
         if r["emitted"]:
             summary["by_mode"][r["mode"]] = summary["by_mode"].get(r["mode"], 0) + 1
-    OUT.write_text(json.dumps({"summary": summary, "variants": rows}, indent=2))
+    OUT.write_text(json.dumps({"summary": summary, "tasks": tasks}, indent=2))
     print(f"wrote {OUT}")
     print(f"  {summary['emitted']} emitted / {summary['total_specs']} specs over {summary['base_tasks']} tasks")
     print(f"  by mode: {summary['by_mode']}")
