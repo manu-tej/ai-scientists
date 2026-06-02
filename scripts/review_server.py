@@ -93,6 +93,7 @@ h1{font-size:18px;margin:0 0 4px}.sub{color:var(--mut);font-size:12px;margin-bot
 .op{font-size:12px;padding:4px 8px;background:#0a0d13;border:1px solid var(--line);border-radius:5px;margin:3px 0}
 .flagbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:8px 12px;background:#2a0f0f;border-top:1px solid #5d2020}
 .fr{background:#0a0d13;color:var(--fg);border:1px solid #5d2020;border-radius:5px;font:12px ui-monospace;padding:3px 6px}
+.fc{flex:1;min-width:220px;background:#0a0d13;color:var(--fg);border:1px solid #5d2020;border-radius:5px;font:12px ui-monospace;padding:3px 8px}
 .drp{font-size:11px;color:#f0b0a8}
 .chk{font-size:12px;padding:3px 8px;border-radius:5px;margin:3px 0}
 .chk.p{background:#0f2417;color:var(--ok)}.chk.f{background:#2a0f0f;color:var(--bad)}
@@ -192,7 +193,7 @@ function nextUnreviewed(){ if(!FLAT.length)return;
  if(el){const t=el.dataset.task; if(!OPEN[t]){OPEN[t]=true; $('#t-'+CSS.escape(t)).classList.add('open');}}
  applyCursor(true);}
 document.addEventListener('keydown',e=>{
- if(e.target.tagName==='TEXTAREA'){ if(e.key==='Escape')e.target.blur(); return; }
+ if(['TEXTAREA','INPUT','SELECT'].includes(e.target.tagName)){ if(e.key==='Escape')e.target.blur(); return; }
  const n=curName();
  if(e.key==='j'||e.key==='ArrowDown'){e.preventDefault();moveCur(1);}
  else if(e.key==='k'||e.key==='ArrowUp'){e.preventDefault();moveCur(-1);}
@@ -224,6 +225,7 @@ function varRow(v){
      <span class=bt>flag reason:</span>
      <select class=fr onclick="event.stopPropagation()" onchange="event.stopPropagation();flagReason('${v.name}',this.value)">
        ${FR.map(o=>`<option value="${o}"${(r.flag_reason||'')===o?' selected':''}>${o||'— pick a reason —'}</option>`).join('')}</select>
+     <input class=fc placeholder="comment (optional)" value="${esc(r.comment||'')}" onclick="event.stopPropagation()" onchange="event.stopPropagation();comment('${v.name}',this.value)">
      <span class=drp title="exact perturbation">dropped: ${esc(dropped.map(d=>d.act+(d.file?' '+d.file:'')).join(' ; ')||'(none)')}</span>
    </div>` : '';
  return `<div class=v data-v="${v.name}" data-task="${v.base_task}"><div class=vh onclick="togV('${v.name}')">
