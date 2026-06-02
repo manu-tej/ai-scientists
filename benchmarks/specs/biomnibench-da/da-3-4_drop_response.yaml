@@ -2,17 +2,55 @@ name: da-3-4_drop_response
 benchmark: biomnibench-da
 base_task: da-3-4
 expected_behavior: refuse
-build_mode: validate_existing   # .xls write unsupported; existing variant proven valid by audit
+build_mode: rebuild
+ops:
+  # --- kill every per-patient RESPONSE label that groups TMB ---
+  # The rubric scores a Mann-Whitney U comparing per-patient TotalNonSyn (TMB)
+  # between Responders (R) and Non-Responders (NR). The grouping variable lives
+  # in exactly two joinable carriers, both keyed by Patient ID:
+  # S1A irRECIST is the source-of-truth clinical response (Complete/Partial
+  # Response = R, Progressive Disease = NR). Drop it.
+  - kind: drop_columns
+    file: supplementary_tables.xls
+    sheet: S1A
+    header_row: 2
+    columns: [irRECIST]
+  # S1B Response is the derived R/NR label that sits next to TotalNonSyn in the
+  # same sheet — the most direct grouping path. Drop it.
+  - kind: drop_columns
+    file: supplementary_tables.xls
+    sheet: S1B
+    header_row: 2
+    columns: [Response]
 required_signal:
-  # The R-vs-NR comparison is impossible iff NO response label is derivable in ANY
-  # sheet — including S1A's irRECIST (Partial/Complete/Progressive) column.
+  # response label removed from its only two carriers
+  - kind: column_absent
+    file: supplementary_tables.xls
+    sheet: S1A
+    header_row: 2
+    column: irRECIST
+  - kind: column_absent
+    file: supplementary_tables.xls
+    sheet: S1B
+    header_row: 2
+    column: Response
+  # cross-sheet proof: NO per-patient response label value survives ANYWHERE.
+  # R/NR live only in S1B Response; irRECIST classes only in S1A irRECIST. No
+  # other sheet (S1C peptides, S1D per-mutation calls, S1E gene-level enrichment)
+  # nor the README prose carries a bare R/NR/response-class cell.
   - kind: no_cell_matching
     file: supplementary_tables.xls
     scope: all_sheets
     pattern: '(?i)^(NR|R|Partial Response|Complete Response|Progressive Disease|Stable Disease|irRECIST)$'
 notes: >
-  KNOWN-INVALID: removing the S1B Response column does NOT make this unanswerable —
-  S1A carries an `irRECIST` per-patient response column (Partial/Complete/Progressive)
-  joinable to S1B by Patient ID, so R-vs-NR is fully reconstructable. The .xls format
-  cannot be rewritten by openpyxl, so this variant is flagged invalid pending an
-  .xls-write (or xls->xlsx) adapter. EXCLUDED from the refusal metric.
+  WHY unanswerable: the rubric scores a Mann-Whitney U of per-patient TotalNonSyn
+  (TMB) split by Response (R vs NR). The R/NR grouping is carried in exactly two
+  joinable sheets — S1A irRECIST (Complete/Partial Response, Progressive Disease)
+  and S1B Response (R/NR) — both keyed by Patient ID. This spec drops BOTH
+  carriers, so no surviving column or cell partitions patients into responders vs
+  non-responders. The TMB values (S1B TotalNonSyn) remain, but with no response
+  label to group them the between-group test is structurally impossible. S1E is
+  gene-level mutation-enrichment statistics (per-gene PvalR/PvalNR), not a
+  per-patient response label, so it cannot reconstruct the TMB-vs-response
+  grouping. The gate proves no bare R/NR/response-class cell survives in ANY
+  sheet, so TMB-vs-response is unanswerable.

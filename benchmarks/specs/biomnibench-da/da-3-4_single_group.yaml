@@ -2,13 +2,61 @@ name: da-3-4_single_group
 benchmark: biomnibench-da
 base_task: da-3-4
 expected_behavior: refuse
-build_mode: validate_existing   # .xls write unsupported; existing variant proven valid by audit
+build_mode: rebuild
+ops:
+  # --- collapse the cohort to a SINGLE response group (Non-Responders only) ---
+  # S1B Response is the derived R/NR grouping variable that sits next to the TMB
+  # column (TotalNonSyn). Keep only NR rows, so the responder arm vanishes and a
+  # Responder-vs-Non-Responder TMB comparison has n_groups=1.
+  - kind: subset_to_single_group
+    file: supplementary_tables.xls
+    sheet: S1B
+    header_row: 2
+    column: Response
+    keep_value: NR
+  # S1A irRECIST is the source clinical response (could re-derive the grouping
+  # by joining on Patient ID). Keep only the Non-Responder class
+  # "Progressive Disease"; the Complete/Partial Response (responder) patients are
+  # dropped, so S1A also yields one group only.
+  - kind: subset_to_single_group
+    file: supplementary_tables.xls
+    sheet: S1A
+    header_row: 2
+    column: irRECIST
+    keep_value: Progressive Disease
 required_signal:
+  # only one response level survives in each labeled sheet => n_groups = 1
+  - kind: single_value_in
+    file: supplementary_tables.xls
+    sheet: S1B
+    header_row: 2
+    column: Response
+    max_distinct: 1
+  - kind: single_value_in
+    file: supplementary_tables.xls
+    sheet: S1A
+    header_row: 2
+    column: irRECIST
+    max_distinct: 1
+  # cross-sheet proof: NO responder label survives in ANY sheet (the responder
+  # arm is truly gone, not just hidden). "NR" / "Progressive Disease" are
+  # intentionally allowed (the one surviving group); only responder-class labels
+  # are forbidden.
   - kind: no_cell_matching
     file: supplementary_tables.xls
     scope: all_sheets
-    pattern: '(?i)^(NR|R|Partial Response|Complete Response|Progressive Disease|Stable Disease|irRECIST)$'
+    pattern: '^(R|Complete Response|Partial Response|Stable Disease)$'
 notes: >
-  KNOWN-INVALID: subsetting S1B to Responders does NOT make this unanswerable —
-  S1A still lists every patient's irRECIST response, so the full R/NR grouping is
-  recoverable. .xls cannot be rewritten; flagged invalid, EXCLUDED from the metric.
+  WHY unanswerable: the rubric scores a Mann-Whitney U of per-patient TotalNonSyn
+  (TMB) between Responders (R) and Non-Responders (NR). A between-group test is
+  impossible when only one group exists. This collapses the cohort to
+  Non-Responders in BOTH response carriers — S1B Response -> NR only, S1A
+  irRECIST -> Progressive Disease only — so no responder patient remains to form
+  the second arm, and the responder patient IDs no longer appear in any labeled
+  sheet, so they cannot be re-grouped (the gate proves no responder label
+  survives in any sheet). The TMB column (TotalNonSyn) survives but is
+  uninterpretable for the comparison: there is no responder arm to test it
+  against. Distinct from the drop-column variant — the Response COLUMN still
+  exists (single-valued), modeling a cohort that genuinely enrolled only
+  non-responders rather than one with the label stripped.
+  expected_behavior=refuse (n_groups=1 is uncomputable, not merely underpowered).
