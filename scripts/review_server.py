@@ -47,6 +47,7 @@ h1{font-size:18px;margin:0 0 4px}.sub{color:var(--mut);font-size:12px;margin-bot
 .st{margin-left:auto;display:flex;gap:8px;align-items:center}
 .pill{font-size:11px;padding:2px 9px;border-radius:20px;border:1px solid var(--line)}
 .ok{color:var(--ok);border-color:#1d4d28}.bad{color:var(--bad);border-color:#5d2020;background:#2a0f0f}
+.pend{color:var(--mut);border-color:var(--line);background:#11161f}
 .rev{font-size:11px;padding:3px 10px;border-radius:6px;border:1px solid var(--line);cursor:pointer;background:#0a0d13;color:var(--fg)}
 .rev.approved{background:#0f2417;border-color:#1d4d28;color:var(--ok)}
 .rev.flagged{background:#2a0f0f;border-color:#5d2020;color:var(--bad)}
@@ -74,10 +75,11 @@ async function load(){
  DATA=await(await fetch('/api/bundle',{cache:'no-store'})).json();
  STATE=await(await fetch('/api/state',{cache:'no-store'})).json();
  const s=DATA.summary;
- $('#sub').textContent=`${s.emitted} emitted / ${s.total_specs} specs · ${s.base_tasks} tasks · dataset ${(s.dataset_revision||'?').slice(0,12)} · modes: `+Object.entries(s.by_mode).map(([k,v])=>`${v} ${k}`).join(', ');
+ const extra=[]; if(s.rejected)extra.push(`${s.rejected} gate✗`); if(s.ungenerated)extra.push(`${s.ungenerated} not-generated`);
+ $('#sub').textContent=`${s.emitted} emitted / ${s.total_specs} specs${extra.length?' ('+extra.join(', ')+')':''} · ${s.base_tasks} tasks · dataset ${(s.dataset_revision||'?').slice(0,12)} · modes: `+Object.entries(s.by_mode).map(([k,v])=>`${v} ${k}`).join(', ');
  const modes=['all',...Object.keys(s.by_mode)];
  $('#modebar').innerHTML='<span class=bt>mode:</span>'+modes.map(m=>`<span class="chip ${m===fMode?'on':''}" onclick="setMode('${m}')">${m}</span>`).join('');
- $('#statusbar').innerHTML='<span class=bt>status:</span>'+['all','emitted','rejected','approved','flagged','unreviewed'].map(x=>`<span class="chip ${x===fStatus?'on':''}" onclick="setStatus('${x}')">${x}</span>`).join('')+`<span class=stat id=cnt></span>`;
+ $('#statusbar').innerHTML='<span class=bt>status:</span>'+['all','emitted','rejected','not-generated','approved','flagged','unreviewed'].map(x=>`<span class="chip ${x===fStatus?'on':''}" onclick="setStatus('${x}')">${x}</span>`).join('')+`<span class=stat id=cnt></span>`;
  render();
 }
 function setMode(m){fMode=m;load()} function setStatus(x){fStatus=x;render();$('#statusbar').querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',c.textContent===x))}
@@ -85,12 +87,16 @@ function mtag(m){return m.startsWith('drop')?'m-drop':m.startsWith('single')?'m-
 function render(){
  let vs=DATA.variants.filter(v=>fMode==='all'||v.mode===fMode);
  vs=vs.filter(v=>{const r=STATE[v.name]?.verdict;
-   if(fStatus==='all')return true; if(fStatus==='emitted')return v.emitted; if(fStatus==='rejected')return v.emitted===false;
+   if(fStatus==='all')return true; if(fStatus==='emitted')return v.emitted===true; if(fStatus==='rejected')return v.emitted===false;
+   if(fStatus==='not-generated')return v.emitted==null;
    if(fStatus==='approved')return r==='approved'; if(fStatus==='flagged')return r==='flagged'; if(fStatus==='unreviewed')return !r;});
  const nrev=DATA.variants.filter(v=>STATE[v.name]?.verdict).length;
  $('#cnt').textContent=`${vs.length} shown · ${nrev}/${DATA.variants.length} reviewed`;
  $('#list').innerHTML=vs.map(v=>{
-  const r=STATE[v.name]||{}; const gate=v.emitted?'<span class="pill ok">gate ✓</span>':'<span class="pill bad">gate ✗</span>';
+  const r=STATE[v.name]||{};
+  const gate = v.emitted===true ? '<span class="pill ok">gate ✓</span>'
+             : v.emitted===false ? '<span class="pill bad">gate ✗</span>'
+             : '<span class="pill pend" title="in a spec file but not in MANIFEST.json — re-run generate_variants">not generated</span>';
   const av=r.verdict==='approved'?'approved':'', fv=r.verdict==='flagged'?'flagged':'';
   return `<div class=v><div class=vh onclick="tog('${v.name}')">
     <span class=nm>${v.name}</span><span class=bt>${v.base_task}</span>

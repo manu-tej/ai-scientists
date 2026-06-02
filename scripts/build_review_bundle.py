@@ -79,6 +79,9 @@ def main():
         "total_specs": len(rows),
         "emitted": sum(1 for r in rows if r["emitted"]),
         "rejected": sum(1 for r in rows if r["emitted"] is False),
+        # in a spec file but absent from MANIFEST.json => not (re)generated yet,
+        # NOT a gate failure. Distinguished so a stale manifest doesn't look broken.
+        "ungenerated": sum(1 for r in rows if r["emitted"] is None),
         "base_tasks": len(by_task),
         "by_mode": {},
         "dataset_revision": manifest.get("pinned_revision"),
