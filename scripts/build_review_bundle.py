@@ -67,6 +67,32 @@ def _tasknum(t: str):
     return tuple(int(p) for p in parts) if parts else (0,)
 
 
+def op_summary(o: dict) -> str:
+    """Plain-English summary of one perturbation op, naming the EXACT columns/files
+    removed — so a reviewer (and a flag reason) can reference precisely what was dropped."""
+    k = o.get("kind"); f = o.get("file", ""); sh = o.get("sheet"); hr = o.get("header_row")
+    loc = f + (f" [sheet {sh}]" if sh else "") + (f" [header_row {hr}]" if hr not in (None, 0) else "")
+    if k == "drop_columns":
+        return f"dropped column(s) {o.get('columns')} from {loc}"
+    if k == "drop_columns_matching":
+        return f"dropped columns matching /{o.get('pattern')}/ from {loc}"
+    if k == "subset_to_single_group":
+        return f"collapsed {loc} to a single group: {o.get('column')} == {o.get('keep_value')!r} (other groups removed)"
+    if k == "drop_rows_by_value":
+        return f"kept only rows where {o.get('column')} in {o.get('keep_values')} in {loc}"
+    if k == "anonymize_column":
+        return f"anonymized labels in column {o.get('column')!r} of {loc}"
+    if k == "reduce_n":
+        return f"subsampled {loc} to n={o.get('n')} rows (seed {o.get('seed', 0)})"
+    if k == "drop_files_matching":
+        return f"deleted all files matching '{o.get('glob')}'"
+    if k == "anonymize_filenames":
+        return f"renamed files matching '{o.get('glob')}' to neutral ids (group token stripped)"
+    if k == "drop_lines_matching":
+        return f"deleted lines matching /{o.get('pattern')}/ from {f}"
+    return f"{k}: {o}"
+
+
 def mode_of(spec: dict) -> str:
     name = spec["name"]
     for k, v in MODE.items():
@@ -96,6 +122,7 @@ def main():
             "mode": mode_of(spec),
             "expected_behavior": spec.get("expected_behavior", "refuse"),
             "ops": [{"kind": o["kind"], **{k: v for k, v in o.items() if k != "kind"}} for o in spec.get("ops", [])],
+            "dropped": [op_summary({"kind": o["kind"], **{k: v for k, v in o.items() if k != "kind"}}) for o in spec.get("ops", [])],
             "checks": [{"kind": c["kind"], **{k: v for k, v in c.items() if k != "kind"}} for c in spec.get("required_signal", [])],
             "notes": spec.get("notes", "").strip(),
             "emitted": m.get("emitted"),

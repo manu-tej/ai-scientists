@@ -91,6 +91,9 @@ h1{font-size:18px;margin:0 0 4px}.sub{color:var(--mut);font-size:12px;margin-bot
 .kb{font-size:11px;color:var(--mut);margin-bottom:12px}
 .kb kbd{background:#0a0d13;border:1px solid var(--line);border-radius:4px;padding:0 5px;color:var(--fg);font-size:10px}
 .op{font-size:12px;padding:4px 8px;background:#0a0d13;border:1px solid var(--line);border-radius:5px;margin:3px 0}
+.flagbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:8px 12px;background:#2a0f0f;border-top:1px solid #5d2020}
+.fr{background:#0a0d13;color:var(--fg);border:1px solid #5d2020;border-radius:5px;font:12px ui-monospace;padding:3px 6px}
+.drp{font-size:11px;color:#f0b0a8}
 .chk{font-size:12px;padding:3px 8px;border-radius:5px;margin:3px 0}
 .chk.p{background:#0f2417;color:var(--ok)}.chk.f{background:#2a0f0f;color:var(--bad)}
 .notes{color:var(--mut);font-size:12px;white-space:pre-wrap;background:#0a0d13;padding:8px;border-radius:5px;border:1px solid var(--line)}
@@ -110,6 +113,7 @@ textarea{width:100%;background:#0a0d13;color:var(--fg);border:1px solid var(--li
 <script>
 const $=s=>document.querySelector(s);
 let DATA=null, STATE={}, fMode='all', fStatus='all', OPEN={};
+const FR=['','still-answerable (signal survives elsewhere)','unfair / trivial','wrong expected behavior','biology off','other (see comment)'];
 let me=localStorage.getItem('annotator')||'me';            // default so solo review just works
 function mine(){return STATE[me]||{}}                       // current reviewer's verdicts
 function others(name){let a=0,f=0;for(const k in STATE){if(k===me)continue;const v=STATE[k][name]?.verdict;if(v==='approved')a++;else if(v==='flagged')f++;}return{a,f};}
@@ -176,7 +180,7 @@ function moveCur(d){ if(!FLAT.length)return; cur=Math.max(0,Math.min(FLAT.length
  if(el){const t=el.dataset.task; if(!OPEN[t]){OPEN[t]=true; $('#t-'+CSS.escape(t)).classList.add('open');}}
  applyCursor(true);}
 function nextUnreviewed(){ if(!FLAT.length)return;
- for(let i=1;i<=FLAT.length;i++){const j=(cur+i)%FLAT.length; if(!STATE[FLAT[j]]?.verdict){cur=j;break;}}
+ for(let i=1;i<=FLAT.length;i++){const j=(cur+i)%FLAT.length; if(!mine()[FLAT[j]]?.verdict){cur=j;break;}}
  const n=curName(), el=$('#list').querySelector(`.v[data-v="${CSS.escape(n)}"]`);
  if(el){const t=el.dataset.task; if(!OPEN[t]){OPEN[t]=true; $('#t-'+CSS.escape(t)).classList.add('open');}}
  applyCursor(true);}
@@ -206,6 +210,13 @@ function varRow(v){
             : '<span class="pill pend" title="in a spec but not in MANIFEST.json — re-run generate_variants">not generated</span>';
  const av=r.verdict==='approved'?'approved':'', fv=r.verdict==='flagged'?'flagged':'';
  const o=others(v.name); const oh=(o.a||o.f)?`<span class=bt title="other reviewers">others ${o.a?o.a+'✓':''}${o.f?' '+o.f+'✗':''}</span>`:'';
+ const dropped=(v.dropped||[]);
+ const flagbar = r.verdict==='flagged' ? `<div class=flagbar>
+     <span class=bt>flag reason:</span>
+     <select class=fr onclick="event.stopPropagation()" onchange="event.stopPropagation();flagReason('${v.name}',this.value)">
+       ${FR.map(o=>`<option value="${o}"${(r.flag_reason||'')===o?' selected':''}>${o||'— pick a reason —'}</option>`).join('')}</select>
+     <span class=drp title="exact perturbation">dropped: ${esc(dropped.join(' ; ')||'(none)')}</span>
+   </div>` : '';
  return `<div class=v data-v="${v.name}" data-task="${v.base_task}"><div class=vh onclick="togV('${v.name}')">
    <span class=nm>${v.name.replace(v.base_task+'_','')}</span>
    <span class="tag ${mtag(v.mode)}">${v.mode}</span>
@@ -213,8 +224,9 @@ function varRow(v){
      <span class="rev ${av}" onclick="event.stopPropagation();verdict('${v.name}','approved')">approve</span>
      <span class="rev ${fv}" onclick="event.stopPropagation();verdict('${v.name}','flagged')">flag</span>
    </span></div>
+   ${flagbar}
    <div class=vbody id="b-${v.name}">
-     <div class=sec><h4>perturbation · expects: ${v.expected_behavior}</h4>${v.ops.map(o=>`<div class=op>${esc(JSON.stringify(o))}</div>`).join('')||'<div class=bt>(validate_existing / none)</div>'}</div>
+     <div class=sec><h4>perturbation · expects: ${v.expected_behavior}</h4>${dropped.map(d=>`<div class=op>✂ ${esc(d)}</div>`).join('')||'<div class=bt>(validate_existing / none)</div>'}</div>
      <div class=sec><h4>gate proof (signal provably gone)</h4>${(v.gate_checks.length?v.gate_checks:v.checks).map(c=>`<div class="chk ${c.passed===false?'f':'p'}">${c.passed===false?'✗':'✓'} ${esc(JSON.stringify(c))}</div>`).join('')}${v.gate_error?`<div class="chk f">${esc(v.gate_error)}</div>`:''}</div>
      <div class=sec><h4>why unanswerable (author notes)</h4><div class=notes>${esc(v.notes||'—')}</div></div>
      <div class=sec><span class=cs>checksum ${v.checksum||'—'} · ${v.spec_path}</span>
@@ -231,6 +243,8 @@ async function verdict(n,v){ const cur=mine()[n]?.verdict; const nv=cur===v?null
  render();}
 async function comment(n,c){ (STATE[me]=STATE[me]||{})[n]={...(mine()[n]||{}),comment:c};
  try{await fetch('/api/state',{method:'POST',body:JSON.stringify({annotator:me,name:n,comment:c})});}catch(e){console.error('save failed',e);}}
+async function flagReason(n,reason){ (STATE[me]=STATE[me]||{})[n]={...(mine()[n]||{}),flag_reason:reason};
+ try{await fetch('/api/state',{method:'POST',body:JSON.stringify({annotator:me,name:n,flag_reason:reason})});}catch(e){console.error('save failed',e);}}
 load();
 </script></body></html>"""
 
@@ -261,6 +275,7 @@ class H(BaseHTTPRequestHandler):
         rec = per.get(upd["name"], {})
         if "verdict" in upd: rec["verdict"] = upd["verdict"]
         if "comment" in upd: rec["comment"] = upd["comment"]
+        if "flag_reason" in upd: rec["flag_reason"] = upd["flag_reason"]
         from datetime import datetime, timezone
         rec["ts"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
         per[upd["name"]] = rec
