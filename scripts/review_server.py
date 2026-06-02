@@ -19,6 +19,24 @@ BUNDLE = ROOT / "runs/review/variants_review.json"
 STATE = ROOT / "runs/review/review_state.json"
 
 
+def _load_state() -> dict:
+    """Review state, namespaced by annotator: {annotator: {variant: {verdict,comment,ts}}}.
+
+    Multi-annotator-ready for future cloud crowdsourcing (each reviewer's verdicts are
+    separate, so inter-annotator agreement can be computed later). Defensively migrates
+    any legacy FLAT file ({variant: {verdict,...}}) under an 'anon' annotator.
+    """
+    if not STATE.exists():
+        return {}
+    s = json.loads(STATE.read_text() or "{}")
+    is_flat = bool(s) and all(isinstance(v, dict) for v in s.values()) and any(
+        ("verdict" in v or "comment" in v) for v in s.values())
+    if is_flat:
+        s = {"anon": s}
+        STATE.write_text(json.dumps(s, indent=2))
+    return s
+
+
 def rebuild_bundle():
     try:
         subprocess.run([sys.executable, str(ROOT / "scripts/build_review_bundle.py")],
@@ -80,6 +98,9 @@ textarea{width:100%;background:#0a0d13;color:var(--fg);border:1px solid var(--li
 </style></head><body><div class=wrap>
 <h1>adversarial-variant review — by task</h1>
 <div class=sub id=sub>loading…</div>
+<div class=bar><span class=bt>reviewer:</span>
+ <input id=who placeholder="your name" style="background:#0a0d13;color:var(--fg);border:1px solid var(--line);border-radius:6px;font:12px ui-monospace;padding:4px 8px">
+ <span class=bt id=whohint></span></div>
 <div class=bar id=modebar></div>
 <div class=bar id=statusbar></div>
 <div class=kb><kbd>j</kbd>/<kbd>k</kbd> next/prev · <kbd>o</kbd> or <kbd>Enter</kbd> expand · <kbd>a</kbd> approve · <kbd>f</kbd> flag · <kbd>u</kbd> next unreviewed · <kbd>c</kbd> comment · <kbd>r</kbd> rubric of current task</div>
@@ -88,9 +109,15 @@ textarea{width:100%;background:#0a0d13;color:var(--fg);border:1px solid var(--li
 <script>
 const $=s=>document.querySelector(s);
 let DATA=null, STATE={}, fMode='all', fStatus='all', OPEN={};
+let me=localStorage.getItem('annotator')||'';
+function mine(){return STATE[me]||{}}                       // current reviewer's verdicts
+function others(name){let a=0,f=0;for(const k in STATE){if(k===me)continue;const v=STATE[k][name]?.verdict;if(v==='approved')a++;else if(v==='flagged')f++;}return{a,f};}
 async function load(){
  DATA=await(await fetch('/api/bundle',{cache:'no-store'})).json();
  STATE=await(await fetch('/api/state',{cache:'no-store'})).json();
+ const w=$('#who'); w.value=me;
+ w.onchange=()=>{me=w.value.trim();localStorage.setItem('annotator',me);render();};
+ $('#whohint').textContent=Object.keys(STATE).length>1?`· ${Object.keys(STATE).length} reviewers on record`:'';
  const s=DATA.summary;
  const extra=[]; if(s.rejected)extra.push(`${s.rejected} gate✗`); if(s.ungenerated)extra.push(`${s.ungenerated} not-generated`);
  $('#sub').textContent=`${s.base_tasks} tasks · ${s.emitted}/${s.total_specs} variants emitted${extra.length?' ('+extra.join(', ')+')':''} · dataset ${(s.dataset_revision||'?').slice(0,12)} · `+Object.entries(s.by_mode).map(([k,v])=>`${v} ${k}`).join(', ');
@@ -102,19 +129,19 @@ async function load(){
 function setMode(m){fMode=m;render();$('#modebar').querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',c.textContent===fMode))}
 function setStatus(x){fStatus=x;render();$('#statusbar').querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',c.textContent===x))}
 function mtag(m){return m.startsWith('drop')?'m-drop':m.startsWith('single')?'m-single':'m-stat'}
-function vMatch(v){const r=STATE[v.name]?.verdict;
+function vMatch(v){const r=mine()[v.name]?.verdict;
  if(fMode!=='all'&&v.mode!==fMode)return false;
  if(fStatus==='all')return true; if(fStatus==='emitted')return v.emitted===true; if(fStatus==='rejected')return v.emitted===false;
  if(fStatus==='not-generated')return v.emitted==null;
  if(fStatus==='approved')return r==='approved'; if(fStatus==='flagged')return r==='flagged'; if(fStatus==='unreviewed')return !r; return true;}
 function render(){
  let allV=DATA.tasks.flatMap(t=>t.variants);
- const nrev=allV.filter(v=>STATE[v.name]?.verdict).length;
+ const nrev=allV.filter(v=>mine()[v.name]?.verdict).length;
  const shownTasks=DATA.tasks.filter(t=>t.variants.some(vMatch));
- $('#cnt').textContent=`${shownTasks.length} tasks shown · ${nrev}/${allV.length} variants reviewed`;
+ $('#cnt').textContent=`${shownTasks.length} tasks shown · ${nrev}/${allV.length} reviewed by ${me||'(set your name)'}`;
  $('#list').innerHTML=shownTasks.map(t=>{
   const vs=t.variants.filter(vMatch);
-  const revd=t.variants.filter(v=>STATE[v.name]?.verdict).length;
+  const revd=t.variants.filter(v=>mine()[v.name]?.verdict).length;
   const gateSum=`<span class="pill ok">${t.n_emitted}✓</span>`+(t.n_rejected?`<span class="pill bad">${t.n_rejected}✗</span>`:'');
   const op=OPEN[t.base_task]?'open':'';
   return `<div class=task><div class=th onclick="togT('${t.base_task}')">
@@ -164,15 +191,16 @@ document.addEventListener('keydown',e=>{
  else if(e.key==='c'){e.preventDefault(); if(n){const b=$('#b-'+CSS.escape(n)); if(!b.classList.contains('open'))togV(n); const ta=b.querySelector('textarea'); if(ta)ta.focus();}}
 });
 function varRow(v){
- const r=STATE[v.name]||{};
+ const r=mine()[v.name]||{};
  const gate = v.emitted===true ? '<span class="pill ok">gate ✓</span>'
             : v.emitted===false ? '<span class="pill bad">gate ✗</span>'
             : '<span class="pill pend" title="in a spec but not in MANIFEST.json — re-run generate_variants">not generated</span>';
  const av=r.verdict==='approved'?'approved':'', fv=r.verdict==='flagged'?'flagged':'';
+ const o=others(v.name); const oh=(o.a||o.f)?`<span class=bt title="other reviewers">others ${o.a?o.a+'✓':''}${o.f?' '+o.f+'✗':''}</span>`:'';
  return `<div class=v data-v="${v.name}" data-task="${v.base_task}"><div class=vh onclick="togV('${v.name}')">
    <span class=nm>${v.name.replace(v.base_task+'_','')}</span>
    <span class="tag ${mtag(v.mode)}">${v.mode}</span>
-   <span class=st>${gate}
+   <span class=st>${oh}${gate}
      <span class="rev ${av}" onclick="event.stopPropagation();verdict('${v.name}','approved')">approve</span>
      <span class="rev ${fv}" onclick="event.stopPropagation();verdict('${v.name}','flagged')">flag</span>
    </span></div>
@@ -188,11 +216,12 @@ function togT(t){OPEN[t]=!OPEN[t];$('#t-'+CSS.escape(t)).classList.toggle('open'
 function togV(n){$('#b-'+CSS.escape(n)).classList.toggle('open')}
 function togR(t){const e=$('#r-'+CSS.escape(t)),b=$('#rt-'+CSS.escape(t));const sh=e.style.display==='none';e.style.display=sh?'block':'none';b.textContent=sh?'▾ hide':'▸ show'}
 function esc(s){return(s==null?'':String(s)).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))}
-async function verdict(n,v){const cur=STATE[n]?.verdict; const nv=cur===v?null:v;
- STATE[n]={...(STATE[n]||{}),verdict:nv};
- await fetch('/api/state',{method:'POST',body:JSON.stringify({name:n,verdict:nv})}); render();}
-async function comment(n,c){STATE[n]={...(STATE[n]||{}),comment:c};
- await fetch('/api/state',{method:'POST',body:JSON.stringify({name:n,comment:c})});}
+function needName(){ if(!me){$('#who').focus(); $('#whohint').textContent='· enter your name first'; return true;} return false; }
+async function verdict(n,v){ if(needName())return; const cur=mine()[n]?.verdict; const nv=cur===v?null:v;
+ (STATE[me]=STATE[me]||{})[n]={...(mine()[n]||{}),verdict:nv};
+ await fetch('/api/state',{method:'POST',body:JSON.stringify({annotator:me,name:n,verdict:nv})}); render();}
+async function comment(n,c){ if(needName())return; (STATE[me]=STATE[me]||{})[n]={...(mine()[n]||{}),comment:c};
+ await fetch('/api/state',{method:'POST',body:JSON.stringify({annotator:me,name:n,comment:c})});}
 load();
 </script></body></html>"""
 
@@ -210,18 +239,22 @@ class H(BaseHTTPRequestHandler):
             rebuild_bundle()
             self._send(BUNDLE.read_text() if BUNDLE.exists() else '{"summary":{},"variants":[]}')
         elif self.path.startswith("/api/state"):
-            self._send(STATE.read_text() if STATE.exists() else "{}")
+            self._send(json.dumps(_load_state()))
         else:
             self._send(PAGE, "text/html; charset=utf-8")
 
     def do_POST(self):
         n = int(self.headers.get("Content-Length", 0))
         upd = json.loads(self.rfile.read(n) or "{}")
-        state = json.loads(STATE.read_text()) if STATE.exists() else {}
-        rec = state.get(upd["name"], {})
+        state = _load_state()
+        who = (upd.get("annotator") or "anon").strip() or "anon"
+        per = state.setdefault(who, {})
+        rec = per.get(upd["name"], {})
         if "verdict" in upd: rec["verdict"] = upd["verdict"]
         if "comment" in upd: rec["comment"] = upd["comment"]
-        state[upd["name"]] = rec
+        from datetime import datetime, timezone
+        rec["ts"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
+        per[upd["name"]] = rec
         STATE.parent.mkdir(parents=True, exist_ok=True)
         STATE.write_text(json.dumps(state, indent=2))
         self._send('{"ok":true}')
