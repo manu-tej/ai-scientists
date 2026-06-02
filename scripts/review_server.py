@@ -68,6 +68,7 @@ h1{font-size:18px;margin:0 0 4px}.sub{color:var(--mut);font-size:12px;margin-bot
 .tbody.open{display:block}
 .sec{margin:13px 0}.sec h4{margin:0 0 6px;font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--mut)}
 .q{color:#e6edf5;white-space:pre-wrap;font-size:13px;background:#0d1118;border-left:3px solid var(--ac);padding:9px 12px;border-radius:0 6px 6px 0}
+.src{color:#cdd9e5;font-size:13px;background:#0d1118;border-left:3px solid #d2a8ff;padding:9px 12px;border-radius:0 6px 6px 0}.src a{text-decoration:none}
 .rubric{white-space:pre-wrap;font-size:12px;color:#c2cdda;background:#0a0d13;border:1px solid var(--line);border-radius:6px;padding:10px 12px;max-height:340px;overflow:auto;margin-top:6px}
 .toggle{font-size:11px;color:var(--ac);cursor:pointer;user-select:none}
 /* variant row inside a task */
@@ -149,6 +150,7 @@ function render(){
     <span class=cnt>${vs.length} variant${vs.length>1?'s':''} · ${revd}/${t.n_variants} reviewed</span>${gateSum}
    </div>
    <div class="tbody ${op}" id="t-${t.base_task}">
+    ${srcLine(t.source)}
     <div class=sec><h4>original question</h4><div class=q>${esc(t.question)}</div></div>
     <div class=sec><h4>rubric <span class=toggle onclick="togR('${t.base_task}')" id="rt-${t.base_task}">▸ show</span></h4>
       <div class=rubric id="r-${t.base_task}" style="display:none">${esc(t.rubric)}</div></div>
@@ -190,6 +192,13 @@ document.addEventListener('keydown',e=>{
  else if(e.key==='r'){e.preventDefault(); const el=n&&$('#list').querySelector(`.v[data-v="${CSS.escape(n)}"]`); if(el)togR(el.dataset.task);}
  else if(e.key==='c'){e.preventDefault(); if(n){const b=$('#b-'+CSS.escape(n)); if(!b.classList.contains('open'))togV(n); const ta=b.querySelector('textarea'); if(ta)ta.focus();}}
 });
+function srcLine(s){
+ if(!s||!s.title)return '';
+ const jy=[s.journal,s.year].filter(Boolean).join(' · ');
+ const doi=s.doi?` · <a href="https://doi.org/${s.doi}" target=_blank style="color:var(--ac)">${s.doi}</a>`:(s.note?` · ${esc(s.note)}`:'');
+ const acc=s.accession?` · <span class=bt>${esc(s.accession)}</span>`:'';
+ return `<div class=sec><h4>source publication</h4><div class=src>${esc(s.title)}<div class=bt style="margin-top:3px">${esc(jy)}${doi}${acc}</div></div></div>`;
+}
 function varRow(v){
  const r=mine()[v.name]||{};
  const gate = v.emitted===true ? '<span class="pill ok">gate ✓</span>'

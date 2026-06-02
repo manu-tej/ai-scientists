@@ -16,7 +16,16 @@ ROOT = Path(__file__).resolve().parents[1]
 SPECS = ROOT / "benchmarks/specs/biomnibench-da"
 DATA = ROOT / "data/biomnibench-da"
 MANIFEST = ROOT / "runs/variants/MANIFEST.json"
+SOURCES = ROOT / "benchmarks/sources.json"   # DA-group -> source publication (PubMed-resolved)
 OUT = ROOT / "runs/review/variants_review.json"
+
+
+def source_of(base_task: str) -> dict:
+    """Source publication for a task's DA group (raw provenance, no scores)."""
+    if not SOURCES.exists():
+        return {}
+    m = re.match(r"da-(\d+)-", base_task)
+    return json.loads(SOURCES.read_text()).get(m.group(1), {}) if m else {}
 
 MODE = {  # infer defect mode from spec ops/name
     "single_group": "single-group collapse", "single_cell_type": "single-group collapse",
@@ -107,6 +116,7 @@ def main():
         tasks.append({
             "base_task": t,
             "title": title_of(t),
+            "source": source_of(t),
             "question": question_of(t),
             "rubric": rubric_of(t),
             "n_variants": len(vs),
