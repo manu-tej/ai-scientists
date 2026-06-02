@@ -114,12 +114,16 @@ textarea{width:100%;background:#0a0d13;color:var(--fg);border:1px solid var(--li
 const $=s=>document.querySelector(s);
 let DATA=null, STATE={}, fMode='all', fStatus='all', OPEN={};
 const FR=['','still-answerable (signal survives elsewhere)','unfair / trivial','wrong expected behavior','biology off','other (see comment)'];
+let ROOT='';                                                // repo abs path (from bundle) for vscode:// links
+// Open a repo-relative path in VS Code (handles huge files the in-browser preview can't).
+function vscodeUrl(p){const enc=s=>s.split('/').map(encodeURIComponent).join('/'); return 'vscode://file'+enc(ROOT)+'/'+enc(p);}
 let me=localStorage.getItem('annotator')||'me';            // default so solo review just works
 function mine(){return STATE[me]||{}}                       // current reviewer's verdicts
 function others(name){let a=0,f=0;for(const k in STATE){if(k===me)continue;const v=STATE[k][name]?.verdict;if(v==='approved')a++;else if(v==='flagged')f++;}return{a,f};}
 async function load(){
  DATA=await(await fetch('/api/bundle',{cache:'no-store'})).json();
  STATE=await(await fetch('/api/state',{cache:'no-store'})).json();
+ ROOT=DATA.summary.repo_root||'';
  const w=$('#who'); w.value=me;
  w.onchange=()=>{me=w.value.trim()||'me';w.value=me;localStorage.setItem('annotator',me);render();};
  $('#whohint').textContent=Object.keys(STATE).length>1?`· ${Object.keys(STATE).length} reviewers on record`:'';
@@ -155,9 +159,11 @@ function render(){
    </div>
    <div class="tbody ${op}" id="t-${t.base_task}">
     ${srcLine(t.source)}
-    <div class=sec><h4>original question <a class=toggle href="/file?path=data/biomnibench-da/${t.base_task}/instruction.md" target=_blank>↗ open instruction.md</a></h4><div class=q>${esc(t.question)}</div></div>
+    <div class=sec><h4>original question <a class=toggle href="${vscodeUrl('data/biomnibench-da/'+t.base_task+'/instruction.md')}">↗ open instruction.md in VS Code</a></h4><div class=q>${esc(t.question)}</div></div>
     <div class=sec><h4>rubric <span class=toggle onclick="togR('${t.base_task}')" id="rt-${t.base_task}">▸ show</span></h4>
       <div class=rubric id="r-${t.base_task}" style="display:none">${esc(t.rubric)}</div></div>
+    <div class=sec><h4>data files (${(t.files||[]).length})</h4>
+      ${(t.files||[]).map(f=>`<div class=op><a href="${vscodeUrl(f.path)}" style="color:var(--ac)">${esc(f.name)}</a> <span class=bt>${f.mb} MB</span></div>`).join('')||'<div class=bt>(no local data files)</div>'}</div>
     <div class=sec><h4>variants derived from this task (${vs.length})</h4>
     ${vs.map(v=>varRow(v)).join('')}</div>
    </div></div>`;
@@ -196,6 +202,8 @@ document.addEventListener('keydown',e=>{
  else if(e.key==='r'){e.preventDefault(); const el=n&&$('#list').querySelector(`.v[data-v="${CSS.escape(n)}"]`); if(el)togR(el.dataset.task);}
  else if(e.key==='c'){e.preventDefault(); if(n){const b=$('#b-'+CSS.escape(n)); if(!b.classList.contains('open'))togV(n); const ta=b.querySelector('textarea'); if(ta)ta.focus();}}
 });
+function fileLink(d){ if(!d.file)return '';
+ return d.path?`<a href="${vscodeUrl(d.path)}" style="color:var(--ac)" onclick="event.stopPropagation()">${esc(d.file)}</a>`:esc(d.file); }
 function srcLine(s){
  if(!s||!s.title)return '';
  const jy=[s.journal,s.year].filter(Boolean).join(' · ');
@@ -215,7 +223,7 @@ function varRow(v){
      <span class=bt>flag reason:</span>
      <select class=fr onclick="event.stopPropagation()" onchange="event.stopPropagation();flagReason('${v.name}',this.value)">
        ${FR.map(o=>`<option value="${o}"${(r.flag_reason||'')===o?' selected':''}>${o||'— pick a reason —'}</option>`).join('')}</select>
-     <span class=drp title="exact perturbation">dropped: ${esc(dropped.join(' ; ')||'(none)')}</span>
+     <span class=drp title="exact perturbation">dropped: ${esc(dropped.map(d=>d.act+(d.file?' '+d.file:'')).join(' ; ')||'(none)')}</span>
    </div>` : '';
  return `<div class=v data-v="${v.name}" data-task="${v.base_task}"><div class=vh onclick="togV('${v.name}')">
    <span class=nm>${v.name.replace(v.base_task+'_','')}</span>
@@ -226,10 +234,10 @@ function varRow(v){
    </span></div>
    ${flagbar}
    <div class=vbody id="b-${v.name}">
-     <div class=sec><h4>perturbation · expects: ${v.expected_behavior}</h4>${dropped.map(d=>`<div class=op>✂ ${esc(d)}</div>`).join('')||'<div class=bt>(validate_existing / none)</div>'}</div>
+     <div class=sec><h4>perturbation · expects: ${v.expected_behavior}</h4>${dropped.map(d=>`<div class=op>✂ ${esc(d.act)} ${fileLink(d)}</div>`).join('')||'<div class=bt>(validate_existing / none)</div>'}</div>
      <div class=sec><h4>gate proof (signal provably gone)</h4>${(v.gate_checks.length?v.gate_checks:v.checks).map(c=>`<div class="chk ${c.passed===false?'f':'p'}">${c.passed===false?'✗':'✓'} ${esc(JSON.stringify(c))}</div>`).join('')}${v.gate_error?`<div class="chk f">${esc(v.gate_error)}</div>`:''}</div>
      <div class=sec><h4>why unanswerable (author notes)</h4><div class=notes>${esc(v.notes||'—')}</div></div>
-     <div class=sec><span class=cs>checksum ${v.checksum||'—'} · <a href="/file?path=${encodeURIComponent(v.spec_path)}" target=_blank style="color:var(--ac)">${v.spec_path}</a></span>
+     <div class=sec><span class=cs>checksum ${v.checksum||'—'} · <a href="${vscodeUrl(v.spec_path)}" style="color:var(--ac)">${v.spec_path}</a></span>
        <textarea placeholder="review comment…" onchange="comment('${v.name}',this.value)">${esc(r.comment||'')}</textarea></div>
    </div></div>`;
 }
@@ -274,10 +282,23 @@ class H(BaseHTTPRequestHandler):
             from urllib.parse import urlparse, parse_qs, unquote
             rel = unquote(parse_qs(urlparse(self.path).query).get("path", [""])[0])
             target = (ROOT / rel).resolve()
-            if ROOT in target.parents and target.is_file():
-                self._send(target.read_text(errors="replace"), "text/plain; charset=utf-8")
-            else:
+            if not (ROOT in target.parents and target.is_file()):
                 self.send_response(404); self.end_headers()
+            else:
+                mb = target.stat().st_size / 1e6
+                ext = target.suffix.lower()
+                if mb > 15:  # don't read a 33MB xlsx / 11GB h5ad into memory as text
+                    self._send(f"(file too large to preview: {mb:.0f} MB)\n{rel}\n\nopen it locally instead.",
+                               "text/plain; charset=utf-8")
+                elif ext in (".csv", ".tsv", ".txt", ".diff", ".md", ".yaml", ".yml", ".json"):
+                    self._send(target.read_text(errors="replace"), "text/plain; charset=utf-8")
+                else:  # binary (xlsx/xls/gz/h5/...): hand back as a download, don't mangle as text
+                    b = target.read_bytes()
+                    self.send_response(200)
+                    self.send_header("Content-Type", "application/octet-stream")
+                    self.send_header("Content-Disposition", f'attachment; filename="{target.name}"')
+                    self.send_header("Cache-Control", "no-store")
+                    self.send_header("Content-Length", str(len(b))); self.end_headers(); self.wfile.write(b)
         else:
             self._send(PAGE, "text/html; charset=utf-8")
 
