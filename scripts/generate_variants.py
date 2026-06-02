@@ -67,12 +67,31 @@ def _file_content_hash(f: Path) -> bytes:
     return hashlib.sha256(f.read_bytes()).digest()
 
 
-def _dir_checksum(d: Path) -> str:
-    """Order-independent checksum of a variant dir's logical content."""
+def _dir_checksum(d: Path, base: Path | None = None) -> str:
+    """Order-independent checksum of a variant dir's logical content.
+
+    Files an op never touched stay HARDLINKED to the pinned base (same inode), so
+    they are byte-identical to base by construction — no need to sha256 an 18GB
+    matrix to learn that. For those we record a cheap "==base:<size>" marker
+    instead of hashing. Only op-modified files (different inode, or no base
+    counterpart) get the full content hash. Deterministic: base is pinned, so
+    "identical to base" is a stable statement across regenerations.
+    """
     h = hashlib.sha256()
     for f in sorted(p for p in d.rglob("*") if p.is_file()):
-        h.update(f.relative_to(d).as_posix().encode())
-        h.update(_file_content_hash(f))
+        rel = f.relative_to(d).as_posix()
+        h.update(rel.encode())
+        bf = base / rel if base else None
+        unmodified = False
+        if bf and bf.exists():
+            try:
+                unmodified = f.stat().st_ino == bf.stat().st_ino and f.stat().st_dev == bf.stat().st_dev
+            except OSError:
+                unmodified = False
+        if unmodified:
+            h.update(f"==base:{f.stat().st_size}".encode())  # hardlink-shared => identical to pinned base
+        else:
+            h.update(_file_content_hash(f))
     return h.hexdigest()[:16]
 
 
@@ -176,7 +195,7 @@ def main() -> None:
         entry = {"base_task": spec.base_task, "expected_behavior": spec.expected_behavior,
                  "emitted": r.emitted, "error": r.error, "checks": checks}
         if r.emitted:
-            entry["checksum"] = _dir_checksum(out_dir)
+            entry["checksum"] = _dir_checksum(out_dir, base_task_dir)
             manifest["summary"]["emitted"] += 1
             status = "OK"
             # On-demand: if this variant's data is heavy, keep the gate proof but
