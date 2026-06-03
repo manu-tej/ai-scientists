@@ -9,7 +9,8 @@
 # PARAMETERS (flag or env; flags win):
 #   --dataset DIR        task tree to run            (default runs/harbor_tasks)   [BB_TASKS_DIR]
 #   --agents "a b c"     codex | claude-code | antigravity-cli | gemini-cli (default codex) [BB_AGENTS]
-#   --replicates K       harbor -n K: build the image ONCE, run the agent K times (default 1) [BB_REPLICATES]
+#   --replicates K       K replicate trials per task, run concurrently (harbor -k K -n K; build
+#                        once, K agent runs in parallel). default 1.                 [BB_REPLICATES]
 #   --out DIR            output root                 (default runs/harbor_matrix)   [BB_OUT]
 #   --verify             run BiomniBench's verifier (--ve ANTHROPIC_API_KEY). Default: collect-only.
 #   --max-effort         crank each agent to its max reasoning: codex reasoning_effort=high,
@@ -135,18 +136,18 @@ run_harbor() {
   case "$agent" in
     codex) cmd=(env -u ANTHROPIC_API_KEY -u OPENAI_API_KEY -u GEMINI_API_KEY CODEX_FORCE_AUTH_JSON=1
         harbor run --yes "${VERIFY_FLAGS[@]}" --path "$path"
-        --agent-import-path "$CODEX_AGENT" --model gpt-5.5 "${eff[@]}" -n "$REPLICATES" -o "$out") ;;
+        --agent-import-path "$CODEX_AGENT" --model gpt-5.5 "${eff[@]}" -k "$REPLICATES" -n "$REPLICATES" -o "$out") ;;
     claude-code) cmd=(env -u ANTHROPIC_API_KEY -u OPENAI_API_KEY -u GEMINI_API_KEY
         CLAUDE_CODE_OAUTH_TOKEN="${CC_OAUTH_TOKEN:-}"
         harbor run --yes "${VERIFY_FLAGS[@]}" --path "$path"
-        --agent claude-code --model claude-opus-4-7 "${eff[@]}" -n "$REPLICATES" -o "$out") ;;
+        --agent claude-code --model claude-opus-4-7 "${eff[@]}" -k "$REPLICATES" -n "$REPLICATES" -o "$out") ;;
     antigravity-cli) cmd=(env -u ANTHROPIC_API_KEY -u OPENAI_API_KEY -u GEMINI_API_KEY -u GOOGLE_API_KEY
         AGY_FORCE_OAUTH=1 AGY_TOKEN_STORE="$AGY_STORE"
         harbor run --yes "${VERIFY_FLAGS[@]}" --path "$path"
-        --agent-import-path "$AGY_AGENT" --model gemini/gemini-3.1-pro-preview "${eff[@]}" -n "$REPLICATES" -o "$out") ;;
+        --agent-import-path "$AGY_AGENT" --model gemini/gemini-3.1-pro-preview "${eff[@]}" -k "$REPLICATES" -n "$REPLICATES" -o "$out") ;;
     gemini-cli) cmd=(env -u ANTHROPIC_API_KEY -u OPENAI_API_KEY -u GEMINI_API_KEY GEMINI_FORCE_OAUTH=1
         harbor run --yes "${VERIFY_FLAGS[@]}" --path "$path"
-        --agent gemini-cli --model gemini/gemini-3.1-pro-preview -n "$REPLICATES" -o "$out") ;;
+        --agent gemini-cli --model gemini/gemini-3.1-pro-preview -k "$REPLICATES" -n "$REPLICATES" -o "$out") ;;
     *) echo "unknown agent: $agent" >&2; return 9 ;;
   esac
   if [ -n "${BB_DRY_RUN:-}" ]; then               # print the command (secrets redacted), don't run
