@@ -1,14 +1,27 @@
 {
   "summary": {
-    "total": 11,
-    "emitted": 9,
-    "validated": 9,
+    "total": 12,
+    "emitted": 10,
+    "validated": 10,
     "failed": [
       "da-3-4_single_group",
       "da-3-4_drop_response"
     ]
   },
   "variants": [
+    {
+      "name": "da-6-2_drop_significance",
+      "emitted": true,
+      "validated": true,
+      "error": "",
+      "checks": [
+        {
+          "kind": "no_column_matching",
+          "passed": true,
+          "detail": "no matching column"
+        }
+      ]
+    },
     {
       "name": "da-3-4_single_group",
       "emitted": false,

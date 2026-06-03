@@ -12,3 +12,4 @@ dist/
 .playwright-mcp/
 biomni_v2_text.md
 
+.claude/

@@ -7,20 +7,27 @@ ops:
     file: paper_deg.xlsx
     sheet: "2 - Training-regulated features"
     header_row: 18
-    columns: [timewise_p_value, training_p_value, training_q, meta_reg_pvalue, meta_reg_het_p]
+    columns: [timewise_p_value, training_p_value, training_q, meta_reg_pvalue, meta_reg_het_p, timewise_zscore, timewise_logFC_se]
 required_signal:
   - kind: no_column_matching
     file: paper_deg.xlsx
     sheet: "2 - Training-regulated features"
     header_row: 18
-    pattern: '(?i)(p_value|pvalue|training_q)'
+    pattern: '(?i)(p_value|pvalue|training_q|zscore|logfc_se)'
 notes: >
   WHY unanswerable: Criterion 2 demands significance (training_q < 0.05 or
   equivalent) at ALL FOUR timepoints (1w/2w/4w/8w) per sex before any gene
   enters a pattern set; the whole completeness filter keys on a significance
   column. Drop training_q (the FDR the rubric names) plus every sibling that
   re-encodes significance: timewise_p_value, training_p_value, meta_reg_pvalue,
-  meta_reg_het_p. With no p/q anywhere, the agent cannot decide which gene is
-  significant at which timepoint, so the 4-timepoint completeness filter and the
-  shared/sex-specific categorisation downstream of it are impossible. logFC
-  remains (effect sizes are observable) but cannot be thresholded for significance.
+  meta_reg_het_p.
+  CRITICAL (review fix): also drop timewise_zscore and timewise_logFC_se. The
+  z-score is a monotone transform of the two-sided p (p = 2*Phi(-|z|)) and
+  reproduces the dropped timewise_p_value for 99.9% of the scored slice; the
+  logFC/SE pair independently yields the same Wald z. Leaving either lets a
+  capable agent recompute per-timepoint significance ("or equivalent") — 161
+  passing (gene,sex) pairs, a clean subset of the 1,532 training_q<0.05 truths,
+  0 false positives — making "refuse" wrong. With z, SE, and all p/q gone, only
+  timewise_logFC (effect size) remains: observable but NOT thresholdable for
+  significance, so the 4-timepoint completeness filter and the shared/sex-specific
+  categorisation downstream of it are genuinely impossible.

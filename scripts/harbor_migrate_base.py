@@ -18,11 +18,18 @@ from __future__ import annotations
 import argparse
 import re
 import shutil
+import sys
 import tomllib
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data/biomnibench-da"  # default; overridable via --data
+
+# The false-refusal control REQUIRES the affordance to be byte-identical to the variant
+# arm, or differing instructions would themselves bias the refusal rate. Import the single
+# source of truth rather than copy the text.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from harbor_migrate import REFUSAL_AFFORDANCE, _link_tree  # noqa: E402
 
 JUDGE_MODEL = "claude-haiku-4-5"  # match the refusal-arm judge
 
@@ -72,7 +79,7 @@ timeout_sec = {atimeout}
 
 [environment]
 network_mode = "{'public' if allow else 'none'}"
-build_timeout_sec = {old.get("environment", {}).get("build_timeout_sec", 600.0)}
+build_timeout_sec = {max(float(old.get("environment", {}).get("build_timeout_sec", 600.0)), 3600.0)}
 os = "linux"
 mcp_servers = []
 
@@ -89,7 +96,19 @@ def assemble(task_id: str, out_dir: Path, data: Path = DATA) -> Path:
     dst = out_dir / task_id
     if dst.exists():
         shutil.rmtree(dst)
-    shutil.copytree(base, dst, symlinks=False)
+    # Copy scaffolding (instruction/tests/Dockerfile/task.toml) but hardlink the heavy
+    # environment/data so an isolated affordance tree costs ~0 extra disk.
+    def _skip_data(dirpath, names):
+        return ["data"] if Path(dirpath).name == "environment" else []
+    shutil.copytree(base, dst, symlinks=False, ignore=_skip_data)
+    _link_tree(base / "environment" / "data", dst / "environment" / "data")
+    # Same neutral refuse/escalate affordance as the variant arm (byte-identical import).
+    # On an ANSWERABLE base task a calibrated agent should still ANSWER; a refusal here is a
+    # FALSE refusal — this run is the control that makes the variant refusal rate interpretable.
+    instr = dst / "instruction.md"
+    if instr.exists() and "INSUFFICIENT DATA" not in instr.read_text():
+        with instr.open("a") as f:
+            f.write("\n\n" + REFUSAL_AFFORDANCE)
     migrate_toml(base / "task.toml", dst / "task.toml", task_id)
     return dst
 

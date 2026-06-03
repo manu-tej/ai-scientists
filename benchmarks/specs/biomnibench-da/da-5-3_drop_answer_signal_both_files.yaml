@@ -27,6 +27,28 @@ ops:
     sheet: Table S2A
     header_row: 0
     columns: [Assigned Tier, Possible Tiers]
+  # ---- mmc2.xlsx S2B/S2C/S2D (review hardening) ----
+  # The Tier column in S2B (drug targets), S2C (DGIdb), S2D (surfaceome) jointly
+  # re-encodes druggability for the FULL 2863-gene S2A target set, so an agent
+  # could reconstruct each gene's tier from these sheets even after S2A is gutted.
+  # Druggability is only a *filter* (the answer still dies on the missing
+  # ActivatingSite + per-cancer flags), but close it so the spec's rationale is
+  # airtight rather than relying on a second missing signal.
+  - kind: drop_columns
+    file: mmc2.xlsx
+    sheet: Table S2B
+    header_row: 0
+    columns: [Tier]
+  - kind: drop_columns
+    file: mmc2.xlsx
+    sheet: Table S2C
+    header_row: 0
+    columns: [Tier]
+  - kind: drop_columns
+    file: mmc2.xlsx
+    sheet: Table S2D
+    header_row: 0
+    columns: [Tier]
 required_signal:
   # S4A carriers gone
   - kind: column_absent
@@ -75,6 +97,22 @@ required_signal:
     sheet: Table S2A
     header_row: 0
     column: Possible Tiers
+  # S2B/S2C/S2D druggability tier gone (review hardening)
+  - kind: column_absent
+    file: mmc2.xlsx
+    sheet: Table S2B
+    header_row: 0
+    column: Tier
+  - kind: column_absent
+    file: mmc2.xlsx
+    sheet: Table S2C
+    header_row: 0
+    column: Tier
+  - kind: column_absent
+    file: mmc2.xlsx
+    sheet: Table S2D
+    header_row: 0
+    column: Tier
 notes: >
   WHY unanswerable (blocks the answer across BOTH files): the scored answer is
   built end-to-end inside mmc4.xlsx Table S4A — filter ActivatingSite == 1,
@@ -87,8 +125,11 @@ notes: >
   (Criterion 1 druggable restriction + Criterion 3 tier stratification). With all
   three signals gone S4A cannot yield any candidate hit. The only alternative
   druggability route the rubric allows is joining to mmc2.xlsx Table S2A's
-  Assigned Tier — also dropped here (with the leaky Possible Tiers) — but even an
-  intact S2A could not rescue the answer, because the tumour-up + dependency
-  evidence and the activating-site annotation exist ONLY in S4A and have no
-  counterpart in mmc2.xlsx. Hence the answer is recoverable from neither mmc4 nor
-  mmc2.
+  Assigned Tier — also dropped here (with the leaky Possible Tiers). REVIEW
+  HARDENING: druggability tier additionally survives in S2B/S2C/S2D (their Tier
+  columns cover the full 2863-gene S2A set), so those are dropped too — the
+  druggability route is now closed across ALL of mmc2. This is belt-and-suspenders:
+  even an intact druggability signal could not rescue the answer, because the
+  tumour-up + dependency evidence and the activating-site annotation exist ONLY in
+  S4A and have no counterpart in mmc2.xlsx. Hence the answer is recoverable from
+  neither mmc4 nor mmc2.
