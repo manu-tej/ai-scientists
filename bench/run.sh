@@ -127,7 +127,7 @@ run_harbor() {
   local -a cmd eff=()
   if [ "$MAX_EFFORT" = 1 ]; then          # per-agent max reasoning (Harbor --ak agent kwargs)
     case "$agent" in
-      codex)           eff=(--ak reasoning_effort=high) ;;                       # codex max
+      codex)           eff=(--ak reasoning_effort=xhigh) ;;                      # codex max (gpt-5.5: low<med<high<xhigh)
       claude-code)     eff=(--ak reasoning_effort=max --ak thinking=enabled) ;;  # Opus max + thinking
       antigravity-cli) eff=(--ak "agy_model_display=Gemini 3.1 Pro (High)") ;;   # force High model
     esac
