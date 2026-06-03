@@ -12,6 +12,8 @@
 #   --replicates K       harbor -n K: build the image ONCE, run the agent K times (default 1) [BB_REPLICATES]
 #   --out DIR            output root                 (default runs/harbor_matrix)   [BB_OUT]
 #   --verify             run BiomniBench's verifier (--ve ANTHROPIC_API_KEY). Default: collect-only.
+#   --max-effort         crank each agent to its max reasoning: codex reasoning_effort=high,
+#                        claude-code --effort max + thinking=enabled, agy "Gemini 3.1 Pro (High)".
 #   -h|--help            show this header.
 #
 # PACING / RESILIENCE (env; all default OFF so base/cc/agy runs are unpaced — turn on for a
@@ -52,6 +54,7 @@ DATASET="${BB_TASKS_DIR:-runs/harbor_tasks}"
 OUT="${BB_OUT:-runs/harbor_matrix}"
 REPLICATES="${BB_REPLICATES:-1}"
 VERIFY=0
+MAX_EFFORT="${BB_MAX_EFFORT:-0}"
 read -r -a AGENTS <<<"${BB_AGENTS:-codex}"
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -60,7 +63,8 @@ while [ $# -gt 0 ]; do
     --replicates|-n) REPLICATES="$2"; shift 2 ;;
     --agents) read -r -a AGENTS <<<"$2"; shift 2 ;;
     --verify) VERIFY=1; shift ;;
-    -h|--help) sed -n '2,40p' "$0"; exit 0 ;;
+    --max-effort) MAX_EFFORT=1; shift ;;
+    -h|--help) sed -n '2,42p' "$0"; exit 0 ;;
     *) echo "unknown arg: $1" >&2; exit 2 ;;
   esac
 done
@@ -120,19 +124,26 @@ is_done() {
 # One harbor invocation for a cell: builds the image once, runs the agent --replicates times.
 run_harbor() {
   local agent="$1" task="$2" path="$DATASET/$2" out="$OUT/$1/$2" log="/tmp/run_${1}_${2}.log"
-  local -a cmd
+  local -a cmd eff=()
+  if [ "$MAX_EFFORT" = 1 ]; then          # per-agent max reasoning (Harbor --ak agent kwargs)
+    case "$agent" in
+      codex)           eff=(--ak reasoning_effort=high) ;;                       # codex max
+      claude-code)     eff=(--ak reasoning_effort=max --ak thinking=enabled) ;;  # Opus max + thinking
+      antigravity-cli) eff=(--ak "agy_model_display=Gemini 3.1 Pro (High)") ;;   # force High model
+    esac
+  fi
   case "$agent" in
     codex) cmd=(env -u ANTHROPIC_API_KEY -u OPENAI_API_KEY -u GEMINI_API_KEY CODEX_FORCE_AUTH_JSON=1
         harbor run --yes "${VERIFY_FLAGS[@]}" --path "$path"
-        --agent-import-path "$CODEX_AGENT" --model gpt-5.5 -n "$REPLICATES" -o "$out") ;;
+        --agent-import-path "$CODEX_AGENT" --model gpt-5.5 "${eff[@]}" -n "$REPLICATES" -o "$out") ;;
     claude-code) cmd=(env -u ANTHROPIC_API_KEY -u OPENAI_API_KEY -u GEMINI_API_KEY
         CLAUDE_CODE_OAUTH_TOKEN="${CC_OAUTH_TOKEN:-}"
         harbor run --yes "${VERIFY_FLAGS[@]}" --path "$path"
-        --agent claude-code --model claude-opus-4-7 -n "$REPLICATES" -o "$out") ;;
+        --agent claude-code --model claude-opus-4-7 "${eff[@]}" -n "$REPLICATES" -o "$out") ;;
     antigravity-cli) cmd=(env -u ANTHROPIC_API_KEY -u OPENAI_API_KEY -u GEMINI_API_KEY -u GOOGLE_API_KEY
         AGY_FORCE_OAUTH=1 AGY_TOKEN_STORE="$AGY_STORE"
         harbor run --yes "${VERIFY_FLAGS[@]}" --path "$path"
-        --agent-import-path "$AGY_AGENT" --model gemini/gemini-3.1-pro-preview -n "$REPLICATES" -o "$out") ;;
+        --agent-import-path "$AGY_AGENT" --model gemini/gemini-3.1-pro-preview "${eff[@]}" -n "$REPLICATES" -o "$out") ;;
     gemini-cli) cmd=(env -u ANTHROPIC_API_KEY -u OPENAI_API_KEY -u GEMINI_API_KEY GEMINI_FORCE_OAUTH=1
         harbor run --yes "${VERIFY_FLAGS[@]}" --path "$path"
         --agent gemini-cli --model gemini/gemini-3.1-pro-preview -n "$REPLICATES" -o "$out") ;;
