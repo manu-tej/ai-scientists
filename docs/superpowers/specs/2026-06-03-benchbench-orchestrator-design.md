@@ -1,8 +1,51 @@
 # benchbench orchestrator — design spec
 
 **Date:** 2026-06-03
-**Status:** Approved design, pre-implementation
+**Status:** DEFERRED to MVP-2 — do NOT build now (see Decision Log below)
 **Author:** brainstormed with Claude (benchbench session)
+
+---
+
+## Decision Log (2026-06-03) — DEFERRED after adversarial review
+
+Four independent devil's-advocate agents (over-engineering, scientific validity,
+operational pre-mortem, opportunity cost) reviewed this spec and converged on: **do not
+build it now.** Summary of why, and what to do instead.
+
+**Why deferred:**
+- **Not on the critical path.** The capability axis is already DONE (cc 0.747 > codex 0.675 >
+  agy 0.462) with the current scripts; the refusal axis is collecting now. The headline result
+  (does trust ranking diverge from capability ranking?) needs ~150–225 runs — a for-loop, not a
+  framework. This spec is ~17–24 researcher-days that produce zero new scientific rows.
+- **Over-engineered for the actual pain.** Real duplication is ~80 lines (half already factored).
+  Router is a one-line ternary; the AWS seam is speculative generality (no AWS account); the
+  sqlite RunStore replaces a working, crash-safe file-presence mechanism; 18 modules for what
+  3 bash scripts do.
+- **Hybrid backend threatened the science.** serene (agent self-installs Python deps, native
+  Docker) vs Modal (pinned deps, gVisor) are different environments, and weight-routing
+  correlates backend with task difficulty — confounding the headline comparison. Deferring Modal
+  resolves this for free: the headline result stays on a uniform host substrate.
+- **Operational/security landmines** (if Modal were used): personal subscription tokens fanned
+  into a 3rd-party cloud (ToS/ban risk, broken in-ephemeral-container refresh); the per-credential
+  lock is in-process (Phase 0 even runs the old script + new orchestrator concurrently on the same
+  credential); $0.10/task is ~9× optimistic in the timeout×retry tail with no spend kill-switch.
+
+**Harvest instead (cheap, justified pieces — apply to current scripts, not as a framework):**
+1. Per-credential mutex (`flock`) on the runners — the one lesson that blocks unattended runs.
+2. Buildability preflight — turn the silent Dockerfile-skip into a loud failure.
+3. Merge the two `migrate_toml` (one `verified` flag) + dispatch `case` into one sourced function.
+4. Bind-mount data / don't-rebuild-per-replicate as a runner patch (the real replicate-scale win).
+5. Pin the Gemini judge (`temperature=0` + seed, or N-vote majority) so the golden isn't circular.
+6. Headline result on ONE uniform backend; demote any Modal use to a labeled scaling ablation
+   gated on an equivalence study.
+7. (Optional) consolidate the 6–10 grader scripts into one `grade.py` — the one real sprawl.
+
+**Revisit this full spec when:** the divergence result is proven AND scaling to MVP-2
+(50 tasks × 6 models × 4 harnesses × K=10, thousands of cells), ideally funded/collaborative.
+The design below is sound for that scale; it is the right tool for the wrong time.
+
+---
+
 
 ## 1. Context
 
