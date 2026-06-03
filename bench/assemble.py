@@ -452,8 +452,11 @@ def _select_tasks(args, mode: str, dataset: Path) -> list[str]:
     if args.all:
         if mode == "variant":
             return validated_variants()
+        # base --all: every complete task dir whose name matches --task-pattern. The default
+        # pattern is BiomniBench's da-N-M; a DIFFERENT benchmark passes its own (e.g. ".+").
+        pat = re.compile(args.task_pattern)
         return sorted(d.name for d in dataset.iterdir()
-                      if re.fullmatch(r"da-\d+-\d+", d.name) and is_complete(d))
+                      if d.is_dir() and pat.fullmatch(d.name) and is_complete(d))
     if not args.task:
         raise SystemExit("specify --task <id> or --all")
     return [args.task]
@@ -479,6 +482,9 @@ def main(argv: list[str] | None = None) -> None:
     ap.add_argument("--all", action="store_true",
                     help="assemble all eligible tasks (variant: MANIFEST-validated; "
                          "base: is_complete over --dataset)")
+    ap.add_argument("--task-pattern", default=r"da-\d+-\d+",
+                    help=r"regex a base task dir name must fully match for --all (default "
+                         r"BiomniBench 'da-\d+-\d+'; a different benchmark passes its own, e.g. '.+')")
     ap.add_argument("--out", type=Path, default=DEFAULT_OUT,
                     help="output task tree (default runs/harbor_tasks)")
     ap.add_argument("--no-remigrate", action="store_true",

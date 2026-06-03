@@ -110,6 +110,40 @@ Identical commands; only the host env differs:
 
 ---
 
+## Running a DIFFERENT benchmark
+
+`bench/run.sh` is benchmark-agnostic — it runs any directory of Harbor tasks. To point the
+pipeline at a different benchmark:
+
+1. **Tasks** — each task is a Harbor task dir: `instruction.md`, `task.toml`, `environment/`
+   (a `Dockerfile` **or** `docker_image` in the toml, plus a `data/` dir), and — for capability
+   grading — a `tests/rubric.txt`. If your benchmark already ships Harbor tasks, skip to (3).
+
+2. **Assemble** (only if you need affordance/verifier wiring or Dockerfile generation):
+   ```bash
+   uv run python -m bench.assemble --base --all \
+       --dataset path/to/your_tasks --task-pattern '.+' \
+       --prompt none --out runs/yourbench_tasks        # --prompt none = no affordance appended
+   ```
+   `--task-pattern` selects which dirs count as tasks (default is BiomniBench's `da-\d+-\d+`).
+   **NOT reusable** (BiomniBench-specific): variant mode (`--variant`, the perturbation/MANIFEST
+   machinery) and the `biomnibench-da/` task-name namespace + metadata in the emitted toml.
+
+3. **Run** — the fully reusable core; nothing benchmark-specific here:
+   ```bash
+   bench/run.sh --dataset runs/yourbench_tasks --agents "codex claude-code antigravity-cli" \
+       --replicates 3 --max-effort --out runs/yourbench_cap
+   ```
+   Use a fresh `--out` so it never touches another benchmark's results (`runs/` is gitignored).
+
+4. **Grade** — `bench/grade.py --mode capability` expects the **Phylo rubric format**
+   (`Criterion N: ... Levels: A=10 B=5 C=0`). A different rubric means adapting
+   `parse_rubric_levels`/`build_prompt`, or scoring with your own tool. Refusal mode +
+   `REFUSAL_DESCRIPTIONS` are BiomniBench-specific.
+
+**Isolation:** every run is keyed by `--out`, and auth/agents are shared infra — so a new
+benchmark runs alongside (or instead of) the current one with zero collision.
+
 ## Notes
 
 - **Capability numbers depend on the trace surface.** The original `*_rejudge_*.json` references
