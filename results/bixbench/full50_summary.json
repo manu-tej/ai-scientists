@@ -1,0 +1,48 @@
+{
+  "per_agent": {
+    "cc": {
+      "open": 0.8472,
+      "mcq": 0.9267,
+      "consist": 0.9792,
+      "n": 50
+    },
+    "codex": {
+      "open": 0.7959,
+      "mcq": 0.9267,
+      "consist": 0.9722,
+      "n": 50
+    },
+    "agy": {
+      "open": 0.8267,
+      "mcq": 0.9067,
+      "consist": 0.9861,
+      "n": 50
+    }
+  },
+  "all_agents_fail": [
+    {
+      "task": "bix-16-q1",
+      "eval_mode": "str_verifier"
+    },
+    {
+      "task": "bix-26-q5",
+      "eval_mode": "str_verifier"
+    },
+    {
+      "task": "bix-27-q5",
+      "eval_mode": "range_verifier"
+    },
+    {
+      "task": "bix-45-q1",
+      "eval_mode": "llm_verifier"
+    },
+    {
+      "task": "bix-54-q7",
+      "eval_mode": "range_verifier"
+    },
+    {
+      "task": "bix-61-q5",
+      "eval_mode": "llm_verifier"
+    }
+  ]
+}

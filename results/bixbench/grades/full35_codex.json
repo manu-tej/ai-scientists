@@ -1,0 +1,1080 @@
+[
+ {
+  "task": "bix-11-q1",
+  "eval_mode": "llm_verifier",
+  "n_reps": 3,
+  "open_acc": null,
+  "mcq_acc": 1.0,
+  "open_agree": null,
+  "reps": [
+   {
+    "rep": "bix-11-q1__LiuEeZ5",
+    "eval_mode": "llm_verifier",
+    "answer": "0.05013984776804917",
+    "open_correct": null,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-11-q1__VtjCQke",
+    "eval_mode": "llm_verifier",
+    "answer": "0.05013984776804917",
+    "open_correct": null,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-11-q1__HpyNWEL",
+    "eval_mode": "llm_verifier",
+    "answer": "0.05013984776804917",
+    "open_correct": null,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-11-q2",
+  "eval_mode": "llm_verifier",
+  "n_reps": 3,
+  "open_acc": 1.0,
+  "mcq_acc": 1.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-11-q2__Dj6KHX5",
+    "eval_mode": "llm_verifier",
+    "answer": "35.34% (88/249)",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-11-q2__yrbbnfV",
+    "eval_mode": "llm_verifier",
+    "answer": "35.34% (88 of 249)",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-11-q2__mAt2FMe",
+    "eval_mode": "llm_verifier",
+    "answer": "35.34% (88 of 249 fungal gene trees)",
+    "open_correct": true,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-12-q2",
+  "eval_mode": "llm_verifier",
+  "n_reps": 2,
+  "open_acc": 0.0,
+  "mcq_acc": 1.0,
+  "open_agree": null,
+  "reps": [
+   {
+    "rep": "bix-12-q2__G4zSZtK",
+    "eval_mode": "llm_verifier",
+    "answer": "3.5384615384615383%",
+    "open_correct": false,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-12-q2__mRM45CM",
+    "eval_mode": "llm_verifier",
+    "answer": "3.5384615384615383%",
+    "open_correct": null,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-12-q4",
+  "eval_mode": "llm_verifier",
+  "n_reps": 3,
+  "open_acc": 0.667,
+  "mcq_acc": 0.667,
+  "open_agree": 0.667,
+  "reps": [
+   {
+    "rep": "bix-12-q4__KwYtPZn",
+    "eval_mode": "llm_verifier",
+    "answer": "6948.0",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-12-q4__MLcK9bm",
+    "eval_mode": "llm_verifier",
+    "answer": "6948.0",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-12-q4__eHXB65U",
+    "eval_mode": "llm_verifier",
+    "answer": "1162",
+    "open_correct": false,
+    "mcq_correct": false
+   }
+  ]
+ },
+ {
+  "task": "bix-12-q5",
+  "eval_mode": "llm_verifier",
+  "n_reps": 3,
+  "open_acc": 1.0,
+  "mcq_acc": 1.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-12-q5__eAZtXR7",
+    "eval_mode": "llm_verifier",
+    "answer": "29",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-12-q5__qvW9roS",
+    "eval_mode": "llm_verifier",
+    "answer": "29",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-12-q5__vhy7moq",
+    "eval_mode": "llm_verifier",
+    "answer": "29",
+    "open_correct": true,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-12-q6",
+  "eval_mode": "llm_verifier",
+  "n_reps": 3,
+  "open_acc": 1.0,
+  "mcq_acc": 1.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-12-q6__2xWzXsd",
+    "eval_mode": "llm_verifier",
+    "answer": "6748.0",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-12-q6__YaLuik6",
+    "eval_mode": "llm_verifier",
+    "answer": "6748",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-12-q6__hQKCU2K",
+    "eval_mode": "llm_verifier",
+    "answer": "6748.0",
+    "open_correct": true,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-14-q1",
+  "eval_mode": "range_verifier",
+  "n_reps": 3,
+  "open_acc": 0.333,
+  "mcq_acc": 1.0,
+  "open_agree": 0.667,
+  "reps": [
+   {
+    "rep": "bix-14-q1__7u52ka9",
+    "eval_mode": "range_verifier",
+    "answer": "30/41 (73.17%)",
+    "open_correct": false,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-14-q1__zHds74D",
+    "eval_mode": "range_verifier",
+    "answer": "30/41 (0.7317; 73.17%)",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-14-q1__F9kw2iT",
+    "eval_mode": "range_verifier",
+    "answer": "30/41 (73.2%)",
+    "open_correct": false,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-16-q1",
+  "eval_mode": "str_verifier",
+  "n_reps": 3,
+  "open_acc": 0.0,
+  "mcq_acc": 0.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-16-q1__2Jx4aZ2",
+    "eval_mode": "str_verifier",
+    "answer": "CCND1 (Spearman rho = -0.6288254699057503)",
+    "open_correct": false,
+    "mcq_correct": false
+   },
+   {
+    "rep": "bix-16-q1__pdFaUy6",
+    "eval_mode": "str_verifier",
+    "answer": "CCND1",
+    "open_correct": false,
+    "mcq_correct": false
+   },
+   {
+    "rep": "bix-16-q1__PQ7vHZG",
+    "eval_mode": "str_verifier",
+    "answer": "CCND1",
+    "open_correct": false,
+    "mcq_correct": false
+   }
+  ]
+ },
+ {
+  "task": "bix-16-q3",
+  "eval_mode": "str_verifier",
+  "n_reps": 3,
+  "open_acc": 1.0,
+  "mcq_acc": 1.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-16-q3__UvcAPfZ",
+    "eval_mode": "str_verifier",
+    "answer": "3",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-16-q3__PuK8pna",
+    "eval_mode": "str_verifier",
+    "answer": "3 genes",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-16-q3__X9RrZmd",
+    "eval_mode": "str_verifier",
+    "answer": "3",
+    "open_correct": true,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-16-q4",
+  "eval_mode": "range_verifier",
+  "n_reps": 3,
+  "open_acc": 1.0,
+  "mcq_acc": 1.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-16-q4__FsbNJVN",
+    "eval_mode": "range_verifier",
+    "answer": "21.8036% (3,854 of 17,676 matched genes; BH-adjusted p < 0.05)",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-16-q4__tnR7Ac6",
+    "eval_mode": "range_verifier",
+    "answer": "21.80358% (3,854 of 17,676 genes)",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-16-q4__HR3Pesc",
+    "eval_mode": "range_verifier",
+    "answer": "21.69% (3874/17864 genes)",
+    "open_correct": true,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-17-q2",
+  "eval_mode": "str_verifier",
+  "n_reps": 3,
+  "open_acc": 1.0,
+  "mcq_acc": 1.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-17-q2__7bGrPJg",
+    "eval_mode": "str_verifier",
+    "answer": "2",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-17-q2__DyJrNND",
+    "eval_mode": "str_verifier",
+    "answer": "2 somatic CHIP variants",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-17-q2__RxDpCM3",
+    "eval_mode": "str_verifier",
+    "answer": "2",
+    "open_correct": true,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-20-q3",
+  "eval_mode": "range_verifier",
+  "n_reps": 3,
+  "open_acc": 1.0,
+  "mcq_acc": 1.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-20-q3__m86D7MK",
+    "eval_mode": "range_verifier",
+    "answer": "37/37 = 1.00 (100%) Benign or Likely Benign",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-20-q3__vqgAJDe",
+    "eval_mode": "range_verifier",
+    "answer": "37/37 = 1.0 (100%)",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-20-q3__EaEr5YV",
+    "eval_mode": "range_verifier",
+    "answer": "37/37 = 1.0000 (100%) of ClinVar-classified somatic CHIP variants were Benign or Likely Benign.",
+    "open_correct": true,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-22-q1",
+  "eval_mode": "str_verifier",
+  "n_reps": 3,
+  "open_acc": 1.0,
+  "mcq_acc": 1.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-22-q1__2Bzoeg3",
+    "eval_mode": "str_verifier",
+    "answer": "CD14 (Pearson r = 0.031693908898)",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-22-q1__vf7aJbX",
+    "eval_mode": "str_verifier",
+    "answer": "CD14 (Pearson r = 0.0316939088979842)",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-22-q1__sGbtSaU",
+    "eval_mode": "str_verifier",
+    "answer": "CD14 (Pearson r = 0.031693908897984)",
+    "open_correct": true,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-22-q4",
+  "eval_mode": "range_verifier",
+  "n_reps": 3,
+  "open_acc": 1.0,
+  "mcq_acc": 1.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-22-q4__sGWrTRX",
+    "eval_mode": "range_verifier",
+    "answer": "0.015815830206",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-22-q4__MMR3PHP",
+    "eval_mode": "range_verifier",
+    "answer": "0.015815830205873",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-22-q4__whewerx",
+    "eval_mode": "range_verifier",
+    "answer": "0.015815830205872593",
+    "open_correct": true,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-26-q5",
+  "eval_mode": "str_verifier",
+  "n_reps": 3,
+  "open_acc": 0.0,
+  "mcq_acc": 0.667,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-26-q5__GCTvvkA",
+    "eval_mode": "str_verifier",
+    "answer": "2",
+    "open_correct": false,
+    "mcq_correct": false
+   },
+   {
+    "rep": "bix-26-q5__4MRWVyt",
+    "eval_mode": "str_verifier",
+    "answer": "2",
+    "open_correct": false,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-26-q5__j7AwziE",
+    "eval_mode": "str_verifier",
+    "answer": "2",
+    "open_correct": false,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-27-q5",
+  "eval_mode": "range_verifier",
+  "n_reps": 3,
+  "open_acc": 0.0,
+  "mcq_acc": 1.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-27-q5__8s4KqDV",
+    "eval_mode": "range_verifier",
+    "answer": "56.4717047395749%",
+    "open_correct": false,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-27-q5__h33Ujrj",
+    "eval_mode": "range_verifier",
+    "answer": "56.471704739574832%",
+    "open_correct": false,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-27-q5__MAU3FMB",
+    "eval_mode": "range_verifier",
+    "answer": "56.471704739575%",
+    "open_correct": false,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-28-q3",
+  "eval_mode": "llm_verifier",
+  "n_reps": 3,
+  "open_acc": 0.667,
+  "mcq_acc": 1.0,
+  "open_agree": 0.667,
+  "reps": [
+   {
+    "rep": "bix-28-q3__e5M8b6z",
+    "eval_mode": "llm_verifier",
+    "answer": "-30.4551",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-28-q3__nifSu4J",
+    "eval_mode": "llm_verifier",
+    "answer": "-30.4551",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-28-q3__dKAVag7",
+    "eval_mode": "llm_verifier",
+    "answer": "-30.455089045661687",
+    "open_correct": false,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-31-q2",
+  "eval_mode": "range_verifier",
+  "n_reps": 3,
+  "open_acc": 1.0,
+  "mcq_acc": 1.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-31-q2__PzUYVRu",
+    "eval_mode": "range_verifier",
+    "answer": "-0.0603835286416",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-31-q2__aPAzgX8",
+    "eval_mode": "range_verifier",
+    "answer": "FAM138A did not pass the filters; shrunken M-vs-F log2FC = -0.0603835286.",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-31-q2__tFuyprn",
+    "eval_mode": "range_verifier",
+    "answer": "Shrunken M-vs-F log2FoldChange for FAM138A: -0.0603835286. It does not pass the filters because baseMean = 0.4836979341 ",
+    "open_correct": true,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-32-q2",
+  "eval_mode": "str_verifier",
+  "n_reps": 3,
+  "open_acc": 0.0,
+  "mcq_acc": 0.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-32-q2__ZsYMMxz",
+    "eval_mode": "str_verifier",
+    "answer": "0",
+    "open_correct": false,
+    "mcq_correct": false
+   },
+   {
+    "rep": "bix-32-q2__roK4zQe",
+    "eval_mode": "str_verifier",
+    "answer": "0",
+    "open_correct": false,
+    "mcq_correct": false
+   },
+   {
+    "rep": "bix-32-q2__iGB8c28",
+    "eval_mode": "str_verifier",
+    "answer": "0",
+    "open_correct": false,
+    "mcq_correct": false
+   }
+  ]
+ },
+ {
+  "task": "bix-34-q2",
+  "eval_mode": "llm_verifier",
+  "n_reps": 3,
+  "open_acc": 1.0,
+  "mcq_acc": 1.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-34-q2__CYD3eDE",
+    "eval_mode": "llm_verifier",
+    "answer": "2.6322860447",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-34-q2__6XgDfTS",
+    "eval_mode": "llm_verifier",
+    "answer": "2.6322860447",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-34-q2__eTbm5RD",
+    "eval_mode": "llm_verifier",
+    "answer": "2.6322860447",
+    "open_correct": true,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-34-q5",
+  "eval_mode": "llm_verifier",
+  "n_reps": 3,
+  "open_acc": 1.0,
+  "mcq_acc": 1.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-34-q5__AVzhZBp",
+    "eval_mode": "llm_verifier",
+    "answer": "1.94748210919180698 (fungi/animals)",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-34-q5__HJniT27",
+    "eval_mode": "llm_verifier",
+    "answer": "Fungi/animals ratio: 1.947482109192",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-34-q5__FcTcVhH",
+    "eval_mode": "llm_verifier",
+    "answer": "1.947482109191807 (fungi/animals)",
+    "open_correct": true,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-35-q1",
+  "eval_mode": "llm_verifier",
+  "n_reps": 3,
+  "open_acc": 1.0,
+  "mcq_acc": 1.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-35-q1__5gPsUQa",
+    "eval_mode": "llm_verifier",
+    "answer": "0.0471",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-35-q1__D3X5qaf",
+    "eval_mode": "llm_verifier",
+    "answer": "0.0471",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-35-q1__tLFxp6j",
+    "eval_mode": "llm_verifier",
+    "answer": "0.0471",
+    "open_correct": true,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-35-q2",
+  "eval_mode": "llm_verifier",
+  "n_reps": 3,
+  "open_acc": 1.0,
+  "mcq_acc": 1.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-35-q2__zZrfmUa",
+    "eval_mode": "llm_verifier",
+    "answer": "3661.0",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-35-q2__jeHTQHR",
+    "eval_mode": "llm_verifier",
+    "answer": "3661.0",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-35-q2__HG63ALC",
+    "eval_mode": "llm_verifier",
+    "answer": "3661.0",
+    "open_correct": true,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-37-q4",
+  "eval_mode": "str_verifier",
+  "n_reps": 3,
+  "open_acc": 1.0,
+  "mcq_acc": 1.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-37-q4__FRLEDp8",
+    "eval_mode": "str_verifier",
+    "answer": "2.27",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-37-q4__f7Eqm3J",
+    "eval_mode": "str_verifier",
+    "answer": "2.27",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-37-q4__k3N8WYu",
+    "eval_mode": "str_verifier",
+    "answer": "2.27",
+    "open_correct": true,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-38-q1",
+  "eval_mode": "llm_verifier",
+  "n_reps": 3,
+  "open_acc": 1.0,
+  "mcq_acc": 1.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-38-q1__Uc6Mitg",
+    "eval_mode": "llm_verifier",
+    "answer": "Fungi/animals median tree-length fold-change: 2.1775-fold (3.0962 / 1.4219), so fungi have the higher median tree length",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-38-q1__ZrKuH9x",
+    "eval_mode": "llm_verifier",
+    "answer": "Fungi have a 2.177508966875308-fold higher median tree length than animals (3.0962 / 1.4219).",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-38-q1__yamepTd",
+    "eval_mode": "llm_verifier",
+    "answer": "Fungi have a 2.1775-fold higher median tree length than animals (3.0962 vs 1.4219).",
+    "open_correct": true,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-43-q2",
+  "eval_mode": "str_verifier",
+  "n_reps": 3,
+  "open_acc": 1.0,
+  "mcq_acc": 1.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-43-q2__xCoo2vW",
+    "eval_mode": "str_verifier",
+    "answer": "5.812405901836796",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-43-q2__reRCSgJ",
+    "eval_mode": "str_verifier",
+    "answer": "5.812405901836796",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-43-q2__xSPzgHq",
+    "eval_mode": "str_verifier",
+    "answer": "5.812405901836796",
+    "open_correct": true,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-43-q4",
+  "eval_mode": "str_verifier",
+  "n_reps": 3,
+  "open_acc": 1.0,
+  "mcq_acc": 1.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-43-q4__bQymUQc",
+    "eval_mode": "str_verifier",
+    "answer": "8/49",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-43-q4__Cva7FXC",
+    "eval_mode": "str_verifier",
+    "answer": "8/49",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-43-q4__xsYGAR6",
+    "eval_mode": "str_verifier",
+    "answer": "8/49",
+    "open_correct": true,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-45-q1",
+  "eval_mode": "llm_verifier",
+  "n_reps": 3,
+  "open_acc": 0.0,
+  "mcq_acc": 1.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-45-q1__REMgXy8",
+    "eval_mode": "llm_verifier",
+    "answer": "1.5197572608715265e-56",
+    "open_correct": false,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-45-q1__GUF3G65",
+    "eval_mode": "llm_verifier",
+    "answer": "1.5197572608715265e-56",
+    "open_correct": false,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-45-q1__kYuojhd",
+    "eval_mode": "llm_verifier",
+    "answer": "1.5197572608715265e-56",
+    "open_correct": null,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-46-q4",
+  "eval_mode": "str_verifier",
+  "n_reps": 3,
+  "open_acc": 1.0,
+  "mcq_acc": 1.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-46-q4__3xyh8P3",
+    "eval_mode": "str_verifier",
+    "answer": "-4.10",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-46-q4__rKVLFuF",
+    "eval_mode": "str_verifier",
+    "answer": "-4.10",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-46-q4__Wz5y3Pc",
+    "eval_mode": "str_verifier",
+    "answer": "-4.10",
+    "open_correct": true,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-47-q3",
+  "eval_mode": "str_verifier",
+  "n_reps": 3,
+  "open_acc": 1.0,
+  "mcq_acc": 1.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-47-q3__DrWwTYY",
+    "eval_mode": "str_verifier",
+    "answer": "NOTCH1",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-47-q3__V2usXc6",
+    "eval_mode": "str_verifier",
+    "answer": "NOTCH1",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-47-q3__h3qKVX5",
+    "eval_mode": "str_verifier",
+    "answer": "NOTCH1 (16 non-reference variants)",
+    "open_correct": true,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-49-q4",
+  "eval_mode": "str_verifier",
+  "n_reps": 3,
+  "open_acc": 0.333,
+  "mcq_acc": 1.0,
+  "open_agree": 0.667,
+  "reps": [
+   {
+    "rep": "bix-49-q4__QZThRnM",
+    "eval_mode": "str_verifier",
+    "answer": "2118",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-49-q4__YPEEUx8",
+    "eval_mode": "str_verifier",
+    "answer": "2106",
+    "open_correct": false,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-49-q4__rhQce5K",
+    "eval_mode": "str_verifier",
+    "answer": "2106",
+    "open_correct": false,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-52-q2",
+  "eval_mode": "range_verifier",
+  "n_reps": 3,
+  "open_acc": 1.0,
+  "mcq_acc": 1.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-52-q2__QYPhc22",
+    "eval_mode": "range_verifier",
+    "answer": "1.1282568023118122e-07 CpGs per bp",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-52-q2__vdM8FPi",
+    "eval_mode": "range_verifier",
+    "answer": "1.128256802312e-07 CpGs per bp",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-52-q2__XNn4QwT",
+    "eval_mode": "range_verifier",
+    "answer": "1.1282568023118122e-07 CpGs per base pair",
+    "open_correct": true,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-6-q4",
+  "eval_mode": "range_verifier",
+  "n_reps": 3,
+  "open_acc": 1.0,
+  "mcq_acc": 1.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-6-q4__b8HsbSY",
+    "eval_mode": "range_verifier",
+    "answer": "0.02097098108581123",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-6-q4__k8yPUi9",
+    "eval_mode": "range_verifier",
+    "answer": "0.020970981085811226",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-6-q4__swJV3Wf",
+    "eval_mode": "range_verifier",
+    "answer": "0.020970981086",
+    "open_correct": true,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-61-q2",
+  "eval_mode": "llm_verifier",
+  "n_reps": 3,
+  "open_acc": 1.0,
+  "mcq_acc": 1.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-61-q2__pRfoSCi",
+    "eval_mode": "llm_verifier",
+    "answer": "12.1283",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-61-q2__demMCvm",
+    "eval_mode": "llm_verifier",
+    "answer": "12.1283",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-61-q2__JzDQfEE",
+    "eval_mode": "llm_verifier",
+    "answer": "12.1283",
+    "open_correct": true,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-61-q5",
+  "eval_mode": "llm_verifier",
+  "n_reps": 3,
+  "open_acc": 0.0,
+  "mcq_acc": 0.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-61-q5__5yQACsm",
+    "eval_mode": "llm_verifier",
+    "answer": "2.56",
+    "open_correct": false,
+    "mcq_correct": false
+   },
+   {
+    "rep": "bix-61-q5__GWcW5Rh",
+    "eval_mode": "llm_verifier",
+    "answer": "2.56",
+    "open_correct": false,
+    "mcq_correct": false
+   },
+   {
+    "rep": "bix-61-q5__WfU8sh5",
+    "eval_mode": "llm_verifier",
+    "answer": "2.56",
+    "open_correct": false,
+    "mcq_correct": false
+   }
+  ]
+ }
+]

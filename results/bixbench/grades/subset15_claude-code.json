@@ -1,0 +1,467 @@
+[
+ {
+  "task": "bix-18-q1",
+  "eval_mode": "range_verifier",
+  "n_reps": 3,
+  "open_acc": 1.0,
+  "mcq_acc": 1.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-18-q1__sXz8gpC",
+    "eval_mode": "range_verifier",
+    "answer": "0.076",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-18-q1__MbAjt5U",
+    "eval_mode": "range_verifier",
+    "answer": "0.076",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-18-q1__pV8SLXM",
+    "eval_mode": "range_verifier",
+    "answer": "0.076",
+    "open_correct": true,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-18-q3",
+  "eval_mode": "range_verifier",
+  "n_reps": 3,
+  "open_acc": 1.0,
+  "mcq_acc": 1.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-18-q3__rrZpVST",
+    "eval_mode": "range_verifier",
+    "answer": "~71% reduction (approximately 71%)",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-18-q3__gQsGtte",
+    "eval_mode": "range_verifier",
+    "answer": "~71% (mean colony area reduced from ~82,442 in wildtype to ~23,920 in \u0394lasR, a reduction of ~71.0%).",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-18-q3__696TTEZ",
+    "eval_mode": "range_verifier",
+    "answer": "~71% reduction (\u0394lasR mean area 23,920 vs Wildtype mean area 82,442)",
+    "open_correct": true,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-24-q2",
+  "eval_mode": "llm_verifier",
+  "n_reps": 3,
+  "open_acc": 1.0,
+  "mcq_acc": 1.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-24-q2__SzwLx4x",
+    "eval_mode": "llm_verifier",
+    "answer": "Downregulation primarily drives the metabolic effects of CBD treatment in CRC cells.\n\nCBD_IC50 vs DMSO (vehicle control)",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-24-q2__toRW6Sh",
+    "eval_mode": "llm_verifier",
+    "answer": "Downregulation. The metabolic effects of CBD treatment in CRC cells are primarily driven by downregulated genes. Of the ",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-24-q2__Sk23arz",
+    "eval_mode": "llm_verifier",
+    "answer": "Downregulation primarily drives the metabolic effects of CBD treatment in CRC cells.\n\nDifferential expression (CBD_IC50 ",
+    "open_correct": true,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-26-q3",
+  "eval_mode": "str_verifier",
+  "n_reps": 3,
+  "open_acc": 1.0,
+  "mcq_acc": 1.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-26-q3__FMBQ4uq",
+    "eval_mode": "str_verifier",
+    "answer": "11",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-26-q3__wJg2iPL",
+    "eval_mode": "str_verifier",
+    "answer": "11",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-26-q3__KsL6SZ4",
+    "eval_mode": "str_verifier",
+    "answer": "11",
+    "open_correct": true,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-30-q3",
+  "eval_mode": "str_verifier",
+  "n_reps": 3,
+  "open_acc": 0.667,
+  "mcq_acc": 1.0,
+  "open_agree": 0.667,
+  "reps": [
+   {
+    "rep": "bix-30-q3__XeKc5GD",
+    "eval_mode": "str_verifier",
+    "answer": "0:0",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-30-q3__3CMSbYM",
+    "eval_mode": "str_verifier",
+    "answer": "0:0",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-30-q3__mmjaCKB",
+    "eval_mode": "str_verifier",
+    "answer": "1:0",
+    "open_correct": false,
+    "mcq_correct": null
+   }
+  ]
+ },
+ {
+  "task": "bix-37-q1",
+  "eval_mode": "llm_verifier",
+  "n_reps": 3,
+  "open_acc": 1.0,
+  "mcq_acc": 1.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-37-q1__SPk5CLb",
+    "eval_mode": "llm_verifier",
+    "answer": "4.81 (Tumor/Normal fold change; log2FC = 2.27; Normal mean = 7.29e+07, Tumor mean = 3.50e+08; p = 0.031)",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-37-q1__dpip9kY",
+    "eval_mode": "llm_verifier",
+    "answer": "4.81",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-37-q1__rTF5Uyr",
+    "eval_mode": "llm_verifier",
+    "answer": "4.81 (Tumor vs Normal; log2FC = 2.27)",
+    "open_correct": true,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-41-q5",
+  "eval_mode": "str_verifier",
+  "n_reps": 3,
+  "open_acc": 1.0,
+  "mcq_acc": 1.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-41-q5__WRm6MTH",
+    "eval_mode": "str_verifier",
+    "answer": "5:1 (Strain 287 : Strain 98)",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-41-q5__ZPSckFS",
+    "eval_mode": "str_verifier",
+    "answer": "5:1 (Strain 287 : Strain 98)",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-41-q5__k2LEypw",
+    "eval_mode": "str_verifier",
+    "answer": "5:1 (Strain 287 : Strain 98)",
+    "open_correct": true,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-51-q2",
+  "eval_mode": "range_verifier",
+  "n_reps": 3,
+  "open_acc": 1.0,
+  "mcq_acc": 1.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-51-q2__pqLNnRM",
+    "eval_mode": "range_verifier",
+    "answer": "111.81",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-51-q2__mvMQpRD",
+    "eval_mode": "range_verifier",
+    "answer": "111.81",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-51-q2__xWCefyM",
+    "eval_mode": "range_verifier",
+    "answer": "111.81",
+    "open_correct": true,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-51-q8",
+  "eval_mode": "range_verifier",
+  "n_reps": 3,
+  "open_acc": 1.0,
+  "mcq_acc": 1.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-51-q8__88JAkLQ",
+    "eval_mode": "range_verifier",
+    "answer": "-0.0750",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-51-q8__PBLFaTr",
+    "eval_mode": "range_verifier",
+    "answer": "-0.0750",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-51-q8__by44vd4",
+    "eval_mode": "range_verifier",
+    "answer": "-0.0750",
+    "open_correct": true,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-52-q6",
+  "eval_mode": "llm_verifier",
+  "n_reps": 3,
+  "open_acc": 1.0,
+  "mcq_acc": 1.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-52-q6__gtbs8VB",
+    "eval_mode": "llm_verifier",
+    "answer": "Chromosome W (~27.29 age-related CpG sites per Mb; 184 sites across 6,742,290 bp).",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-52-q6__pKVe3Z6",
+    "eval_mode": "llm_verifier",
+    "answer": "Chromosome W (~27.29 age-related CpG sites per Mb; 184 sites across 6,742,290 bp)",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-52-q6__pR8g4ES",
+    "eval_mode": "llm_verifier",
+    "answer": "W (chromosome W; 184 age-related CpG sites across 6,742,290 bp = 27.29 sites per Mb).",
+    "open_correct": true,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-52-q7",
+  "eval_mode": "str_verifier",
+  "n_reps": 3,
+  "open_acc": 1.0,
+  "mcq_acc": 1.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-52-q7__eKYpbad",
+    "eval_mode": "str_verifier",
+    "answer": "19159",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-52-q7__kxBPkvc",
+    "eval_mode": "str_verifier",
+    "answer": "19159",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-52-q7__mpHuzNs",
+    "eval_mode": "str_verifier",
+    "answer": "19159",
+    "open_correct": true,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-53-q2",
+  "eval_mode": "llm_verifier",
+  "n_reps": 3,
+  "open_acc": 1.0,
+  "mcq_acc": 1.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-53-q2__gr8VHPT",
+    "eval_mode": "llm_verifier",
+    "answer": "Excluding the third replicates (KL3, WL3) INCREASES the number of significantly differentially expressed genes.\n\n- Full ",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-53-q2__PJUrWwD",
+    "eval_mode": "llm_verifier",
+    "answer": "Excluding the third replicates (KL3, WL3) INCREASES the number of significantly differentially expressed genes.\n\n- Full ",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-53-q2__A6AwTW7",
+    "eval_mode": "llm_verifier",
+    "answer": "Increase. With all three replicates (KL1-3 vs WL1-3), 1426 genes are significantly differentially expressed (padj < 0.05",
+    "open_correct": true,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-53-q5",
+  "eval_mode": "str_verifier",
+  "n_reps": 3,
+  "open_acc": 1.0,
+  "mcq_acc": 1.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-53-q5__2nD2xBN",
+    "eval_mode": "str_verifier",
+    "answer": "0.1",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-53-q5__MLBDQbx",
+    "eval_mode": "str_verifier",
+    "answer": "0.1",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-53-q5__hR3PFMG",
+    "eval_mode": "str_verifier",
+    "answer": "0.1",
+    "open_correct": true,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-54-q7",
+  "eval_mode": "range_verifier",
+  "n_reps": 3,
+  "open_acc": 0.0,
+  "mcq_acc": 1.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-54-q7__GSk49ge",
+    "eval_mode": "range_verifier",
+    "answer": "~178,984 (predicted colony area at optimal proportion of strain 287 \u2248 0.898, using the natural spline with df=4, the bes",
+    "open_correct": false,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-54-q7__ZnGqfux",
+    "eval_mode": "range_verifier",
+    "answer": "Maximum predicted colony area = 178,984 (at optimal proportion of strain 287 \u2248 0.898), using the natural spline (df=4) m",
+    "open_correct": false,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-54-q7__ZvWPqTa",
+    "eval_mode": "range_verifier",
+    "answer": "178984",
+    "open_correct": false,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-55-q1",
+  "eval_mode": "llm_verifier",
+  "n_reps": 3,
+  "open_acc": 0.667,
+  "mcq_acc": 0.667,
+  "open_agree": 0.667,
+  "reps": [
+   {
+    "rep": "bix-55-q1__W4Bx7uF",
+    "eval_mode": "llm_verifier",
+    "answer": "101",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-55-q1__XRqUVZn",
+    "eval_mode": "llm_verifier",
+    "answer": "79",
+    "open_correct": false,
+    "mcq_correct": false
+   },
+   {
+    "rep": "bix-55-q1__wsuxVdG",
+    "eval_mode": "llm_verifier",
+    "answer": "101",
+    "open_correct": true,
+    "mcq_correct": true
+   }
+  ]
+ }
+]
