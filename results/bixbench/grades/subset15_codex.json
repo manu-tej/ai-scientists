@@ -1,0 +1,467 @@
+[
+ {
+  "task": "bix-18-q1",
+  "eval_mode": "range_verifier",
+  "n_reps": 3,
+  "open_acc": 1.0,
+  "mcq_acc": 1.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-18-q1__Euz9LbA",
+    "eval_mode": "range_verifier",
+    "answer": "0.076 (Wildtype)",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-18-q1__fxqvUMh",
+    "eval_mode": "range_verifier",
+    "answer": "Wildtype: 0.076",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-18-q1__7tPy6YA",
+    "eval_mode": "range_verifier",
+    "answer": "0.076",
+    "open_correct": true,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-18-q3",
+  "eval_mode": "range_verifier",
+  "n_reps": 3,
+  "open_acc": 1.0,
+  "mcq_acc": 1.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-18-q3__HjEmbND",
+    "eval_mode": "range_verifier",
+    "answer": "Approximately 71% reduction.",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-18-q3__VLdGmpK",
+    "eval_mode": "range_verifier",
+    "answer": "Approximately 71.0%",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-18-q3__vcEKsbt",
+    "eval_mode": "range_verifier",
+    "answer": "Approximately 71% reduction.",
+    "open_correct": true,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-24-q2",
+  "eval_mode": "llm_verifier",
+  "n_reps": 3,
+  "open_acc": 1.0,
+  "mcq_acc": 1.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-24-q2__6hjxkWa",
+    "eval_mode": "llm_verifier",
+    "answer": "Downregulation (22/22 significant metabolic GO BP terms were enriched among downregulated genes).",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-24-q2__bkKZ9gu",
+    "eval_mode": "llm_verifier",
+    "answer": "Downregulation primarily drives the metabolic GO BP signal (down:up metabolic enriched terms = 5:2).",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-24-q2__uf6TRay",
+    "eval_mode": "llm_verifier",
+    "answer": "Downregulation primarily drives the metabolic effects: 15 significant metabolic GO BP terms from downregulated genes vs ",
+    "open_correct": true,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-26-q3",
+  "eval_mode": "str_verifier",
+  "n_reps": 3,
+  "open_acc": 1.0,
+  "mcq_acc": 1.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-26-q3__sA6UvBe",
+    "eval_mode": "str_verifier",
+    "answer": "11",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-26-q3__v8yiLpw",
+    "eval_mode": "str_verifier",
+    "answer": "11",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-26-q3__RtDBhLV",
+    "eval_mode": "str_verifier",
+    "answer": "11",
+    "open_correct": true,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-30-q3",
+  "eval_mode": "str_verifier",
+  "n_reps": 3,
+  "open_acc": 1.0,
+  "mcq_acc": 1.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-30-q3__MXJpko4",
+    "eval_mode": "str_verifier",
+    "answer": "0:0",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-30-q3__JrcFem9",
+    "eval_mode": "str_verifier",
+    "answer": "0:0",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-30-q3__MCc5k55",
+    "eval_mode": "str_verifier",
+    "answer": "0:0",
+    "open_correct": true,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-37-q1",
+  "eval_mode": "llm_verifier",
+  "n_reps": 3,
+  "open_acc": 1.0,
+  "mcq_acc": 1.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-37-q1__JTSXvRr",
+    "eval_mode": "llm_verifier",
+    "answer": "4.81-fold higher in tumor than normal.",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-37-q1__TDmD4sS",
+    "eval_mode": "llm_verifier",
+    "answer": "4.81-fold higher in tumor than normal",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-37-q1__iJkSBd9",
+    "eval_mode": "llm_verifier",
+    "answer": "4.81-fold higher in tumor than normal",
+    "open_correct": true,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-41-q5",
+  "eval_mode": "str_verifier",
+  "n_reps": 3,
+  "open_acc": 1.0,
+  "mcq_acc": 1.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-41-q5__REewE9W",
+    "eval_mode": "str_verifier",
+    "answer": "5:1",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-41-q5__HBkSTBR",
+    "eval_mode": "str_verifier",
+    "answer": "5:1 (Strain 287:Strain 98)",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-41-q5__RyXN5pc",
+    "eval_mode": "str_verifier",
+    "answer": "5:1",
+    "open_correct": true,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-51-q2",
+  "eval_mode": "range_verifier",
+  "n_reps": 3,
+  "open_acc": 1.0,
+  "mcq_acc": 1.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-51-q2__ULGqUNi",
+    "eval_mode": "range_verifier",
+    "answer": "AIC = 111.8125",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-51-q2__XRUYvzA",
+    "eval_mode": "range_verifier",
+    "answer": "111.8124599253",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-51-q2__nA8Bs68",
+    "eval_mode": "range_verifier",
+    "answer": "111.81245992528",
+    "open_correct": true,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-51-q8",
+  "eval_mode": "range_verifier",
+  "n_reps": 3,
+  "open_acc": 1.0,
+  "mcq_acc": 1.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-51-q8__FaE5YxK",
+    "eval_mode": "range_verifier",
+    "answer": "-0.074953918 (log-odds per year of age for PR response)",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-51-q8__toYdm9e",
+    "eval_mode": "range_verifier",
+    "answer": "-0.07495391803708487",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-51-q8__sgL9puJ",
+    "eval_mode": "range_verifier",
+    "answer": "-0.07495392",
+    "open_correct": true,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-52-q6",
+  "eval_mode": "llm_verifier",
+  "n_reps": 3,
+  "open_acc": 1.0,
+  "mcq_acc": 1.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-52-q6__46WtEkR",
+    "eval_mode": "llm_verifier",
+    "answer": "Chromosome W (27.290431 age-related CpG sites per Mb; 184 sites / 6,742,290 bp).",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-52-q6__BDkBMmA",
+    "eval_mode": "llm_verifier",
+    "answer": "Chromosome W (27.290431 age-related CpG sites per Mb).",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-52-q6__rhKgzhr",
+    "eval_mode": "llm_verifier",
+    "answer": "Chromosome W (27.290430996 age-related CpG sites per Mbp).",
+    "open_correct": true,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-52-q7",
+  "eval_mode": "str_verifier",
+  "n_reps": 3,
+  "open_acc": 1.0,
+  "mcq_acc": 1.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-52-q7__JrUMGDf",
+    "eval_mode": "str_verifier",
+    "answer": "19159",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-52-q7__awX2Jon",
+    "eval_mode": "str_verifier",
+    "answer": "19,159 rows",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-52-q7__ixGyb7N",
+    "eval_mode": "str_verifier",
+    "answer": "19,159 rows",
+    "open_correct": true,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-53-q2",
+  "eval_mode": "llm_verifier",
+  "n_reps": 3,
+  "open_acc": 1.0,
+  "mcq_acc": 1.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-53-q2__B4mkaED",
+    "eval_mode": "llm_verifier",
+    "answer": "All 6 replicates: 1,479 significant DE genes. Excluding KL3/WL3: 1,931 significant DE genes. Removing the third replicat",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-53-q2__PYLsUQi",
+    "eval_mode": "llm_verifier",
+    "answer": "Using DESeq2 with normal-prior LFC shrinkage and thresholds p < 0.05, |log2FC| > 1, baseMean > 10: KL1-3 vs WL1-3 yielde",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-53-q2__7JHQQFj",
+    "eval_mode": "llm_verifier",
+    "answer": "Full KL1-3 vs WL1-3: 1,479 significant differentially expressed genes.\nExcluding KL3 and WL3: 1,931 significant differen",
+    "open_correct": true,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-53-q5",
+  "eval_mode": "str_verifier",
+  "n_reps": 3,
+  "open_acc": 1.0,
+  "mcq_acc": 1.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-53-q5__MF5gEVt",
+    "eval_mode": "str_verifier",
+    "answer": "0.1",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-53-q5__dSFsJDR",
+    "eval_mode": "str_verifier",
+    "answer": "0.1",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-53-q5__kvKt82m",
+    "eval_mode": "str_verifier",
+    "answer": "0.1",
+    "open_correct": true,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-54-q7",
+  "eval_mode": "range_verifier",
+  "n_reps": 3,
+  "open_acc": 0.0,
+  "mcq_acc": 1.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-54-q7__3QBCX4i",
+    "eval_mode": "range_verifier",
+    "answer": "180,771.36 colony area units at proportion strain 287 = 0.9019.",
+    "open_correct": false,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-54-q7__AN5YFWs",
+    "eval_mode": "range_verifier",
+    "answer": "180771.36 colony-area units at strain-287 proportion 0.901919 (natural spline df=4 model).",
+    "open_correct": false,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-54-q7__bULBgMf",
+    "eval_mode": "range_verifier",
+    "answer": "180,771.36 area units at p287 = 0.90193 (natural spline df=4 model).",
+    "open_correct": false,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-55-q1",
+  "eval_mode": "llm_verifier",
+  "n_reps": 3,
+  "open_acc": 1.0,
+  "mcq_acc": 1.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-55-q1__QWMVhsT",
+    "eval_mode": "llm_verifier",
+    "answer": "101",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-55-q1__f3PDasL",
+    "eval_mode": "llm_verifier",
+    "answer": "101",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-55-q1__wrBRSpf",
+    "eval_mode": "llm_verifier",
+    "answer": "101",
+    "open_correct": true,
+    "mcq_correct": true
+   }
+  ]
+ }
+]

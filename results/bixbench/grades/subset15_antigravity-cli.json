@@ -1,0 +1,467 @@
+[
+ {
+  "task": "bix-18-q1",
+  "eval_mode": "range_verifier",
+  "n_reps": 3,
+  "open_acc": 1.0,
+  "mcq_acc": 1.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-18-q1__BD6Homf",
+    "eval_mode": "range_verifier",
+    "answer": "0.076",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-18-q1__eiFhLME",
+    "eval_mode": "range_verifier",
+    "answer": "0.076",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-18-q1__CcPyaQx",
+    "eval_mode": "range_verifier",
+    "answer": "0.076",
+    "open_correct": true,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-18-q3",
+  "eval_mode": "range_verifier",
+  "n_reps": 3,
+  "open_acc": 1.0,
+  "mcq_acc": 1.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-18-q3__dMKS7Ys",
+    "eval_mode": "range_verifier",
+    "answer": "71%",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-18-q3__XytRmxS",
+    "eval_mode": "range_verifier",
+    "answer": "71%",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-18-q3__ZDwiUvZ",
+    "eval_mode": "range_verifier",
+    "answer": "~71%",
+    "open_correct": true,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-24-q2",
+  "eval_mode": "llm_verifier",
+  "n_reps": 3,
+  "open_acc": 1.0,
+  "mcq_acc": 1.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-24-q2__sWZeiS7",
+    "eval_mode": "llm_verifier",
+    "answer": "Downregulation",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-24-q2__S8L3Ez2",
+    "eval_mode": "llm_verifier",
+    "answer": "downregulation",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-24-q2__tQj9YhH",
+    "eval_mode": "llm_verifier",
+    "answer": "downregulation",
+    "open_correct": true,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-26-q3",
+  "eval_mode": "str_verifier",
+  "n_reps": 3,
+  "open_acc": 1.0,
+  "mcq_acc": 1.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-26-q3__AgbDP5Q",
+    "eval_mode": "str_verifier",
+    "answer": "11",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-26-q3__dQG26SX",
+    "eval_mode": "str_verifier",
+    "answer": "11",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-26-q3__ZaUNi65",
+    "eval_mode": "str_verifier",
+    "answer": "11",
+    "open_correct": true,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-30-q3",
+  "eval_mode": "str_verifier",
+  "n_reps": 3,
+  "open_acc": 0.667,
+  "mcq_acc": 0.667,
+  "open_agree": 0.667,
+  "reps": [
+   {
+    "rep": "bix-30-q3__Hy2Bktv",
+    "eval_mode": "str_verifier",
+    "answer": "0:0",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-30-q3__qfFsXma",
+    "eval_mode": "str_verifier",
+    "answer": "0:0",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-30-q3__QTNEV6G",
+    "eval_mode": "str_verifier",
+    "answer": "1:0",
+    "open_correct": false,
+    "mcq_correct": false
+   }
+  ]
+ },
+ {
+  "task": "bix-37-q1",
+  "eval_mode": "llm_verifier",
+  "n_reps": 3,
+  "open_acc": 1.0,
+  "mcq_acc": 1.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-37-q1__TqvEE6u",
+    "eval_mode": "llm_verifier",
+    "answer": "4.81",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-37-q1__TqekNw8",
+    "eval_mode": "llm_verifier",
+    "answer": "4.81",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-37-q1__HaA3eD7",
+    "eval_mode": "llm_verifier",
+    "answer": "4.81",
+    "open_correct": true,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-41-q5",
+  "eval_mode": "str_verifier",
+  "n_reps": 3,
+  "open_acc": 1.0,
+  "mcq_acc": 1.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-41-q5__PK7bG37",
+    "eval_mode": "str_verifier",
+    "answer": "5:1",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-41-q5__cJtFkxh",
+    "eval_mode": "str_verifier",
+    "answer": "5:1",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-41-q5__jWksCuW",
+    "eval_mode": "str_verifier",
+    "answer": "5:1",
+    "open_correct": true,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-51-q2",
+  "eval_mode": "range_verifier",
+  "n_reps": 3,
+  "open_acc": 1.0,
+  "mcq_acc": 1.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-51-q2__cBRHLEk",
+    "eval_mode": "range_verifier",
+    "answer": "111.81",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-51-q2__EvqkjqF",
+    "eval_mode": "range_verifier",
+    "answer": "111.81",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-51-q2__w6JdFAp",
+    "eval_mode": "range_verifier",
+    "answer": "111.8125",
+    "open_correct": true,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-51-q8",
+  "eval_mode": "range_verifier",
+  "n_reps": 3,
+  "open_acc": 1.0,
+  "mcq_acc": 1.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-51-q8__ru8epvM",
+    "eval_mode": "range_verifier",
+    "answer": "-0.0750",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-51-q8__XmZyAkV",
+    "eval_mode": "range_verifier",
+    "answer": "-0.0750",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-51-q8__tRAbx2h",
+    "eval_mode": "range_verifier",
+    "answer": "-0.075",
+    "open_correct": true,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-52-q6",
+  "eval_mode": "llm_verifier",
+  "n_reps": 3,
+  "open_acc": 1.0,
+  "mcq_acc": 1.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-52-q6__TuFsmin",
+    "eval_mode": "llm_verifier",
+    "answer": "W",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-52-q6__9UH4i7x",
+    "eval_mode": "llm_verifier",
+    "answer": "Chromosome W",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-52-q6__apsPaZV",
+    "eval_mode": "llm_verifier",
+    "answer": "Chromosome W",
+    "open_correct": true,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-52-q7",
+  "eval_mode": "str_verifier",
+  "n_reps": 3,
+  "open_acc": 1.0,
+  "mcq_acc": 1.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-52-q7__kZUJSv9",
+    "eval_mode": "str_verifier",
+    "answer": "19159",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-52-q7__rQtXCSq",
+    "eval_mode": "str_verifier",
+    "answer": "19159",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-52-q7__xn6Gyvg",
+    "eval_mode": "str_verifier",
+    "answer": "19159",
+    "open_correct": true,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-53-q2",
+  "eval_mode": "llm_verifier",
+  "n_reps": 3,
+  "open_acc": 1.0,
+  "mcq_acc": 1.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-53-q2__KriBWDn",
+    "eval_mode": "llm_verifier",
+    "answer": "Increase",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-53-q2__deyrPk3",
+    "eval_mode": "llm_verifier",
+    "answer": "Increase",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-53-q2__LjmatDr",
+    "eval_mode": "llm_verifier",
+    "answer": "increase",
+    "open_correct": true,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-53-q5",
+  "eval_mode": "str_verifier",
+  "n_reps": 3,
+  "open_acc": 1.0,
+  "mcq_acc": 1.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-53-q5__53jQhT6",
+    "eval_mode": "str_verifier",
+    "answer": "0.1",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-53-q5__UCHBubr",
+    "eval_mode": "str_verifier",
+    "answer": "0.1",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-53-q5__mMFd3jH",
+    "eval_mode": "str_verifier",
+    "answer": "0.1",
+    "open_correct": true,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-54-q7",
+  "eval_mode": "range_verifier",
+  "n_reps": 3,
+  "open_acc": 0.0,
+  "mcq_acc": 1.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-54-q7__aPHzRRE",
+    "eval_mode": "range_verifier",
+    "answer": "178983.9",
+    "open_correct": false,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-54-q7__j2Kgdbd",
+    "eval_mode": "range_verifier",
+    "answer": "178983.9",
+    "open_correct": false,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-54-q7__t7TdNFR",
+    "eval_mode": "range_verifier",
+    "answer": "178983.9",
+    "open_correct": false,
+    "mcq_correct": true
+   }
+  ]
+ },
+ {
+  "task": "bix-55-q1",
+  "eval_mode": "llm_verifier",
+  "n_reps": 3,
+  "open_acc": 1.0,
+  "mcq_acc": 1.0,
+  "open_agree": 1.0,
+  "reps": [
+   {
+    "rep": "bix-55-q1__3gkzmNV",
+    "eval_mode": "llm_verifier",
+    "answer": "101",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-55-q1__ndhkaru",
+    "eval_mode": "llm_verifier",
+    "answer": "101",
+    "open_correct": true,
+    "mcq_correct": true
+   },
+   {
+    "rep": "bix-55-q1__HuYc2af",
+    "eval_mode": "llm_verifier",
+    "answer": "101",
+    "open_correct": true,
+    "mcq_correct": true
+   }
+  ]
+ }
+]
