@@ -12,7 +12,7 @@ plan to combine them into a credible, demo-able validation loop.
 
 ## 1. What the evals taught us (stock-take)
 
-Three strands, one conclusion.
+Four strands, one conclusion. (All eval numbers are collated in [`results/`](../../results/).)
 
 **(a) 3-agent BixBench-Verified-50 runs** (`docs/research/2026-06-05-bixbench-verified-50-results.md`)
 - On a frozen accuracy benchmark, frontier agents are **statistically indistinguishable**:
@@ -25,7 +25,18 @@ Three strands, one conclusion.
   (bix-54-q7 monoculture anchors; bix-16-q1 DepMap sign convention — proven by reproduction).
   Per-agent consistency is blind to this; only cross-agent agreement catches it.
 
-**(b) Deep research, 2024–2026** (`docs/research/2026-06-05-scientific-eval-design-deep-research.md`)
+**(b) 3-agent BiomniBench-DA runs** (collated in [`results/biomnibench/`](../../results/biomnibench/))
+- **The judge flips the ranking**: Gemini judge → codex 0.770 > cc 0.758; MiniMax judge →
+  cc 0.806 > codex 0.737. Same data, different "winner" depending on who grades. agy last (~0.49) under both.
+- **Capability ≠ consistency**: codex is the *steadiest* agent (mean per-task SD 0.002) but not
+  the most capable; cc is most capable (MiniMax) but least consistent (0.077).
+- **Refusal collapse**: on sabotaged-data tasks (correct answer = "unanswerable"), **0 appropriate
+  refusals** — every response fabricated or partially hedged (codex fabricates 56%, cc 40%; one
+  fetched survival data from the GDC API to fill a deleted column). Accuracy benchmarks never test
+  this; it is the sharpest, most demo-worthy trust failure, and the direct antithesis of
+  quration's ConfidenceGauge/abstention claims.
+
+**(c) Deep research, 2024–2026** (`docs/research/2026-06-05-scientific-eval-design-deep-research.md`)
 - The field agrees: BixBench MCQ ≈ random, AstaBench end-to-end discovery floors ~5%,
   FIRE-Bench F1 SDs ±23–47 swamp between-agent gaps.
 - The fix is **temporal/replication** answer keys + **process/calibration** scoring +
@@ -33,7 +44,7 @@ Three strands, one conclusion.
   programmatic date-restricted retrieval works. LLM-judge reliability is almost never
   human-anchored (only FIRE-Bench reports F1 0.89 vs humans).
 
-**(c) Gathering recipes** (shipped, in quration `recipes/`, commit `e5adc4b`)
+**(d) Gathering recipes** (shipped, in quration `recipes/`, commit `e5adc4b`)
 - Five key-free recipes (GEO, PubMed, bioRxiv/medRxiv, ClinicalTrials.gov, PRIDE) surface
   candidate datasets/papers into one uniform **curation manifest**, with `--since` post-cutoff
   filtering. This is the **dataset-sourcing front-end** for the validation loop below.
