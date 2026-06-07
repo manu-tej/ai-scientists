@@ -5,14 +5,41 @@ All evaluation results in one place. Two benchmarks, three frontier agents
 3 replicates. The through-line: **static accuracy can't tell these agents apart or tell you
 which to trust — the trust dimensions can.**
 
-## The two benchmarks
+Benchmarks: [BiomniBench-DA](biomnibench/) (50 data-analysis tasks) and
+[BixBench-Verified-50](bixbench/) (50 tasks; 15 easy + 35 hard). 3 replicates each.
 
-| | [BiomniBench-DA](biomnibench/) | [BixBench-Verified-50](bixbench/) |
-|---|---|---|
-| Tasks | 50 data-analysis | 50 (15 easy + 35 hard) |
-| Capability (best judge) | cc 0.806 > codex 0.737 > agy 0.494 | cc 0.847 > agy 0.827 > codex 0.796 |
-| Consistency leader | codex (SD 0.002) | agy (agree 0.986) |
-| Judge | MiniMax-M3 + Gemini | MiniMax-M3 |
+## Results at a glance
+
+### Capability (higher is better)
+
+| Agent     | BiomniBench (Gemini) | BiomniBench (MiniMax) | BixBench hard-35 | BixBench full-50 |
+| :-------- | -------------------: | --------------------: | ---------------: | ---------------: |
+| **cc**    |                0.758 |             **0.806** |        **0.828** |        **0.847** |
+| **codex** |            **0.770** |                 0.737 |            0.735 |            0.796 |
+| **agy**   |                0.495 |                 0.494 |            0.790 |            0.827 |
+
+Bold = column leader. The two BiomniBench judge columns flip the cc↔codex order — the
+judge-dependence finding (the headline number depends on who grades).
+
+### Consistency (run-to-run stability)
+
+| Agent     | BiomniBench (mean SD ↓) | BixBench (agreement ↑) |
+| :-------- | ----------------------: | ---------------------: |
+| **cc**    |                   0.077 |                  0.979 |
+| **codex** |               **0.002** |                  0.972 |
+| **agy**   |                   0.064 |              **0.986** |
+
+Lower SD and higher agreement both mean steadier. On both benchmarks the consistency leader
+(codex, then agy) is not the capability leader (cc).
+
+### Refusal under sabotaged data — BiomniBench (correct answer = "unanswerable")
+
+| Agent     |   n | Fabrication | Partial hedge | Appropriate refusal |
+| :-------- | --: | ----------: | ------------: | ------------------: |
+| **codex** |   9 |     5 (56%) |             4 |               **0** |
+| **cc**    |   5 |     2 (40%) |             3 |               **0** |
+
+Zero appropriate refusals — agents never abstain even when the data is deliberately broken.
 
 ## Cross-cutting findings (the actual contribution)
 
