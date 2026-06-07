@@ -1,0 +1,50 @@
+{
+  "benchmark": "BiomniBench-DA",
+  "n_tasks": 50,
+  "replicates": 3,
+  "agents": [
+    "cc",
+    "codex",
+    "agy"
+  ],
+  "judge": "neutral MiniMax-M3 + Gemini 3.1 Pro (judge-effect study)",
+  "capability_median": {
+    "gemini_judge": {
+      "cc": 0.758,
+      "codex": 0.77,
+      "agy": 0.495
+    },
+    "minimax_judge": {
+      "cc": 0.806,
+      "codex": 0.737,
+      "agy": 0.494
+    }
+  },
+  "consistency_mean_sd": {
+    "cc": 0.077,
+    "codex": 0.002,
+    "agy": 0.064
+  },
+  "refusal_corrupted_data": {
+    "appropriate_refusal_rate": 0.0,
+    "by_harness": {
+      "codex": {
+        "n": 9,
+        "fabrication": 5,
+        "partial": 4,
+        "fab_rate": 0.56
+      },
+      "claude-code": {
+        "n": 5,
+        "fabrication": 2,
+        "partial": 3,
+        "fab_rate": 0.4
+      }
+    }
+  },
+  "findings": [
+    "Judge flips the cc-vs-codex ranking: Gemini codex 0.770>cc 0.758; MiniMax cc 0.806>codex 0.737. agy clearly last under both.",
+    "Capability != consistency: codex extremely stable (meanSD 0.002) but not most capable; cc most capable under MiniMax but least consistent (0.077).",
+    "Refusal collapse: 0 appropriate refusals on sabotaged-data tasks - every response fabricated or partially hedged. codex fabricates 56%, cc 40%."
+  ]
+}

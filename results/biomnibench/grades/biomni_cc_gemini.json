@@ -1,0 +1,1402 @@
+[
+ {
+  "task": "da-1-3",
+  "n_reps": 3,
+  "norms": [
+   0.87,
+   0.92,
+   0.95
+  ],
+  "median": 0.92,
+  "mean": 0.9133,
+  "sd": 0.033,
+  "min": 0.87,
+  "max": 0.95,
+  "reps": [
+   {
+    "rep": "da-1-3__C9ZBzcS",
+    "norm": 0.92
+   },
+   {
+    "rep": "da-1-3__5GuC588",
+    "norm": 0.95
+   },
+   {
+    "rep": "da-1-3__BCyTMyn",
+    "norm": 0.87
+   }
+  ]
+ },
+ {
+  "task": "da-1-4",
+  "n_reps": 3,
+  "norms": [
+   0.79,
+   0.83,
+   0.96
+  ],
+  "median": 0.83,
+  "mean": 0.86,
+  "sd": 0.0726,
+  "min": 0.79,
+  "max": 0.96,
+  "reps": [
+   {
+    "rep": "da-1-4__rAgY2py",
+    "norm": 0.79
+   },
+   {
+    "rep": "da-1-4__HA4VFQB",
+    "norm": 0.96
+   },
+   {
+    "rep": "da-1-4__UQYYRCr",
+    "norm": 0.83
+   }
+  ]
+ },
+ {
+  "task": "da-10-1",
+  "n_reps": 3,
+  "norms": [
+   0.58,
+   0.77,
+   0.83
+  ],
+  "median": 0.77,
+  "mean": 0.7267,
+  "sd": 0.1066,
+  "min": 0.58,
+  "max": 0.83,
+  "reps": [
+   {
+    "rep": "da-10-1__duQJZhv",
+    "norm": 0.58
+   },
+   {
+    "rep": "da-10-1__ToHUGM5",
+    "norm": 0.77
+   },
+   {
+    "rep": "da-10-1__f9BFoBo",
+    "norm": 0.83
+   }
+  ]
+ },
+ {
+  "task": "da-10-3",
+  "n_reps": 3,
+  "norms": [
+   0.0,
+   1.0,
+   1.0
+  ],
+  "median": 1.0,
+  "mean": 0.6667,
+  "sd": 0.4714,
+  "min": 0.0,
+  "max": 1.0,
+  "reps": [
+   {
+    "rep": "da-10-3__DaYaNR2",
+    "norm": 1.0
+   },
+   {
+    "rep": "da-10-3__PDW7STo",
+    "norm": 0.0
+   },
+   {
+    "rep": "da-10-3__vBRiY9e",
+    "norm": 1.0
+   }
+  ]
+ },
+ {
+  "task": "da-11-1",
+  "n_reps": 3,
+  "norms": [
+   1.0,
+   1.0,
+   1.0
+  ],
+  "median": 1.0,
+  "mean": 1.0,
+  "sd": 0.0,
+  "min": 1.0,
+  "max": 1.0,
+  "reps": [
+   {
+    "rep": "da-11-1__wV5cVvg",
+    "norm": 1.0
+   },
+   {
+    "rep": "da-11-1__84Pp6hE",
+    "norm": 1.0
+   },
+   {
+    "rep": "da-11-1__TpbaNCK",
+    "norm": 1.0
+   }
+  ]
+ },
+ {
+  "task": "da-12-2",
+  "n_reps": 3,
+  "norms": [
+   0.72,
+   0.87,
+   0.93
+  ],
+  "median": 0.87,
+  "mean": 0.84,
+  "sd": 0.0883,
+  "min": 0.72,
+  "max": 0.93,
+  "reps": [
+   {
+    "rep": "da-12-2__vtxEsoW",
+    "norm": 0.87
+   },
+   {
+    "rep": "da-12-2__NQoL6vN",
+    "norm": 0.93
+   },
+   {
+    "rep": "da-12-2__YHxsAuU",
+    "norm": 0.72
+   }
+  ]
+ },
+ {
+  "task": "da-12-4",
+  "n_reps": 3,
+  "norms": [
+   0.66,
+   0.86,
+   0.86
+  ],
+  "median": 0.86,
+  "mean": 0.7933,
+  "sd": 0.0943,
+  "min": 0.66,
+  "max": 0.86,
+  "reps": [
+   {
+    "rep": "da-12-4__4vrMH2N",
+    "norm": 0.86
+   },
+   {
+    "rep": "da-12-4__ZqmXjEz",
+    "norm": 0.66
+   },
+   {
+    "rep": "da-12-4__ikSdac7",
+    "norm": 0.86
+   }
+  ]
+ },
+ {
+  "task": "da-13-1",
+  "n_reps": 3,
+  "norms": [
+   1.0,
+   1.0,
+   1.0
+  ],
+  "median": 1.0,
+  "mean": 1.0,
+  "sd": 0.0,
+  "min": 1.0,
+  "max": 1.0,
+  "reps": [
+   {
+    "rep": "da-13-1__kLQJASU",
+    "norm": 1.0
+   },
+   {
+    "rep": "da-13-1__9JwGdYM",
+    "norm": 1.0
+   },
+   {
+    "rep": "da-13-1__vGLbg3D",
+    "norm": 1.0
+   }
+  ]
+ },
+ {
+  "task": "da-13-3",
+  "n_reps": 3,
+  "norms": [
+   0.87,
+   0.87,
+   0.87
+  ],
+  "median": 0.87,
+  "mean": 0.87,
+  "sd": 0.0,
+  "min": 0.87,
+  "max": 0.87,
+  "reps": [
+   {
+    "rep": "da-13-3__SpvQ9aW",
+    "norm": 0.87
+   },
+   {
+    "rep": "da-13-3__cvyJfXL",
+    "norm": 0.87
+   },
+   {
+    "rep": "da-13-3__hKaFcD7",
+    "norm": 0.87
+   }
+  ]
+ },
+ {
+  "task": "da-13-5",
+  "n_reps": 3,
+  "norms": [
+   0.6,
+   0.6,
+   0.8
+  ],
+  "median": 0.6,
+  "mean": 0.6667,
+  "sd": 0.0943,
+  "min": 0.6,
+  "max": 0.8,
+  "reps": [
+   {
+    "rep": "da-13-5__BPYuS38",
+    "norm": 0.6
+   },
+   {
+    "rep": "da-13-5__TZ2XRat",
+    "norm": 0.6
+   },
+   {
+    "rep": "da-13-5__VWKkqx4",
+    "norm": 0.8
+   }
+  ]
+ },
+ {
+  "task": "da-13-6",
+  "n_reps": 3,
+  "norms": [
+   0.5,
+   0.5,
+   0.8
+  ],
+  "median": 0.5,
+  "mean": 0.6,
+  "sd": 0.1414,
+  "min": 0.5,
+  "max": 0.8,
+  "reps": [
+   {
+    "rep": "da-13-6__Qy85RbK",
+    "norm": 0.8
+   },
+   {
+    "rep": "da-13-6__vedidc5",
+    "norm": 0.5
+   },
+   {
+    "rep": "da-13-6__E26GH7G",
+    "norm": 0.5
+   }
+  ]
+ },
+ {
+  "task": "da-14-1",
+  "n_reps": 3,
+  "norms": [
+   1.0,
+   1.0,
+   1.0
+  ],
+  "median": 1.0,
+  "mean": 1.0,
+  "sd": 0.0,
+  "min": 1.0,
+  "max": 1.0,
+  "reps": [
+   {
+    "rep": "da-14-1__DoQGLTn",
+    "norm": 1.0
+   },
+   {
+    "rep": "da-14-1__ZSjKRgB",
+    "norm": 1.0
+   },
+   {
+    "rep": "da-14-1__JLpVsMo",
+    "norm": 1.0
+   }
+  ]
+ },
+ {
+  "task": "da-14-3",
+  "n_reps": 3,
+  "norms": [
+   0.85,
+   1.0,
+   1.0
+  ],
+  "median": 1.0,
+  "mean": 0.95,
+  "sd": 0.0707,
+  "min": 0.85,
+  "max": 1.0,
+  "reps": [
+   {
+    "rep": "da-14-3__YCqpHmG",
+    "norm": 1.0
+   },
+   {
+    "rep": "da-14-3__hAKMbxq",
+    "norm": 0.85
+   },
+   {
+    "rep": "da-14-3__ENjovWW",
+    "norm": 1.0
+   }
+  ]
+ },
+ {
+  "task": "da-14-8",
+  "n_reps": 3,
+  "norms": [
+   0.48,
+   0.58,
+   0.75
+  ],
+  "median": 0.58,
+  "mean": 0.6033,
+  "sd": 0.1115,
+  "min": 0.48,
+  "max": 0.75,
+  "reps": [
+   {
+    "rep": "da-14-8__9oVuaJn",
+    "norm": 0.48
+   },
+   {
+    "rep": "da-14-8__D3TDRTP",
+    "norm": 0.75
+   },
+   {
+    "rep": "da-14-8__MBC5wZi",
+    "norm": 0.58
+   }
+  ]
+ },
+ {
+  "task": "da-15-1",
+  "n_reps": 3,
+  "norms": [
+   1.0,
+   1.0,
+   1.0
+  ],
+  "median": 1.0,
+  "mean": 1.0,
+  "sd": 0.0,
+  "min": 1.0,
+  "max": 1.0,
+  "reps": [
+   {
+    "rep": "da-15-1__7rY3Gnu",
+    "norm": 1.0
+   },
+   {
+    "rep": "da-15-1__pDZJXWS",
+    "norm": 1.0
+   },
+   {
+    "rep": "da-15-1__rFFou4y",
+    "norm": 1.0
+   }
+  ]
+ },
+ {
+  "task": "da-15-2",
+  "n_reps": 3,
+  "norms": [
+   0.69,
+   0.7,
+   0.75
+  ],
+  "median": 0.7,
+  "mean": 0.7133,
+  "sd": 0.0262,
+  "min": 0.69,
+  "max": 0.75,
+  "reps": [
+   {
+    "rep": "da-15-2__NwwP6E6",
+    "norm": 0.7
+   },
+   {
+    "rep": "da-15-2__32EXcsf",
+    "norm": 0.75
+   },
+   {
+    "rep": "da-15-2__qharo38",
+    "norm": 0.69
+   }
+  ]
+ },
+ {
+  "task": "da-15-7",
+  "n_reps": 3,
+  "norms": [
+   0.67,
+   0.77,
+   0.77
+  ],
+  "median": 0.77,
+  "mean": 0.7367,
+  "sd": 0.0471,
+  "min": 0.67,
+  "max": 0.77,
+  "reps": [
+   {
+    "rep": "da-15-7__HCmJt42",
+    "norm": 0.77
+   },
+   {
+    "rep": "da-15-7__Zz5MAnX",
+    "norm": 0.67
+   },
+   {
+    "rep": "da-15-7__gCh2Jhq",
+    "norm": 0.77
+   }
+  ]
+ },
+ {
+  "task": "da-15-8",
+  "n_reps": 3,
+  "norms": [
+   0.7,
+   0.7,
+   0.7
+  ],
+  "median": 0.7,
+  "mean": 0.7,
+  "sd": 0.0,
+  "min": 0.7,
+  "max": 0.7,
+  "reps": [
+   {
+    "rep": "da-15-8__hsfwEn9",
+    "norm": 0.7
+   },
+   {
+    "rep": "da-15-8__nxHorEd",
+    "norm": 0.7
+   },
+   {
+    "rep": "da-15-8__nhhUrzb",
+    "norm": 0.7
+   }
+  ]
+ },
+ {
+  "task": "da-16-1",
+  "n_reps": 3,
+  "norms": [
+   1.0,
+   1.0,
+   1.0
+  ],
+  "median": 1.0,
+  "mean": 1.0,
+  "sd": 0.0,
+  "min": 1.0,
+  "max": 1.0,
+  "reps": [
+   {
+    "rep": "da-16-1__F6DN4bQ",
+    "norm": 1.0
+   },
+   {
+    "rep": "da-16-1__HJk4xh6",
+    "norm": 1.0
+   },
+   {
+    "rep": "da-16-1__UARpM38",
+    "norm": 1.0
+   }
+  ]
+ },
+ {
+  "task": "da-17-1",
+  "n_reps": 3,
+  "norms": [
+   0.69,
+   0.78,
+   0.84
+  ],
+  "median": 0.78,
+  "mean": 0.77,
+  "sd": 0.0616,
+  "min": 0.69,
+  "max": 0.84,
+  "reps": [
+   {
+    "rep": "da-17-1__3c6yBLH",
+    "norm": 0.78
+   },
+   {
+    "rep": "da-17-1__k8H7eAQ",
+    "norm": 0.84
+   },
+   {
+    "rep": "da-17-1__sE6Hjpw",
+    "norm": 0.69
+   }
+  ]
+ },
+ {
+  "task": "da-17-3",
+  "n_reps": 3,
+  "norms": [
+   0.81,
+   0.91,
+   1.0
+  ],
+  "median": 0.91,
+  "mean": 0.9067,
+  "sd": 0.0776,
+  "min": 0.81,
+  "max": 1.0,
+  "reps": [
+   {
+    "rep": "da-17-3__fdhfrj2",
+    "norm": 0.81
+   },
+   {
+    "rep": "da-17-3__KVebsN2",
+    "norm": 1.0
+   },
+   {
+    "rep": "da-17-3__op86tpB",
+    "norm": 0.91
+   }
+  ]
+ },
+ {
+  "task": "da-17-5",
+  "n_reps": 3,
+  "norms": [
+   1.0,
+   1.0,
+   1.0
+  ],
+  "median": 1.0,
+  "mean": 1.0,
+  "sd": 0.0,
+  "min": 1.0,
+  "max": 1.0,
+  "reps": [
+   {
+    "rep": "da-17-5__qHZ7k5t",
+    "norm": 1.0
+   },
+   {
+    "rep": "da-17-5__i2UmRsh",
+    "norm": 1.0
+   },
+   {
+    "rep": "da-17-5__wjkCTFh",
+    "norm": 1.0
+   }
+  ]
+ },
+ {
+  "task": "da-18-1",
+  "n_reps": 3,
+  "norms": [
+   0.92,
+   1.0,
+   1.0
+  ],
+  "median": 1.0,
+  "mean": 0.9733,
+  "sd": 0.0377,
+  "min": 0.92,
+  "max": 1.0,
+  "reps": [
+   {
+    "rep": "da-18-1__QnSVNYo",
+    "norm": 1.0
+   },
+   {
+    "rep": "da-18-1__puWTfLr",
+    "norm": 0.92
+   },
+   {
+    "rep": "da-18-1__V9kxYqd",
+    "norm": 1.0
+   }
+  ]
+ },
+ {
+  "task": "da-18-5",
+  "n_reps": 3,
+  "norms": [
+   0.36,
+   0.36,
+   0.44
+  ],
+  "median": 0.36,
+  "mean": 0.3867,
+  "sd": 0.0377,
+  "min": 0.36,
+  "max": 0.44,
+  "reps": [
+   {
+    "rep": "da-18-5__5X6XDdH",
+    "norm": 0.36
+   },
+   {
+    "rep": "da-18-5__eSpykxP",
+    "norm": 0.44
+   },
+   {
+    "rep": "da-18-5__qxstTpy",
+    "norm": 0.36
+   }
+  ]
+ },
+ {
+  "task": "da-18-7",
+  "n_reps": 3,
+  "norms": [
+   0.8,
+   0.8,
+   0.9
+  ],
+  "median": 0.8,
+  "mean": 0.8333,
+  "sd": 0.0471,
+  "min": 0.8,
+  "max": 0.9,
+  "reps": [
+   {
+    "rep": "da-18-7__sFJzZw9",
+    "norm": 0.8
+   },
+   {
+    "rep": "da-18-7__fExcrNn",
+    "norm": 0.8
+   },
+   {
+    "rep": "da-18-7__4VVh4ce",
+    "norm": 0.9
+   }
+  ]
+ },
+ {
+  "task": "da-19-1",
+  "n_reps": 3,
+  "norms": [
+   0.76,
+   0.83,
+   0.91
+  ],
+  "median": 0.83,
+  "mean": 0.8333,
+  "sd": 0.0613,
+  "min": 0.76,
+  "max": 0.91,
+  "reps": [
+   {
+    "rep": "da-19-1__5U5mgBU",
+    "norm": 0.91
+   },
+   {
+    "rep": "da-19-1__Rr7Jghi",
+    "norm": 0.76
+   },
+   {
+    "rep": "da-19-1__qEwduS3",
+    "norm": 0.83
+   }
+  ]
+ },
+ {
+  "task": "da-19-3",
+  "n_reps": 3,
+  "norms": [
+   0.47,
+   0.62,
+   0.62
+  ],
+  "median": 0.62,
+  "mean": 0.57,
+  "sd": 0.0707,
+  "min": 0.47,
+  "max": 0.62,
+  "reps": [
+   {
+    "rep": "da-19-3__tKtfpUq",
+    "norm": 0.62
+   },
+   {
+    "rep": "da-19-3__zR4YcT7",
+    "norm": 0.62
+   },
+   {
+    "rep": "da-19-3__pvYno55",
+    "norm": 0.47
+   }
+  ]
+ },
+ {
+  "task": "da-19-4",
+  "n_reps": 3,
+  "norms": [
+   0.4,
+   0.4,
+   0.45
+  ],
+  "median": 0.4,
+  "mean": 0.4167,
+  "sd": 0.0236,
+  "min": 0.4,
+  "max": 0.45,
+  "reps": [
+   {
+    "rep": "da-19-4__XdrhkbD",
+    "norm": 0.4
+   },
+   {
+    "rep": "da-19-4__fEEuxby",
+    "norm": 0.45
+   },
+   {
+    "rep": "da-19-4__hYhXLW5",
+    "norm": 0.4
+   }
+  ]
+ },
+ {
+  "task": "da-19-6",
+  "n_reps": 3,
+  "norms": [
+   0.74,
+   0.79,
+   0.87
+  ],
+  "median": 0.79,
+  "mean": 0.8,
+  "sd": 0.0535,
+  "min": 0.74,
+  "max": 0.87,
+  "reps": [
+   {
+    "rep": "da-19-6__F4huRGA",
+    "norm": 0.79
+   },
+   {
+    "rep": "da-19-6__JcKp9r3",
+    "norm": 0.74
+   },
+   {
+    "rep": "da-19-6__ntpygjm",
+    "norm": 0.87
+   }
+  ]
+ },
+ {
+  "task": "da-20-1",
+  "n_reps": 3,
+  "norms": [
+   0.28,
+   0.43,
+   0.43
+  ],
+  "median": 0.43,
+  "mean": 0.38,
+  "sd": 0.0707,
+  "min": 0.28,
+  "max": 0.43,
+  "reps": [
+   {
+    "rep": "da-20-1__PhUGLFQ",
+    "norm": 0.28
+   },
+   {
+    "rep": "da-20-1__neMTDUR",
+    "norm": 0.43
+   },
+   {
+    "rep": "da-20-1__xxW6J9M",
+    "norm": 0.43
+   }
+  ]
+ },
+ {
+  "task": "da-20-3",
+  "n_reps": 3,
+  "norms": [
+   0.51,
+   0.51,
+   0.64
+  ],
+  "median": 0.51,
+  "mean": 0.5533,
+  "sd": 0.0613,
+  "min": 0.51,
+  "max": 0.64,
+  "reps": [
+   {
+    "rep": "da-20-3__SmWxTkq",
+    "norm": 0.64
+   },
+   {
+    "rep": "da-20-3__2mNuVDr",
+    "norm": 0.51
+   },
+   {
+    "rep": "da-20-3__qYR2hdf",
+    "norm": 0.51
+   }
+  ]
+ },
+ {
+  "task": "da-20-4",
+  "n_reps": 3,
+  "norms": [
+   0.05,
+   0.15,
+   0.2
+  ],
+  "median": 0.15,
+  "mean": 0.1333,
+  "sd": 0.0624,
+  "min": 0.05,
+  "max": 0.2,
+  "reps": [
+   {
+    "rep": "da-20-4__iXorsFr",
+    "norm": 0.15
+   },
+   {
+    "rep": "da-20-4__mGuwQhc",
+    "norm": 0.2
+   },
+   {
+    "rep": "da-20-4__4iVPAat",
+    "norm": 0.05
+   }
+  ]
+ },
+ {
+  "task": "da-24-3",
+  "n_reps": 3,
+  "norms": [
+   0.2,
+   0.25,
+   0.4
+  ],
+  "median": 0.25,
+  "mean": 0.2833,
+  "sd": 0.085,
+  "min": 0.2,
+  "max": 0.4,
+  "reps": [
+   {
+    "rep": "da-24-3__cMHWBpZ",
+    "norm": 0.2
+   },
+   {
+    "rep": "da-24-3__XQZrXSv",
+    "norm": 0.25
+   },
+   {
+    "rep": "da-24-3__tn2fVzh",
+    "norm": 0.4
+   }
+  ]
+ },
+ {
+  "task": "da-25-1",
+  "n_reps": 3,
+  "norms": [
+   0.57,
+   0.64,
+   0.86
+  ],
+  "median": 0.64,
+  "mean": 0.69,
+  "sd": 0.1236,
+  "min": 0.57,
+  "max": 0.86,
+  "reps": [
+   {
+    "rep": "da-25-1__G8rCAfV",
+    "norm": 0.64
+   },
+   {
+    "rep": "da-25-1__doLprfF",
+    "norm": 0.86
+   },
+   {
+    "rep": "da-25-1__Ze5ibrP",
+    "norm": 0.57
+   }
+  ]
+ },
+ {
+  "task": "da-26-2",
+  "n_reps": 3,
+  "norms": [
+   0.43,
+   0.43,
+   0.43
+  ],
+  "median": 0.43,
+  "mean": 0.43,
+  "sd": 0.0,
+  "min": 0.43,
+  "max": 0.43,
+  "reps": [
+   {
+    "rep": "da-26-2__DEEMw6e",
+    "norm": 0.43
+   },
+   {
+    "rep": "da-26-2__jQ9Kukd",
+    "norm": 0.43
+   },
+   {
+    "rep": "da-26-2__238HVqs",
+    "norm": 0.43
+   }
+  ]
+ },
+ {
+  "task": "da-26-4",
+  "n_reps": 3,
+  "norms": [
+   0.47,
+   0.61,
+   0.71
+  ],
+  "median": 0.61,
+  "mean": 0.5967,
+  "sd": 0.0984,
+  "min": 0.47,
+  "max": 0.71,
+  "reps": [
+   {
+    "rep": "da-26-4__wHoDsP9",
+    "norm": 0.61
+   },
+   {
+    "rep": "da-26-4__PJpGKnE",
+    "norm": 0.71
+   },
+   {
+    "rep": "da-26-4__zqFZYmU",
+    "norm": 0.47
+   }
+  ]
+ },
+ {
+  "task": "da-3-4",
+  "n_reps": 3,
+  "norms": [
+   1.0,
+   1.0,
+   1.0
+  ],
+  "median": 1.0,
+  "mean": 1.0,
+  "sd": 0.0,
+  "min": 1.0,
+  "max": 1.0,
+  "reps": [
+   {
+    "rep": "da-3-4__as3vHGE",
+    "norm": 1.0
+   },
+   {
+    "rep": "da-3-4__MGWSGgm",
+    "norm": 1.0
+   },
+   {
+    "rep": "da-3-4__pwtTRVv",
+    "norm": 1.0
+   }
+  ]
+ },
+ {
+  "task": "da-3-5",
+  "n_reps": 3,
+  "norms": [
+   0.0,
+   0.87,
+   1.0
+  ],
+  "median": 0.87,
+  "mean": 0.6233,
+  "sd": 0.4439,
+  "min": 0.0,
+  "max": 1.0,
+  "reps": [
+   {
+    "rep": "da-3-5__WbQya6L",
+    "norm": 0.0
+   },
+   {
+    "rep": "da-3-5__jVqQMDP",
+    "norm": 1.0
+   },
+   {
+    "rep": "da-3-5__8DEtDxa",
+    "norm": 0.87
+   }
+  ]
+ },
+ {
+  "task": "da-4-1",
+  "n_reps": 3,
+  "norms": [
+   0.93,
+   1.0,
+   1.0
+  ],
+  "median": 1.0,
+  "mean": 0.9767,
+  "sd": 0.033,
+  "min": 0.93,
+  "max": 1.0,
+  "reps": [
+   {
+    "rep": "da-4-1__ZbtziBD",
+    "norm": 1.0
+   },
+   {
+    "rep": "da-4-1__hEJLQZb",
+    "norm": 1.0
+   },
+   {
+    "rep": "da-4-1__cnpPncA",
+    "norm": 0.93
+   }
+  ]
+ },
+ {
+  "task": "da-4-6",
+  "n_reps": 3,
+  "norms": [
+   0.51,
+   0.71,
+   0.71
+  ],
+  "median": 0.71,
+  "mean": 0.6433,
+  "sd": 0.0943,
+  "min": 0.51,
+  "max": 0.71,
+  "reps": [
+   {
+    "rep": "da-4-6__Fb6VGjQ",
+    "norm": 0.51
+   },
+   {
+    "rep": "da-4-6__ZzYBF8x",
+    "norm": 0.71
+   },
+   {
+    "rep": "da-4-6__fzQVpi2",
+    "norm": 0.71
+   }
+  ]
+ },
+ {
+  "task": "da-4-7",
+  "n_reps": 3,
+  "norms": [
+   0.58,
+   0.67,
+   0.67
+  ],
+  "median": 0.67,
+  "mean": 0.64,
+  "sd": 0.0424,
+  "min": 0.58,
+  "max": 0.67,
+  "reps": [
+   {
+    "rep": "da-4-7__Pr7Xn3j",
+    "norm": 0.67
+   },
+   {
+    "rep": "da-4-7__TMzEsTq",
+    "norm": 0.67
+   },
+   {
+    "rep": "da-4-7__aEj3Smb",
+    "norm": 0.58
+   }
+  ]
+ },
+ {
+  "task": "da-5-1",
+  "n_reps": 3,
+  "norms": [
+   0.68,
+   1.0,
+   1.0
+  ],
+  "median": 1.0,
+  "mean": 0.8933,
+  "sd": 0.1508,
+  "min": 0.68,
+  "max": 1.0,
+  "reps": [
+   {
+    "rep": "da-5-1__6yHuvU7",
+    "norm": 1.0
+   },
+   {
+    "rep": "da-5-1__HP7rkKa",
+    "norm": 1.0
+   },
+   {
+    "rep": "da-5-1__CqjnsPN",
+    "norm": 0.68
+   }
+  ]
+ },
+ {
+  "task": "da-5-3",
+  "n_reps": 3,
+  "norms": [
+   0.82,
+   0.95,
+   0.95
+  ],
+  "median": 0.95,
+  "mean": 0.9067,
+  "sd": 0.0613,
+  "min": 0.82,
+  "max": 0.95,
+  "reps": [
+   {
+    "rep": "da-5-3__7rpJYsS",
+    "norm": 0.95
+   },
+   {
+    "rep": "da-5-3__ANynSUq",
+    "norm": 0.95
+   },
+   {
+    "rep": "da-5-3__x9W6Lb2",
+    "norm": 0.82
+   }
+  ]
+ },
+ {
+  "task": "da-6-2",
+  "n_reps": 3,
+  "norms": [
+   0.25,
+   0.42,
+   0.42
+  ],
+  "median": 0.42,
+  "mean": 0.3633,
+  "sd": 0.0801,
+  "min": 0.25,
+  "max": 0.42,
+  "reps": [
+   {
+    "rep": "da-6-2__fXCjdPY",
+    "norm": 0.42
+   },
+   {
+    "rep": "da-6-2__qHWbpyA",
+    "norm": 0.25
+   },
+   {
+    "rep": "da-6-2__jEDFQ8T",
+    "norm": 0.42
+   }
+  ]
+ },
+ {
+  "task": "da-6-5",
+  "n_reps": 3,
+  "norms": [
+   0.77,
+   0.77,
+   1.0
+  ],
+  "median": 0.77,
+  "mean": 0.8467,
+  "sd": 0.1084,
+  "min": 0.77,
+  "max": 1.0,
+  "reps": [
+   {
+    "rep": "da-6-5__rszRYKy",
+    "norm": 1.0
+   },
+   {
+    "rep": "da-6-5__EF24NPn",
+    "norm": 0.77
+   },
+   {
+    "rep": "da-6-5__dYJUEfj",
+    "norm": 0.77
+   }
+  ]
+ },
+ {
+  "task": "da-8-1",
+  "n_reps": 3,
+  "norms": [
+   0.79,
+   0.9,
+   1.0
+  ],
+  "median": 0.9,
+  "mean": 0.8967,
+  "sd": 0.0858,
+  "min": 0.79,
+  "max": 1.0,
+  "reps": [
+   {
+    "rep": "da-8-1__7Yqz4NN",
+    "norm": 1.0
+   },
+   {
+    "rep": "da-8-1__sAnL24C",
+    "norm": 0.9
+   },
+   {
+    "rep": "da-8-1__dJhpHdv",
+    "norm": 0.79
+   }
+  ]
+ },
+ {
+  "task": "da-8-2",
+  "n_reps": 3,
+  "norms": [
+   0.49,
+   0.9,
+   0.9
+  ],
+  "median": 0.9,
+  "mean": 0.7633,
+  "sd": 0.1933,
+  "min": 0.49,
+  "max": 0.9,
+  "reps": [
+   {
+    "rep": "da-8-2__LDcYThc",
+    "norm": 0.49
+   },
+   {
+    "rep": "da-8-2__ojvH3dV",
+    "norm": 0.9
+   },
+   {
+    "rep": "da-8-2__kQrbHLV",
+    "norm": 0.9
+   }
+  ]
+ },
+ {
+  "task": "da-8-3",
+  "n_reps": 3,
+  "norms": [
+   0.65,
+   0.67,
+   0.78
+  ],
+  "median": 0.67,
+  "mean": 0.7,
+  "sd": 0.0572,
+  "min": 0.65,
+  "max": 0.78,
+  "reps": [
+   {
+    "rep": "da-8-3__yEpNCrG",
+    "norm": 0.67
+   },
+   {
+    "rep": "da-8-3__mxMLgVv",
+    "norm": 0.78
+   },
+   {
+    "rep": "da-8-3__at8YrJL",
+    "norm": 0.65
+   }
+  ]
+ },
+ {
+  "task": "da-9-1",
+  "n_reps": 3,
+  "norms": [
+   0.66,
+   0.69,
+   0.71
+  ],
+  "median": 0.69,
+  "mean": 0.6867,
+  "sd": 0.0205,
+  "min": 0.66,
+  "max": 0.71,
+  "reps": [
+   {
+    "rep": "da-9-1__MQZ8f6o",
+    "norm": 0.66
+   },
+   {
+    "rep": "da-9-1__BcWyNGQ",
+    "norm": 0.69
+   },
+   {
+    "rep": "da-9-1__EqEQu5v",
+    "norm": 0.71
+   }
+  ]
+ },
+ {
+  "task": "da-9-7",
+  "n_reps": 3,
+  "norms": [
+   0.68,
+   0.86,
+   1.0
+  ],
+  "median": 0.86,
+  "mean": 0.8467,
+  "sd": 0.131,
+  "min": 0.68,
+  "max": 1.0,
+  "reps": [
+   {
+    "rep": "da-9-7__6zGBgpT",
+    "norm": 1.0
+   },
+   {
+    "rep": "da-9-7__Hig5pUj",
+    "norm": 0.86
+   },
+   {
+    "rep": "da-9-7__SJBUd2T",
+    "norm": 0.68
+   }
+  ]
+ }
+]
