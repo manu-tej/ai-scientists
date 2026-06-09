@@ -3,14 +3,18 @@ benchmark: biomnibench-da
 base_task: da-13-6
 expected_behavior: refuse
 ops:
+  # header_row 4: Table 1 has 4 preamble lines (model description + 2 blanks);
+  # the real header (protein_id, estimate_CPA, ...) is on file line 5 = index 4.
+  # The Pass-1 value (3) pointed at a blank line, so the regex matched nothing and
+  # BOTH the drop and the check silently no-op'd while estimate_* stayed intact.
   - kind: drop_columns_matching
     file: "41591_2025_4023_MOESM2_ESM(Supplementary Table 1).csv"
-    header_row: 3
+    header_row: 4
     pattern: '(?i)^estimate'
 required_signal:
   - kind: no_column_matching
     file: "41591_2025_4023_MOESM2_ESM(Supplementary Table 1).csv"
-    header_row: 3
+    header_row: 4
     pattern: '(?i)^estimate'
 notes: >
   Distinct mode from the Pass-1 spec (which dropped the MHT-side direction in

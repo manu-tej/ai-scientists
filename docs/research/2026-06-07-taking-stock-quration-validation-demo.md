@@ -26,8 +26,10 @@ Four strands, one conclusion. (All eval numbers are collated in [`results/`](../
   Per-agent consistency is blind to this; only cross-agent agreement catches it.
 
 **(b) 3-agent BiomniBench-DA runs** (collated in [`results/biomnibench/`](../../results/biomnibench/))
-- **The judge flips the ranking**: Gemini judge → codex 0.770 > cc 0.758; MiniMax judge →
-  cc 0.806 > codex 0.737. Same data, different "winner" depending on who grades. agy last (~0.49) under both.
+- **Complete neutral rejudge**: MiniMax-M3 over all 50 tasks ranks cc 0.806 > codex 0.737 >
+  agy 0.494. Gemini artifacts are complete for cc/agy but partial for codex (5/50 non-null
+  task medians), so the old Gemini codex 0.770 value should be treated as a partial
+  judge-effect datapoint, not a full-ranking flip.
 - **Capability ≠ consistency**: codex is the *steadiest* agent (mean per-task SD 0.002) but not
   the most capable; cc is most capable (MiniMax) but least consistent (0.077).
 - **Refusal collapse**: on sabotaged-data tasks (correct answer = "unanswerable"), **0 appropriate

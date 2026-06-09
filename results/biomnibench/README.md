@@ -1,19 +1,21 @@
 # BiomniBench-DA — 3-agent results
 
 50 data-analysis tasks · 3 replicates · agents cc (Claude Opus 4.7), codex (gpt-5.5),
-agy (Gemini 3.1 Pro) · graded by neutral MiniMax-M3 **and** Gemini 3.1 Pro (judge-effect study).
+agy (Gemini 3.1 Pro) · complete neutral MiniMax-M3 rejudge, with partial Gemini 3.1 Pro
+judge-effect artifacts.
 
-## Capability (median of per-task medians)
+## Capability (mean of per-task medians)
 
-| Agent     | Gemini judge | MiniMax judge |
-| :-------- | -----------: | ------------: |
-| **cc**    |        0.758 |     **0.806** |
-| **codex** |    **0.770** |         0.737 |
-| **agy**   |        0.495 |         0.494 |
+| Agent     | MiniMax-M3 judge | Gemini judge |
+| :-------- | ----------------: | -----------: |
+| **cc**    |         **0.806** |        0.758 |
+| **codex** |             0.737 |    0.770 *   |
+| **agy**   |             0.494 |        0.495 |
 
-**The judge flips the cc-vs-codex ranking** (Gemini: codex > cc; MiniMax: cc > codex); agy is
-clearly last under both. This is the judge-dependence finding — the same number you'd headline
-depends on who grades.
+*Codex/Gemini is partial: 5/50 tasks have non-null Gemini grades in
+`grades/biomni_codex_gemini.json`. The complete 50-task headline is therefore the MiniMax-M3
+column: cc > codex > agy. The Gemini artifacts remain useful for judge-effect inspection, but
+should not be read as a full 50-task Codex-vs-cc ranking.
 
 ## Consistency (mean per-task SD across 3 reps; lower = steadier)
 
@@ -46,7 +48,9 @@ failure in the whole program.
 
 ## Files
 
-- `grades/biomni_<agent>_<judge>.json` — per-task 3-rep grades (median, sd, per-rep norms).
+- `grades/biomni_<agent>_<judge>.json` — per-task 3-rep grades (median, sd, per-rep norms);
+  MiniMax-M3 files are complete for all three agents, while `biomni_codex_gemini.json` has
+  5/50 non-null task medians.
 - `refusal/refusal_classifications.json` — per-response refusal classification + reason.
 - `refusal/refusal_consolidated.json` — canonical cc+codex refusal cells (provenance).
 - `summary.json` — the numbers above, machine-readable.

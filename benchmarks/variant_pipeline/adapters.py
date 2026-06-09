@@ -187,6 +187,24 @@ class TabularAdapter:
         if cols:
             self.drop_columns(cols, sheet=sheet, header_row=header_row)
 
+    def drop_columns_by_index(self, indices, sheet=None) -> None:
+        """Drop columns by 0-based grid POSITION, not name.
+
+        Needed when two columns share a raw header (e.g. side-by-side arm blocks
+        both headed "Gene name"): pandas mangles the second to "Gene name.1" but
+        the raw grid the writer edits has identical names, so a name-based drop
+        can't address the duplicate. Positions are unambiguous.
+        """
+        drop = set(indices)
+        if not self.is_excel:
+            rows = self._rows()
+            self._write_rows([[v for i, v in enumerate(r) if i not in drop] for r in rows])
+            return
+        sheets = self._excel_read_all_raw()
+        rows = sheets[sheet]
+        sheets[sheet] = [[v for i, v in enumerate(r) if i not in drop] for r in rows]
+        self._excel_write_all(sheets)
+
     def keep_rows_where(self, column, keep_values, sheet=None, header_row=0) -> None:
         keep = {str(v) for v in keep_values}
         if not self.is_excel:
@@ -202,6 +220,24 @@ class TabularAdapter:
         kept = [r for r in rows[header_row + 1:] if len(r) > gi and str(r[gi]) in keep]
         sheets[sheet] = rows[:header_row + 1] + kept
         self._excel_write_all(sheets)
+
+    # ---- value-level fingerprint (effect assertion) ---- #
+    def fingerprint(self) -> str:
+        """Hash of the cell VALUES (not bytes). Used to assert an op actually
+        changed the data: every Excel/CSV op rewrites the file, so byte hashes
+        always differ — only the values are invariant under a no-op."""
+        import hashlib
+        h = hashlib.sha256()
+        if self.is_excel:
+            sheets = self._excel_read_all_raw()
+            for name in sorted(sheets):
+                h.update(name.encode())
+                for row in sheets[name]:
+                    h.update(repr(row).encode())
+        else:
+            for row in self._rows():
+                h.update(repr(row).encode())
+        return h.hexdigest()
 
     def reduce_rows(self, n, seed=0, sheet=None, header_row=0) -> None:
         import random
@@ -255,6 +291,16 @@ class AnnDataAdapter:
             else:
                 cats = np.unique(node[:])
         return [c.decode() if isinstance(c, bytes) else str(c) for c in cats]
+
+    def fingerprint(self) -> str:
+        """Hash of obs schema + category labels: detects dropped obs columns and
+        anonymized categories without touching the (huge) expression matrix."""
+        import hashlib
+        h = hashlib.sha256()
+        for c in self.obs_columns():
+            h.update(c.encode())
+            h.update(repr(self.obs_category_values(c)).encode())
+        return h.hexdigest()
 
     def drop_obs_columns(self, columns) -> None:
         import h5py

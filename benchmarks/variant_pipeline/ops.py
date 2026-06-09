@@ -91,6 +91,11 @@ def apply_op(op: Op, data_dir: Path) -> None:
             for sh in sheets:
                 ad.drop_columns_matching(pat, sheet=sh, header_row=hr)
 
+    elif k == "drop_columns_by_index":
+        # Positional drop for duplicate-named columns (e.g. two "Gene name" arm
+        # blocks): a name-based drop can't address the second one.
+        ad.drop_columns_by_index(op.params["indices"], sheet=op.params.get("sheet"))
+
     elif k == "subset_to_single_group":
         ad.keep_rows_where(op.params["column"], [op.params["keep_value"]],
                            sheet=op.params.get("sheet"), header_row=hr)

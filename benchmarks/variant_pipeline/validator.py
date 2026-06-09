@@ -37,8 +37,73 @@ def _all_columns(ad, params: dict) -> list[tuple[str, str]]:
     return out
 
 
+def _scan_all_files(data_dir: Path, pat, include_instruction: bool) -> list[str]:
+    """Scan EVERY file in the task surface for a leaked signal — the failure the
+    per-file checks miss (sibling barcodes.tsv, an undropped peak file, the
+    GSM->condition mapping printed in instruction.md). Big binaries are scanned
+    cheaply or skipped: h5ad -> obs category values only; files > cap -> skipped
+    (matrices don't carry the categorical label we're hunting)."""
+    import pandas as pd
+    from .adapters import _XLSX_READ_ENGINE, UnsupportedFormat
+    SIZE_CAP = 200 * 1024 * 1024
+    TABULAR = (".csv", ".tsv", ".txt", ".diff", ".xls", ".xlsx", ".gz")
+    hits: list[str] = []
+    for f in sorted(Path(data_dir).rglob("*")):
+        if not f.is_file():
+            continue
+        ext = f.suffix.lower()
+        if ext == ".h5ad":                          # obs labels only — never the matrix
+            try:
+                ad = AnnDataAdapter(f)
+                for c in ad.obs_columns():
+                    if any(pat.search(str(v)) for v in ad.obs_category_values(c)):
+                        hits.append(f"{f.name}:obs[{c}]")
+            except Exception:
+                pass
+            continue
+        if f.stat().st_size > SIZE_CAP:             # skip giant matrices (.mtx etc.)
+            continue
+        if ext in TABULAR:
+            try:
+                ad = get_adapter(f)
+                if getattr(ad, "is_excel", False):
+                    for sh in ad.sheet_names():
+                        df = pd.read_excel(f, sheet_name=sh, header=None, dtype=str, engine=_XLSX_READ_ENGINE)
+                        if any(pat.search(str(v)) for v in df.values.ravel() if v == v):
+                            hits.append(f"{f.name}:{sh}")
+                else:
+                    if any(pat.search(str(v)) for row in ad._rows() for v in row):
+                        hits.append(f.name)
+                continue
+            except (UnsupportedFormat, Exception):
+                pass
+        try:                                        # any other text file under the cap
+            if pat.search(f.read_text(errors="ignore")):
+                hits.append(f.name)
+        except Exception:
+            pass
+    if include_instruction:                         # variant root = <task>/environment/data -> ../../instruction.md
+        instr = Path(data_dir).parent.parent / "instruction.md"
+        try:
+            if instr.exists() and pat.search(instr.read_text(errors="ignore")):
+                hits.append("instruction.md")
+        except Exception:
+            pass
+    return hits
+
+
 def _eval(check: SignalCheck, data_dir: Path) -> CheckResult:
     k = check.kind
+
+    # --- whole-surface leak scan: the signal must not survive in ANY data file
+    # (sibling tables, undropped artifacts) NOR in instruction.md. Catches the
+    # largest leak class — perturbing the named table while the axis re-appears
+    # in a file (or the prompt) the per-file checks never look at. ---
+    if k == "no_signal_anywhere":
+        pat = re.compile(check.params["pattern"])
+        hits = _scan_all_files(Path(data_dir), pat, check.params.get("include_instruction", True))
+        return CheckResult(k, not hits,
+                           "no signal leaks anywhere" if not hits else f"LEAK in: {hits[:6]}")
 
     # --- file-LEVEL check: the answer-critical group must not survive in any
     # filename (pairs with the anonymize_filenames op). ---

@@ -73,6 +73,23 @@ def test_xlsx_drop_columns_all_sheets(base_data: Path):
     assert "Tier" not in ad.list_columns(sheet="S2B")
 
 
+def test_xlsx_drop_columns_by_index_handles_duplicate_headers(tmp_path: Path):
+    d = tmp_path / "base"
+    d.mkdir()
+    wb = Workbook()
+    sh = wb.active
+    sh.title = "Sheet1"
+    sh.append(["title", "", "", "", "", "", ""])
+    sh.append(["Gene name", "log2FC", "OP overlap", "", "Gene name", "log2FC", "KD overlap"])
+    sh.append(["A", 1.0, "yes", "", "B", -1.0, "yes"])
+    wb.save(d / "dupes.xlsx")
+
+    apply_op(Op("drop_columns_by_index", {"file": "dupes.xlsx", "sheet": "Sheet1", "indices": [2, 4, 5, 6]}), d)
+
+    ad = TabularAdapter(d / "dupes.xlsx")
+    assert ad.list_columns(sheet="Sheet1", header_row=1) == ["Gene name", "log2FC"]
+
+
 def test_subset_to_single_group(base_data: Path):
     apply_op(Op("subset_to_single_group", {"file": "resp.csv", "column": "Response", "keep_value": "R"}), base_data)
     vals = set(TabularAdapter(base_data / "resp.csv").column_values("Response"))
@@ -117,6 +134,25 @@ def test_validator_no_value_matching_catches_leak(base_data: Path):
     assert validate(spec, base_data)[0].passed is False
 
 
+def test_validator_no_signal_anywhere_scans_sibling_files_and_instruction(tmp_path: Path):
+    task = tmp_path / "task"
+    data = task / "environment" / "data"
+    data.mkdir(parents=True)
+    (task / "instruction.md").write_text("Analyze the CONTROL arm.\n")
+    (data / "kept.csv").write_text("id,value\nA,1\n")
+    (data / "sibling.csv").write_text("id,group\nB,CONTROL\n")
+    spec = VariantSpec.from_dict({
+        "name": "t", "benchmark": "b", "base_task": "x", "expected_behavior": "refuse",
+        "required_signal": [{"kind": "no_signal_anywhere", "pattern": r"CONTROL"}],
+    })
+
+    result = validate(spec, data)[0]
+
+    assert result.passed is False
+    assert "sibling.csv" in result.detail
+    assert "instruction.md" in result.detail
+
+
 # --------------------------------------------------------------------------- #
 # Builder: emit-only-if-valid                                                  #
 # --------------------------------------------------------------------------- #
@@ -134,6 +170,23 @@ def test_builder_refuses_to_emit_invalid_variant(base_data: Path, tmp_path: Path
     assert res.emitted is False
     assert "validation_failed" in res.error
     assert not out.exists()  # broken output removed
+
+
+def test_builder_refuses_to_emit_when_op_has_no_effect(base_data: Path, tmp_path: Path):
+    spec = VariantSpec.from_dict({
+        "name": "noop", "benchmark": "b", "base_task": "x", "expected_behavior": "refuse",
+        "ops": [{"kind": "drop_columns_matching", "file": "table.csv",
+                 "header_row": 3, "pattern": r"does_not_exist"}],
+        "required_signal": [{"kind": "no_column_matching", "file": "table.csv",
+                             "header_row": 3, "pattern": r"does_not_exist"}],
+    })
+
+    out = tmp_path / "variant"
+    res = build_variant(spec, base_data, out)
+
+    assert res.emitted is False
+    assert "op_no_effect" in res.error
+    assert not out.exists()
 
 
 def test_builder_emits_valid_variant(base_data: Path, tmp_path: Path):

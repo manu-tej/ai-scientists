@@ -10,7 +10,7 @@ import yaml
 @dataclass
 class Op:
     """One perturbation applied to the base data to remove answer-critical signal."""
-    kind: str            # drop_columns | drop_rows_by_value | subset_to_single_group | anonymize_column | reduce_n
+    kind: str            # drop_columns | drop_columns_by_index | drop_rows_by_value | subset_to_single_group | anonymize_column | reduce_n
     params: dict = field(default_factory=dict)
 
 
@@ -18,6 +18,8 @@ class Op:
 class SignalCheck:
     """One assertion the built variant must satisfy to count as unanswerable."""
     kind: str            # no_column_matching | single_value_in | no_value_matching | max_rows | column_absent
+    #                      | no_signal_anywhere (scan ALL data files + instruction.md for a leaked pattern)
+    #                      | no_filename_matching | no_line_matching | no_cell_matching
     params: dict = field(default_factory=dict)
 
 

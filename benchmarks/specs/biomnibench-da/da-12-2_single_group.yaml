@@ -13,22 +13,27 @@ ops:
   # "v" overlap-flag columns, because each flag standalone re-encodes the shared
   # set without the partner list. Result: one usable group, no second group, no
   # precomputed overlap -> "shared between OP and KD" is uncomputable.
-  - kind: drop_columns
+  # POSITIONAL drop: the two arms share raw headers ("Gene name"/"log2FC" appear
+  # twice), so a name-based drop targeting "Gene name.1" never matches the raw
+  # grid the writer edits (pandas-only mangling) — it left the KD arm intact and
+  # the check passed vacuously. Drop by 0-based grid position instead:
+  #   0,1 Gene name,log2FC (OP arm — KEEP)        2 OP-side overlap flag (drop)
+  #   3   blank separator (keep)                  4,5 Gene name,log2FC (KD arm — drop)
+  #   6   KD-side overlap flag (drop)
+  - kind: drop_columns_by_index
     file: TS7.xlsx
     sheet: Sheet1
-    header_row: 1
-    columns:
-      - "Gene name.1"                                   # KD-arm gene list (the second group)
-      - "log2FC.1"                                      # KD-arm fold change
-      - "Genes overlapped with DEGs of OP groups"       # KD-side v flag (re-encodes shared set)
-      - "Genes overlapped with DEGs of KD groups"       # OP-side v flag (re-encodes shared set)
+    indices: [2, 4, 5, 6]
 required_signal:
   # (1) Only ONE "Gene name" column may survive: the single surviving group.
-  #     The KD arm's "Gene name.1" must be gone so no second list exists to
-  #     intersect (OP ∩ KD = 1545 was a re-encoding path).
+  #     header_row: 1 is the real gene-name header (row 0 is a title row); without
+  #     it the check read the title row and passed vacuously. With the KD arm gone,
+  #     pandas no longer mangles a second "Gene name" -> "Gene name.1", so its
+  #     absence now genuinely proves no second list exists to intersect.
   - kind: column_absent
     file: TS7.xlsx
     scope: all_sheets
+    header_row: 1
     column: "Gene name.1"
   # (2) No overlap-flag column survives on any sheet (kills both v re-encodings).
   - kind: no_column_matching

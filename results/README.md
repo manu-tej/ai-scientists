@@ -1,7 +1,7 @@
 # Results compendium — biomedical-agent trust evaluation
 
 All evaluation results in one place. Two benchmarks, three frontier agents
-(cc = Claude Opus 4.7, codex = gpt-5.5, agy = Gemini 3.1 Pro), graded by neutral judges with
+(cc = Claude Opus 4.7, codex = gpt-5.5, agy = Gemini 3.1 Pro), graded with
 3 replicates. The through-line: **static accuracy can't tell these agents apart or tell you
 which to trust — the trust dimensions can.**
 
@@ -12,14 +12,15 @@ Benchmarks: [BiomniBench-DA](biomnibench/) (50 data-analysis tasks) and
 
 ### Capability (higher is better)
 
-| Agent     | BiomniBench (Gemini) | BiomniBench (MiniMax) | BixBench hard-35 | BixBench full-50 |
-| :-------- | -------------------: | --------------------: | ---------------: | ---------------: |
-| **cc**    |                0.758 |             **0.806** |        **0.828** |        **0.847** |
-| **codex** |            **0.770** |                 0.737 |            0.735 |            0.796 |
-| **agy**   |                0.495 |                 0.494 |            0.790 |            0.827 |
+| Agent     | BiomniBench MiniMax-M3 | BiomniBench Gemini | BixBench hard-35 | BixBench full-50 |
+| :-------- | ---------------------: | -----------------: | ---------------: | ---------------: |
+| **cc**    |              **0.806** |              0.758 |        **0.828** |        **0.847** |
+| **codex** |                  0.737 |          0.770 *   |            0.735 |            0.796 |
+| **agy**   |                  0.494 |              0.495 |            0.790 |            0.827 |
 
-Bold = column leader. The two BiomniBench judge columns flip the cc↔codex order — the
-judge-dependence finding (the headline number depends on who grades).
+Bold = complete-column leader. BiomniBench MiniMax-M3 is the complete 50-task neutral rejudge.
+*The Codex/Gemini artifact has 5/50 non-null task medians, so that value is retained only as a
+partial judge-effect datapoint, not a full ranking.
 
 ### Consistency (run-to-run stability)
 
@@ -51,9 +52,9 @@ Zero appropriate refusals — agents never abstain even when the data is deliber
    *both* benchmarks (BiomniBench: cc capable / codex steady; BixBench: cc capable / agy
    steady). "Best agent" depends on which axis you weight.
 
-3. **The judge changes the answer.** On BiomniBench the cc-vs-codex ranking flips between the
-   Gemini and MiniMax judges. LLM-as-judge numbers are judge-dependent and (when an agent
-   judges itself) circular — see [the eval-design research](../docs/research/2026-06-05-scientific-eval-design-deep-research.md).
+3. **Judge choice and coverage matter.** On BiomniBench, the complete MiniMax-M3 rejudge ranks
+   cc > codex > agy; the Gemini artifacts are complete for cc/agy but partial for codex. Treat
+   LLM-as-judge numbers as judge- and coverage-dependent — see [the eval-design research](../docs/research/2026-06-05-scientific-eval-design-deep-research.md).
 
 4. **Refusal collapse.** On sabotaged-data tasks (correct answer = "unanswerable"), agents gave
    **zero appropriate refusals** — every response fabricated or partially hedged (codex

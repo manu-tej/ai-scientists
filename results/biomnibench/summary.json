@@ -7,8 +7,8 @@
     "codex",
     "agy"
   ],
-  "judge": "neutral MiniMax-M3 + Gemini 3.1 Pro (judge-effect study)",
-  "capability_median": {
+  "judge": "complete neutral MiniMax-M3 rejudge + partial Gemini 3.1 Pro judge-effect artifacts",
+  "capability_mean_task_medians": {
     "gemini_judge": {
       "cc": 0.758,
       "codex": 0.77,
@@ -18,6 +18,18 @@
       "cc": 0.806,
       "codex": 0.737,
       "agy": 0.494
+    }
+  },
+  "capability_coverage_tasks": {
+    "gemini_judge": {
+      "cc": 50,
+      "codex": 5,
+      "agy": 50
+    },
+    "minimax_judge": {
+      "cc": 50,
+      "codex": 50,
+      "agy": 50
     }
   },
   "consistency_mean_sd": {
@@ -43,7 +55,8 @@
     }
   },
   "findings": [
-    "Judge flips the cc-vs-codex ranking: Gemini codex 0.770>cc 0.758; MiniMax cc 0.806>codex 0.737. agy clearly last under both.",
+    "Complete MiniMax-M3 rejudge ranks cc 0.806 > codex 0.737 > agy 0.494 by mean of per-task medians.",
+    "Gemini judge artifacts are incomplete for codex (5/50 non-null task medians), so Gemini codex 0.770 is not a full 50-task ranking against cc.",
     "Capability != consistency: codex extremely stable (meanSD 0.002) but not most capable; cc most capable under MiniMax but least consistent (0.077).",
     "Refusal collapse: 0 appropriate refusals on sabotaged-data tasks - every response fabricated or partially hedged. codex fabricates 56%, cc 40%."
   ]

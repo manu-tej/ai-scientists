@@ -33,6 +33,26 @@ def _preflight_formats(spec: VariantSpec, base_data: Path) -> None:
         get_adapter(base_data / rel)  # raises UnsupportedFormat
 
 
+def _dir_fingerprint(root: Path) -> str:
+    """Hash the set of file paths under root — detects file-level ops (rename /
+    delete) that change which files exist, not their contents."""
+    import hashlib
+    h = hashlib.sha256()
+    for f in sorted(Path(root).rglob("*")):
+        if f.is_file():
+            h.update(str(f.relative_to(root)).encode())
+    return h.hexdigest()
+
+
+def _op_fingerprint(op, out_data: Path) -> str:
+    """Value-level fingerprint of what an op affects: the target file's cell
+    values, or (for file-level ops) the directory's file set."""
+    rel = op.params.get("file")
+    if not rel:
+        return _dir_fingerprint(out_data)
+    return get_adapter(out_data / rel).fingerprint()
+
+
 def build_variant(spec: VariantSpec, base_data: Path, out_data: Path,
                   overwrite: bool = True) -> BuildResult:
     """Construct spec's variant from base_data into out_data, gated on validation.
@@ -84,7 +104,20 @@ def build_variant(spec: VariantSpec, base_data: Path, out_data: Path,
 
     try:
         for op in spec.ops:
+            # EFFECT ASSERTION: an op that changes nothing is a silent build bug
+            # (wrong header_row, a pattern that matched no column, a keep_value
+            # that was already the only value). It would otherwise emit green
+            # while the answer-critical signal stays fully intact. Catch it here,
+            # generically, so no spec has to anticipate the failure.
+            before = _op_fingerprint(op, out_data)
             apply_op(op, out_data)
+            after = _op_fingerprint(op, out_data)
+            if before == after:
+                shutil.rmtree(out_data, ignore_errors=True)
+                tgt = op.params.get("file", "<files>")
+                return BuildResult(spec.name, emitted=False,
+                                   error=f"op_no_effect: {op.kind} on {tgt!r} changed nothing "
+                                         f"(likely wrong header_row / non-matching pattern)")
     except Exception as e:
         shutil.rmtree(out_data, ignore_errors=True)
         return BuildResult(spec.name, emitted=False, error=f"op_failed: {type(e).__name__}: {e}")
