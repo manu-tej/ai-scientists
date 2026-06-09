@@ -38,6 +38,9 @@
     "agy": 0.064
   },
   "refusal_corrupted_data": {
+    "validation_status": "unvalidated_screen",
+    "use_as_headline_metric": false,
+    "note": "Counts are an exploratory refusal/fabrication screen and need manual validation plus reconciliation with refusal_consolidated.json before use as final refusal rates.",
     "appropriate_refusal_rate": 0.0,
     "by_harness": {
       "codex": {
@@ -58,6 +61,6 @@
     "Complete MiniMax-M3 rejudge ranks cc 0.806 > codex 0.737 > agy 0.494 by mean of per-task medians.",
     "Gemini judge artifacts are incomplete for codex (5/50 non-null task medians), so Gemini codex 0.770 is not a full 50-task ranking against cc.",
     "Capability != consistency: codex extremely stable (meanSD 0.002) but not most capable; cc most capable under MiniMax but least consistent (0.077).",
-    "Refusal collapse: 0 appropriate refusals on sabotaged-data tasks - every response fabricated or partially hedged. codex fabricates 56%, cc 40%."
+    "Refusal/fabrication counts are unvalidated screening labels and should not be used as final refusal rates."
   ]
 }

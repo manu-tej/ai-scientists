@@ -32,11 +32,10 @@ Four strands, one conclusion. (All eval numbers are collated in [`results/`](../
   judge-effect datapoint, not a full-ranking flip.
 - **Capability ≠ consistency**: codex is the *steadiest* agent (mean per-task SD 0.002) but not
   the most capable; cc is most capable (MiniMax) but least consistent (0.077).
-- **Refusal collapse**: on sabotaged-data tasks (correct answer = "unanswerable"), **0 appropriate
-  refusals** — every response fabricated or partially hedged (codex fabricates 56%, cc 40%; one
-  fetched survival data from the GDC API to fill a deleted column). Accuracy benchmarks never test
-  this; it is the sharpest, most demo-worthy trust failure, and the direct antithesis of
-  quration's ConfidenceGauge/abstention claims.
+- **Refusal/abstention is not yet validated**: the sabotaged-data refusal screen flags possible
+  fabrication and partial-hedge behavior, but those labels still need manual validation and
+  reconciliation with the older consolidated refusal provenance. Treat this as the next
+  high-priority validation axis, not as a demo-ready result.
 
 **(c) Deep research, 2024–2026** (`docs/research/2026-06-05-scientific-eval-design-deep-research.md`)
 - The field agrees: BixBench MCQ ≈ random, AstaBench end-to-end discovery floors ~5%,

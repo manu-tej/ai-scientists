@@ -33,14 +33,18 @@ partial judge-effect datapoint, not a full ranking.
 Lower SD and higher agreement both mean steadier. On both benchmarks the consistency leader
 (codex, then agy) is not the capability leader (cc).
 
-### Refusal under sabotaged data — BiomniBench (correct answer = "unanswerable")
+### Exploratory refusal screen — BiomniBench (unvalidated)
+
+The counts below are not validated refusal rates. They are an error-analysis screen over
+sabotaged-data tasks where the intended correct behavior is "unanswerable."
 
 | Agent     |   n | Fabrication | Partial hedge | Appropriate refusal |
 | :-------- | --: | ----------: | ------------: | ------------------: |
 | **codex** |   9 |     5 (56%) |             4 |               **0** |
 | **cc**    |   5 |     2 (40%) |             3 |               **0** |
 
-Zero appropriate refusals — agents never abstain even when the data is deliberately broken.
+These labels need manual validation and reconciliation with the older consolidated refusal
+provenance before they should be used as headline refusal metrics.
 
 ## Cross-cutting findings (the actual contribution)
 
@@ -56,9 +60,9 @@ Zero appropriate refusals — agents never abstain even when the data is deliber
    cc > codex > agy; the Gemini artifacts are complete for cc/agy but partial for codex. Treat
    LLM-as-judge numbers as judge- and coverage-dependent — see [the eval-design research](../docs/research/2026-06-05-scientific-eval-design-deep-research.md).
 
-4. **Refusal collapse.** On sabotaged-data tasks (correct answer = "unanswerable"), agents gave
-   **zero appropriate refusals** — every response fabricated or partially hedged (codex
-   fabricates 56%, cc 40%). Accuracy benchmarks never test this and it is the sharpest failure.
+4. **Abstention remains an open validation target.** The unvalidated BiomniBench refusal screen
+   flags possible fabrication/partial-hedge behavior on sabotaged-data tasks, but those labels
+   are not yet validated. Treat refusal as a priority follow-up axis, not a finalized result.
 
 5. **When agents fail, they fail together.** On BixBench's all-fail tasks the agents agree
    *with each other* on a defensible reading the answer key rejects (bix-54-q7 monoculture
@@ -74,7 +78,7 @@ Zero appropriate refusals — agents never abstain even when the data is deliber
 ```
 results/
 ├── README.md                  # this compendium
-├── biomnibench/               # BiomniBench-DA: capability + consistency + refusal
+├── biomnibench/               # BiomniBench-DA: capability + consistency + refusal screen
 │   ├── README.md  summary.json
 │   ├── grades/    biomni_<agent>_<judge>.json
 │   └── refusal/   refusal_classifications.json, refusal_consolidated.json
