@@ -871,35 +871,29 @@
   "task": "da-20-4",
   "n_reps": 3,
   "norms": [
-   0.63,
-   0.63,
-   0.73
+   0.05,
+   0.1,
+   0.2
   ],
-  "median": 0.63,
-  "mean": 0.6633,
-  "sd": 0.0471,
-  "min": 0.63,
-  "max": 0.73,
+  "median": 0.1,
+  "mean": 0.1167,
+  "sd": 0.0624,
+  "min": 0.05,
+  "max": 0.2,
   "reps": [
    {
-    "rep": "da-20-4__CerDrVo",
-    "norm": 0.63
+    "rep": "da-20-4__FVUGLdz",
+    "norm": 0.2
    },
    {
-    "rep": "da-20-4__77fZR6z",
-    "norm": 0.73
+    "rep": "da-20-4__u6siLJi",
+    "norm": 0.1
    },
    {
-    "rep": "da-20-4__cGepKwf",
-    "norm": 0.63
+    "rep": "da-20-4__Hvg4wXT",
+    "norm": 0.05
    }
-  ],
-  "_corrected": {
-   "date": "2026-06-13",
-   "reason": "re-run under fixed instruction (method disclosed)",
-   "prior_median": 0.1,
-   "judge": "minimax/minimax-m3"
-  }
+  ]
  },
  {
   "task": "da-24-3",
@@ -961,35 +955,29 @@
   "task": "da-26-2",
   "n_reps": 3,
   "norms": [
-   0.87,
-   0.87,
-   0.87
+   0.35,
+   0.35,
+   0.43
   ],
-  "median": 0.87,
-  "mean": 0.87,
-  "sd": 0.0,
-  "min": 0.87,
-  "max": 0.87,
+  "median": 0.35,
+  "mean": 0.3767,
+  "sd": 0.0377,
+  "min": 0.35,
+  "max": 0.43,
   "reps": [
    {
-    "rep": "da-26-2__WUvC9HT",
-    "norm": 0.87
+    "rep": "da-26-2__mTuPckD",
+    "norm": 0.43
    },
    {
-    "rep": "da-26-2__hVemhxV",
-    "norm": 0.87
+    "rep": "da-26-2__45VUdWx",
+    "norm": 0.35
    },
    {
-    "rep": "da-26-2__JJQcVkP",
-    "norm": 0.87
+    "rep": "da-26-2__zGhDsEQ",
+    "norm": 0.35
    }
-  ],
-  "_corrected": {
-   "date": "2026-06-13",
-   "reason": "re-run under fixed instruction (method disclosed)",
-   "prior_median": 0.35,
-   "judge": "minimax/minimax-m3"
-  }
+  ]
  },
  {
   "task": "da-26-4",

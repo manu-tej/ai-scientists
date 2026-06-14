@@ -15,9 +15,10 @@
       "agy": 0.495
     },
     "minimax_judge": {
-      "cc": 0.806,
-      "codex": 0.737,
-      "agy": 0.494
+      "cc": 0.826,
+      "codex": 0.758,
+      "agy": 0.512,
+      "_corrected": "2026-06-13: was cc 0.806 / codex 0.737 / agy 0.494. Score-of-record reflects 2 defects above MiniMax-3 judge noise (~±0.07): da-26-2 + da-20-4 (method disclosed, re-run, ≈+0.5). da-15-8 + da-4-6 rubric bugs fixed in task files but score change within noise -> originals kept. da-25-1 reverted. Ranking unchanged; only deltas >~0.15 are meaningful. See docs/research/2026-06-11-rubric-fixes.md"
     }
   },
   "capability_coverage_tasks": {
@@ -58,7 +59,8 @@
     }
   },
   "findings": [
-    "Complete MiniMax-M3 rejudge ranks cc 0.806 > codex 0.737 > agy 0.494 by mean of per-task medians.",
+    "Complete MiniMax-M3 rejudge ranks cc 0.826 > codex 0.758 > agy 0.512 by mean of per-task medians (corrected 2026-06-13 for da-26-2 + da-20-4; ranking unchanged from the pre-correction cc 0.806 > codex 0.737 > agy 0.494).",
+    "MiniMax-3 judge is non-deterministic (~±0.07 run-to-run on identical inputs; grade_reps is single-vote): only score deltas >~0.15 are meaningful. da-15-8/da-4-6 rubric-bug fixes had within-noise score impact and were left at originals. Use grade_reps --votes N (N>=5) for stable scores of record.",
     "Gemini judge artifacts are incomplete for codex (5/50 non-null task medians), so Gemini codex 0.770 is not a full 50-task ranking against cc.",
     "Capability != consistency: codex extremely stable (meanSD 0.002) but not most capable; cc most capable under MiniMax but least consistent (0.077).",
     "Refusal/fabrication counts are unvalidated screening labels and should not be used as final refusal rates."

@@ -12,15 +12,24 @@ Benchmarks: [BiomniBench-DA](biomnibench/) (50 data-analysis tasks) and
 
 ### Capability (higher is better)
 
-| Agent     | BiomniBench MiniMax-M3 | BiomniBench Gemini | BixBench hard-35 | BixBench full-50 |
-| :-------- | ---------------------: | -----------------: | ---------------: | ---------------: |
-| **cc**    |              **0.806** |              0.758 |        **0.828** |        **0.847** |
-| **codex** |                  0.737 |          0.770 *   |            0.735 |            0.796 |
-| **agy**   |                  0.494 |              0.495 |            0.790 |            0.827 |
+| Agent     | BiomniBench MiniMax-M3 † | BiomniBench Gemini | BixBench hard-35 | BixBench full-50 |
+| :-------- | -----------------------: | -----------------: | ---------------: | ---------------: |
+| **cc**    |                **0.826** |              0.758 |        **0.828** |        **0.847** |
+| **codex** |                    0.758 |          0.770 *   |            0.735 |            0.796 |
+| **agy**   |                    0.512 |              0.495 |            0.790 |            0.827 |
 
 Bold = complete-column leader. BiomniBench MiniMax-M3 is the complete 50-task neutral rejudge.
 *The Codex/Gemini artifact has 5/50 non-null task medians, so that value is retained only as a
 partial judge-effect datapoint, not a full ranking.
+
+† **Corrected 2026-06-13** (was cc 0.806 / codex 0.737 / agy 0.494). Two benchmark defects with
+score impact **above MiniMax-3's ~±0.07 judge noise** are reflected here — **da-26-2** and **da-20-4**
+(forbidden-paper methods now disclosed in the instruction; all agents ≈ +0.5 after re-run). Two more
+rubric *bugs* were fixed in the task files (da-15-8 swapped files, da-4-6 unstaged `mmc1`) but their
+score change was within judge noise, so their scores are left at the originals. A 5th flagged task
+(da-25-1) was reverted — disclosure proved its failure genuine, not a defect. **Ranking unchanged
+(cc > codex > agy).** Only deltas >~0.15 are meaningful (the judge is non-deterministic). See
+[the fix changelog](../docs/research/2026-06-11-rubric-fixes.md).
 
 ### Consistency (run-to-run stability)
 

@@ -6,11 +6,17 @@ judge-effect artifacts.
 
 ## Capability (mean of per-task medians)
 
-| Agent     | MiniMax-M3 judge | Gemini judge |
-| :-------- | ----------------: | -----------: |
-| **cc**    |         **0.806** |        0.758 |
-| **codex** |             0.737 |    0.770 *   |
-| **agy**   |             0.494 |        0.495 |
+| Agent     | MiniMax-M3 judge † | Gemini judge |
+| :-------- | -----------------: | -----------: |
+| **cc**    |          **0.826** |        0.758 |
+| **codex** |              0.758 |    0.770 *   |
+| **agy**   |              0.512 |        0.495 |
+
+† Corrected 2026-06-13 (was cc 0.806 / codex 0.737 / agy 0.494). Two defects with score impact
+above MiniMax-3's ~±0.07 judge noise are reflected: da-26-2 + da-20-4 (≈ +0.5 after re-run with the
+method disclosed). da-15-8 + da-4-6 rubric *bugs* were fixed in the task files but their score change
+was within noise → scores left at originals. da-25-1 reverted. Ranking unchanged; only deltas >~0.15
+are meaningful. See [../../docs/research/2026-06-11-rubric-fixes.md](../../docs/research/2026-06-11-rubric-fixes.md).
 
 *Codex/Gemini is partial: 5/50 tasks have non-null Gemini grades in
 `grades/biomni_codex_gemini.json`. The complete 50-task headline is therefore the MiniMax-M3

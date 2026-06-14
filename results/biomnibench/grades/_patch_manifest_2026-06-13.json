@@ -1,0 +1,15 @@
+{
+  "grades_dir": "results/biomnibench/grades",
+  "file_template": "biomni_{agent}_minimax.json",
+  "judge": "minimax/minimax-m3",
+  "patches": [
+    {"agent":"cc","task":"da-26-2","source":"/tmp/patch_grades/clean_regrade_smoke_claude-code.json","reason":"re-run under fixed instruction (method disclosed)"},
+    {"agent":"codex","task":"da-26-2","source":"/tmp/patch_grades/clean_regrade_smoke_codex.json","reason":"re-run under fixed instruction (method disclosed)"},
+    {"agent":"agy","task":"da-26-2","source":"/tmp/patch_grades/clean_regrade_smoke_antigravity-cli.json","reason":"re-run under fixed instruction (method disclosed)"},
+    {"agent":"cc","task":"da-20-4","source":"/tmp/patch_grades/clean_regrade_full_claude-code.json","reason":"re-run under fixed instruction (method disclosed)"},
+    {"agent":"codex","task":"da-20-4","source":"/tmp/patch_grades/clean_regrade_full_codex.json","reason":"re-run under fixed instruction (method disclosed)"},
+    {"agent":"agy","task":"da-20-4","source":"/tmp/patch_grades/clean_regrade_full_antigravity-cli.json","reason":"re-run under fixed instruction (method disclosed)"},
+    {"agent":"agy","task":"da-15-8","source":"/tmp/patch_grades/cap3_regrade_agy.json","reason":"re-graded vs fixed rubric (swapped MOESM files corrected)"},
+    {"agent":"agy","task":"da-4-6","source":"/tmp/patch_grades/cap3_regrade_agy.json","reason":"re-graded vs fixed rubric (unstaged mmc1.csv requirement removed)"}
+  ]
+}

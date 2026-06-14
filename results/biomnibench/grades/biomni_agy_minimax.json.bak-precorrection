@@ -870,35 +870,29 @@
   "task": "da-20-4",
   "n_reps": 3,
   "norms": [
-   0.6,
-   0.6,
-   0.7
+   0.1,
+   0.15,
+   0.15
   ],
-  "median": 0.6,
-  "mean": 0.6333,
-  "sd": 0.0471,
-  "min": 0.6,
-  "max": 0.7,
+  "median": 0.15,
+  "mean": 0.1333,
+  "sd": 0.0236,
+  "min": 0.1,
+  "max": 0.15,
   "reps": [
    {
-    "rep": "da-20-4__ThhZf4U",
-    "norm": 0.6
+    "rep": "da-20-4__2YbgZUR",
+    "norm": 0.15
    },
    {
-    "rep": "da-20-4__HvaqnbV",
-    "norm": 0.7
+    "rep": "da-20-4__DuyEodu",
+    "norm": 0.1
    },
    {
-    "rep": "da-20-4__syw7MRr",
-    "norm": 0.6
+    "rep": "da-20-4__oCQGBFe",
+    "norm": 0.15
    }
-  ],
-  "_corrected": {
-   "date": "2026-06-13",
-   "reason": "re-run under fixed instruction (method disclosed)",
-   "prior_median": 0.15,
-   "judge": "minimax/minimax-m3"
-  }
+  ]
  },
  {
   "task": "da-24-3",
@@ -958,32 +952,31 @@
  },
  {
   "task": "da-26-2",
-  "n_reps": 2,
+  "n_reps": 3,
   "norms": [
-   0.76,
-   0.87
+   0.3,
+   0.35,
+   0.35
   ],
-  "median": 0.815,
-  "mean": 0.815,
-  "sd": 0.055,
-  "min": 0.76,
-  "max": 0.87,
+  "median": 0.35,
+  "mean": 0.3333,
+  "sd": 0.0236,
+  "min": 0.3,
+  "max": 0.35,
   "reps": [
    {
-    "rep": "da-26-2__fUTkkd9",
-    "norm": 0.87
+    "rep": "da-26-2__kseusKf",
+    "norm": 0.35
    },
    {
-    "rep": "da-26-2__cjeHC6z",
-    "norm": 0.76
+    "rep": "da-26-2__qSW583t",
+    "norm": 0.35
+   },
+   {
+    "rep": "da-26-2__yNoGJGP",
+    "norm": 0.3
    }
-  ],
-  "_corrected": {
-   "date": "2026-06-13",
-   "reason": "re-run under fixed instruction (method disclosed)",
-   "prior_median": 0.35,
-   "judge": "minimax/minimax-m3"
-  }
+  ]
  },
  {
   "task": "da-26-4",
