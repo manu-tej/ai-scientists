@@ -12,9 +12,9 @@ import argparse, json, subprocess, threading, time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 SERENE = "user@host"
-MAC_ROOT = "/Users/manuarrojwala/2026/ai-scientists/runs/harbor_base_matrix"
+MAC_ROOT = "runs/harbor_base_matrix"
 SERENE_ROOT = "~/benchbench/runs/harbor_base_matrix"
-COLLECTOR_MAC = "/Users/manuarrojwala/2026/ai-scientists/scripts/collect_status.py"
+COLLECTOR_MAC = "scripts/collect_status.py"
 COLLECTOR_SERENE = "~/benchbench/scripts/collect_status.py"
 REFRESH_S = 25
 TOTAL = 50

@@ -1,6 +1,6 @@
 # Publication Readiness
 
-Status: local research repo, not public-ready yet. Do not make public until the user explicitly does so after review.
+Status: public repo (released 2026-07-02). Code, variant specs, and derived results; source datasets cited by accession, not redistributed.
 
 ## What I Did
 
