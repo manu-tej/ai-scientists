@@ -39,22 +39,35 @@
     "agy": 0.064
   },
   "refusal_corrupted_data": {
-    "validation_status": "unvalidated_screen",
+    "validation_status": "mixed_screen_and_consolidated_rejudge",
     "use_as_headline_metric": false,
-    "note": "Counts are an exploratory refusal/fabrication screen and need manual validation plus reconciliation with refusal_consolidated.json before use as final refusal rates.",
-    "appropriate_refusal_rate": 0.0,
-    "by_harness": {
+    "note": "Public framing: appropriate refusals are rare and judge/variant-sensitive, not impossible. The early screen is retained for failure-mode triage; the Gemini consolidated majority counts are the cleaned current counts.",
+    "early_unvalidated_screen": {
       "codex": {
         "n": 9,
         "fabrication": 5,
         "partial": 4,
+        "appropriate_refusal": 0,
         "fab_rate": 0.56
       },
       "claude-code": {
         "n": 5,
         "fabrication": 2,
         "partial": 3,
+        "appropriate_refusal": 0,
         "fab_rate": 0.4
+      }
+    },
+    "gemini_consolidated_variant_majority": {
+      "claude-code": {
+        "appropriate_refusal": 1,
+        "variants": 8,
+        "appropriate_refusal_rate": 0.125
+      },
+      "codex": {
+        "appropriate_refusal": 2,
+        "variants": 9,
+        "appropriate_refusal_rate": 0.222
       }
     }
   },
@@ -63,6 +76,6 @@
     "MiniMax-3 judge is non-deterministic (~±0.07 run-to-run on identical inputs; grade_reps is single-vote): only score deltas >~0.15 are meaningful. da-15-8/da-4-6 rubric-bug fixes had within-noise score impact and were left at originals. Use grade_reps --votes N (N>=5) for stable scores of record.",
     "Gemini judge artifacts are incomplete for codex (5/50 non-null task medians), so Gemini codex 0.770 is not a full 50-task ranking against cc.",
     "Capability != consistency: codex extremely stable (meanSD 0.002) but not most capable; cc most capable under MiniMax but least consistent (0.077).",
-    "Refusal/fabrication counts are unvalidated screening labels and should not be used as final refusal rates."
+    "Refusal/fabrication labels are judge- and variant-sensitive. Current cleaned framing: appropriate refusals are rare, not zero; see refusal/refusal_consolidated.json."
   ]
 }

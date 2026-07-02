@@ -36,30 +36,33 @@ should not be read as a full 50-task Codex-vs-cc ranking.
 **Capability ≠ consistency:** codex is the *steadiest* agent but not the most capable; cc is
 most capable (MiniMax) but the *least* consistent. Accuracy and reliability rank differently.
 
-## Exploratory refusal screen (`refusal/`)
+## Refusal screen (`refusal/`)
 
 Tasks where a critical column / sample size / p-values were removed, so the correct response is
-*"this can't be answered."* The classifications below are **not yet validated**; treat them as
-an exploratory screen and error-analysis queue, not as a headline benchmark result.
+*"this can't be answered."* The early screen below is retained as an error-analysis queue, not as
+a headline benchmark result.
 
-| Agent     |   n | Fabrication | Partial hedge | Appropriate refusal |
-| :-------- | --: | ----------: | ------------: | ------------------: |
-| **codex** |   9 |     5 (56%) |             4 |               **0** |
-| **cc**    |   5 |     2 (40%) |             3 |               **0** |
+| Agent     |   n | Fabrication | Partial hedge | Appropriate refusal, early screen |
+| :-------- | --: | ----------: | ------------: | -------------------------------: |
+| **codex** |   9 |     5 (56%) |             4 |                            **0** |
+| **cc**    |   5 |     2 (40%) |             3 |                            **0** |
 
-The unvalidated screen suggests a concerning pattern worth adjudicating manually: responses often
-continued after detecting missing data, including cases that appear to reconstruct dropped labels
-or substitute external data. Do not use these counts as final refusal rates until the labels and
-variant validity are independently reviewed.
+The consolidated Gemini re-judge changes the public framing: refusals are rare, not zero. By
+per-variant majority, `refusal/refusal_consolidated.json` reports cc 1/8 variants and codex 2/9
+variants as appropriate refusals. The dominant failure remains partial acknowledgment followed by
+an answer, with variant-specific fabrication.
 
 ## Files
 
 - `grades/biomni_<agent>_<judge>.json` — per-task 3-rep grades (median, sd, per-rep norms);
   MiniMax-M3 files are complete for all three agents, while `biomni_codex_gemini.json` has
   5/50 non-null task medians.
-- `refusal/refusal_classifications.json` — unvalidated per-response refusal screen + reason.
-- `refusal/refusal_consolidated.json` — older consolidated refusal provenance; not authoritative
-  until reconciled with the unvalidated screen.
+- `refusal/refusal_classifications.json` — early per-response refusal screen + reason.
+- `refusal/refusal_consolidated.json` — consolidated Gemini re-judge and current cleaned
+  per-variant majority counts.
+- `failure_analysis.xlsx` — derived manual/LLM-assisted failure-mode workbook. Use as
+  working error analysis, not as independent benchmark ground truth.
 - `summary.json` — the numbers above, machine-readable.
 
-Raw run trees live on serene (`/home/manu/benchbench/runs/`).
+Raw run trees are not included in this public-candidate result folder. Release a scrubbed,
+intentional run bundle separately if raw traces are needed for reproduction.
