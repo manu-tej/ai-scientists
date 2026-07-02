@@ -3,7 +3,7 @@
 # (avoids both machines running the same cell). Runs while the Mac cc arm is alive.
 set -uo pipefail
 cd "$HOME/2026/ai-scientists"
-H=manu@10.0.0.113
+H="${SYNC_HOST:-user@host}"
 B=runs/harbor_base_matrix/claude-code
 while pgrep -f "run_mac_cc.sh" >/dev/null 2>&1; do
   for d in "$B"/*/; do
