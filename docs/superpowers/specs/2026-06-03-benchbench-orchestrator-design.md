@@ -21,7 +21,7 @@ build it now.** Summary of why, and what to do instead.
   Router is a one-line ternary; the AWS seam is speculative generality (no AWS account); the
   sqlite RunStore replaces a working, crash-safe file-presence mechanism; 18 modules for what
   3 bash scripts do.
-- **Hybrid backend threatened the science.** serene (agent self-installs Python deps, native
+- **Hybrid backend threatened the science.** The local host (agent self-installs Python deps, native
   Docker) vs Modal (pinned deps, gVisor) are different environments, and weight-routing
   correlates backend with task difficulty — confounding the headline comparison. Deferring Modal
   resolves this for free: the headline result stays on a uniform host substrate.
@@ -71,7 +71,7 @@ the cost of that duplication: every fix had to be reasoned about per-script.
 - **Grading** — 6+ standalone judge scripts sharing logic through `importlib` file-loading
   hacks, run as a manual step hours after the agent, each writing its own ad-hoc JSON with no
   index back to the runs.
-- **Compute** — single-machine (mac/serene) with an 18GB "COPY data into image" build model
+- **Compute** — single-machine (workstation/local host) with an 18GB "COPY data into image" build model
   that the replicate phase would multiply ~15×; operational babysitting over a flaky LAN ssh.
 
 ### Hard-won lessons this design must encode
@@ -94,8 +94,8 @@ the cost of that duplication: every fix had to be reasoned about per-script.
 - One Python orchestrator replacing the bash runners, with a **pluggable compute backend**
   (`Executor`) so host / Modal / future AWS are swappable — *the AWS seam*.
 - A **pluggable data backend** (`DataStore`) with **Hugging Face as the canonical, versioned,
-  Xet-deduped source of truth**; serene-local and Modal-Volume are caches hydrated from HF.
-- **Hybrid-by-weight routing**: light tasks on serene ($0), heavy tasks burst to Modal
+  Xet-deduped source of truth**; local-host and Modal-Volume are caches hydrated from HF.
+- **Hybrid-by-weight routing**: light tasks on the local host ($0), heavy tasks burst to Modal
   (~$0.10/task, $500 credits available).
 - **Unified task assembly** (one parametric pipeline) and **unified grading** (capability +
   refusal, model-agnostic), with grading wired into the run, not a manual afterthought.
@@ -126,14 +126,14 @@ RunConfig (declarative: matrix × backends × routing × data × grading)
       │
       ├─ DataStore.fetch(task, rev) ─► resolve+cache task data (HF → local/Volume)
       │     ├─ HFDataStore        canonical, versioned, Xet-deduped   ← source of truth
-      │     ├─ LocalDirStore      serene disk (cache)
+      │     ├─ LocalDirStore      local host disk (cache)
       │     ├─ ModalVolumeStore   hydrated from HF (cache)
       │     └─ (future) S3Store    AWS, hydrated from HF
       │
       ├─ Router.route(cell) ─► picks an Executor by policy (weight → host vs Modal)
       │
       ├─ Executor.run(cell, data) -> CellResult    ← the AWS seam
-      │     ├─ HostExecutor(target=serene)   native Docker, $0, light tasks
+      │     ├─ HostExecutor(target=local-host)   native Docker, $0, light tasks
       │     ├─ HostExecutor(target=mac)      secondary
       │     ├─ ModalExecutor                 Volume bind-mount, heavy/burst
       │     └─ (future) AwsExecutor          new file, not a refactor
@@ -141,9 +141,9 @@ RunConfig (declarative: matrix × backends × routing × data × grading)
       └─ Grader.score(result) -> CellScore   ← unified capability + refusal, model-agnostic
 ```
 
-**Process placement.** The orchestrator runs *on serene* (always-on, native Docker, 546G):
+**Process placement.** The orchestrator runs *on the local host* (always-on, native Docker):
 host cells execute against local Docker, Modal cells dispatch to Modal's API over the
-network. This removes the mac→serene ssh-babysitting entirely; the mac is a thin
+network. This removes the laptop-to-host ssh-babysitting entirely; the laptop is a thin
 control/monitor client.
 
 ## 4. Interfaces
@@ -164,7 +164,7 @@ class CellResult:
     status: str                # ok | failed | refused | incomplete
     answer: str | None
     trace: str | None
-    backend: str               # serene | modal | mac
+    backend: str               # local-host | modal | workstation
     raw_dir: str               # full run output location
     returncode: int
     elapsed_sec: float
@@ -190,8 +190,8 @@ class Grader(Protocol):        # HOW a result becomes a score
     def score(self, result: CellResult) -> CellScore: ...   # capability OR refusal
 ```
 
-`Router.route(cell) -> Executor` is pure policy (`weight=="heavy" → Modal, else → serene`).
-The **Scheduler** owns the per-credential concurrency lock so a codex cell on serene and one
+`Router.route(cell) -> Executor` is pure policy (`weight=="heavy" -> Modal, else -> local-host`).
+The **Scheduler** owns the per-credential concurrency lock so a codex cell on the local host and one
 on Modal can never run concurrently (the 403/429 invariant, made structurally impossible).
 
 ## 5. Data flow — three commands, one store
@@ -220,7 +220,7 @@ matrix:
   replicates: 5
 routing:
   heavy_to:    modal
-  default_to:  serene
+  default_to:  local-host
 data:
   store:    hf
   repo:     <user>/trustbench-bio-variants   # private
@@ -280,7 +280,7 @@ state), replacing ssh+grep across `/tmp`.
 ## 9. Build sequence (thin spine first, non-disruptive)
 
 **Phase 0 — Spine + host, $0, zero disruption.** Build `bench/` alongside the running script:
-the five interfaces, `RunStore`, `HostExecutor(serene)` wrapping the proven `run_variant_matrix`
+the five interfaces, `RunStore`, `HostExecutor(local-host)` wrapping the proven `run_variant_matrix`
 logic, unified `assembly.py` (merges the 3 migrators + dockerfile-gen with a buildability
 preflight), unified `grading.py` (merges the 6 graders). Validate against already-collected
 data via golden tests. The in-flight run finishes on the old script; a one-time `bench import`
@@ -329,11 +329,11 @@ bench/
   datastores/
     base.py        # DataStore protocol
     hf.py          # HFDataStore (canonical)
-    local.py       # LocalDirStore (serene cache)
+    local.py       # LocalDirStore (local host cache)
     modal_vol.py   # ModalVolumeStore (cache)
   executors/
     base.py        # Executor protocol + shared run scaffolding
-    host.py        # HostExecutor(target=serene|mac) — wraps harbor run
+    host.py        # HostExecutor(target=local-host|workstation) — wraps harbor run
     modal.py       # ModalExecutor — wraps modal_v2 app
   cli.py           # bench build-variants | run | report | status | import
 ```

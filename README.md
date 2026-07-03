@@ -4,6 +4,18 @@ Benchmarking notes and harnesses for evaluating scientific AI agents on biologic
 
 The motivating question is not only whether an agent can reach the right answer, but whether it behaves like a trustworthy analyst when the task is ambiguous, under-specified, or impossible with the provided data.
 
+## What I built
+
+- Framed a trust evaluation for biology agents around computation, calibration, refusal, trajectory consistency, and benchmark validity.
+- Built and interpreted BiomniBench-DA adversarial variants and result summaries.
+- Corrected over-strong public claims when later judging showed that the initial zero-refusal framing was too strong.
+
+## Where coding agents helped
+
+- Implemented and iterated on runners, graders, extractors, variant specs, utilities, and documentation drafts.
+- Helped with local audit passes for private paths, result framing, and publication caveats.
+- Produced drafts and implementation help only; public claims are tied to run artifacts, source files, and reviewed summaries.
+
 ## Current Focus
 
 This repository started as a BiomniBench-DA investigation:
@@ -43,6 +55,18 @@ The repo intentionally excludes local data, runs, and secrets:
 - Agent and judge API keys should stay in local environment files only.
 
 Most scripts are designed to run through `uv` once dependencies and data are present. Exact commands vary by experiment and are documented in `RESULTS.md` and `bench/README.md`.
+
+## Verification
+
+- 2026-07-02: `uv run pytest -q tests/test_providers.py` -> 8 passed.
+- 2026-07-02: `jq empty results/biomnibench/summary.json results/biomnibench/refusal/refusal_classifications.json results/biomnibench/refusal/refusal_consolidated.json` -> passed.
+- 2026-07-02: `git diff --check` -> passed.
+
+## Limitations
+
+- This is a working research repository, not a paper claim.
+- Raw benchmark inputs and full run directories are excluded unless a scrubbed result bundle is deliberately released.
+- Refusal labels and failure-mode labels are judge-sensitive derived evidence, not standalone benchmark ground truth.
 
 ## Status
 

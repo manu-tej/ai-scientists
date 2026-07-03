@@ -4,7 +4,7 @@
 **Goal:** Generalization — run the agy reliability eval (capability + 3-rep consistency) on a
 **second** benchmark (BixBench-Verified-50) to test whether the trust-ranking pattern we see on
 BiomniBench-DA replicates off one benchmark. Source: HF bucket `amanutej/benchbench` →
-`BixBench-Verified-50/` (synced to serene for the run; capsules are ~3.5 GB).
+`BixBench-Verified-50/` (synced to a private run worker for the run; capsules are ~3.5 GB).
 
 **Decisions (user, 2026-06-04):** agent = **antigravity-cli (agy)** first; **smoke-test a few tasks**
 before the full set; grading = **both** open-answer AND MCQ.
@@ -21,7 +21,7 @@ Each record: `question`, `ideal` (gold), `distractors` (exactly 3 → MCQ), `ans
 - **Capsule zip** contains `CapsuleData-<uuid>/` (raw data) **and** `CapsuleNotebook-<uuid>/..._executed.ipynb`
   (the worked solution). **The notebook MUST be stripped** — else the agent reads the answer.
 
-## Harbor task contract (mirrors BiomniBench, verified on serene)
+## Harbor task contract (mirrors BiomniBench, verified on a private run worker)
 
 ```
 <question_id>/
@@ -61,7 +61,7 @@ Reuses the Gemini backend (bench/grade.py) for the 20 llm_verifier items; str/ra
 | bix-53-q2 | llm_verifier | "Increases the number of diff…" | 308d53bf (600 KB) |
 
 ## Run plan
-1. `hf buckets sync` the 3 smoke capsules + jsonl to serene (native CLI, trusted).
+1. `hf buckets sync` the 3 smoke capsules + jsonl to the private run worker (native CLI, trusted).
 2. `build_bixbench_tasks.py --ids bix-18-q3 bix-30-q3 bix-53-q2` → `runs/bixbench_smoke/`.
 3. `bench/run.sh --agents antigravity-cli -k1 -n1 --max-effort` (1 rep, serialized — low load alongside cc/codex backfills).
 4. `grade_bixbench.py` both modes → eyeball: did the adapter+verifiers work end-to-end?

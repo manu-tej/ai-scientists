@@ -2,14 +2,14 @@
 
 Status: public repo (released 2026-07-02). Code, variant specs, and derived results; source datasets cited by accession, not redistributed.
 
-## What I Did
+## What I built
 
 - Framed the trust question for biology agents: capability is not enough; calibration, refusal, trajectory consistency, and benchmark validity matter.
 - Designed and interpreted BiomniBench-DA experiments and adversarial variants.
 - Audited and corrected claims when later judging showed that the initial zero-refusal framing was too strong.
 - Own the public summary and final interpretation.
 
-## Coding-Agent Help
+## Where coding agents helped
 
 - Coding agents helped implement scripts, runners, graders, extractors, variant specs, and repeated local audits.
 - Coding agents drafted intermediate plans and summaries.
@@ -24,7 +24,7 @@ These should stay out of the public repo unless deliberately released:
 - Full run directories under `runs/` unless a specific result bundle is scrubbed and intentional.
 - Local browser/debug artifacts.
 
-## Current Gates
+## Limitations / Current gates
 
 - Keep `results/biomnibench/refusal/refusal_classifications.json` only as the early per-response refusal screen unless individual labels are re-adjudicated again.
 - Keep `results/biomnibench/failure_analysis.xlsx` only as a derived working analysis artifact; do not treat manual failure-mode labels as a benchmark ground truth without review.

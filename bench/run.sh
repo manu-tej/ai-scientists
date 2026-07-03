@@ -25,7 +25,7 @@
 #   BB_BATCH=12          cells per batch before a batch cooldown
 #   BB_BATCH_COOLDOWN=0  sleep after each batch
 #   BB_INITIAL_COOLDOWN=0 sleep before starting (let a usage window reset)
-#   BB_PRUNE_BUILDER=1   docker builder prune per task (needed on the mac VM disk; set 0 on serene)
+#   BB_PRUNE_BUILDER=1   docker builder prune per task (needed on local VM-backed Docker; set 0 on remote/native Docker)
 #
 # AUTH ($0, subscription only — the agent NEVER sees an API key; verifier key only via --ve):
 #   codex            CODEX_FORCE_AUTH_JSON=1 + CodexNoImagegen agent (kills the imagegen-400 bug)

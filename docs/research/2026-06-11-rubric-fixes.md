@@ -43,9 +43,9 @@ from headline capability numbers.
 
 ## Results — executed 2026-06-13
 
-Re-grade (rubric-only) + re-run (instruction) completed on **serene** (canonical run `cap3`;
-judge = MiniMax-3 via `openrouter:minimax/minimax-m3`; codex serene auth refreshed by mirroring the
-fresh local token). 3-rep medians unless noted.
+Re-grade (rubric-only) + re-run (instruction) completed on the private remote run worker
+(canonical run `cap3`; judge = MiniMax-3 via `openrouter:minimax/minimax-m3`; Codex auth refreshed
+from the current local subscription token). 3-rep medians unless noted.
 
 | Task | Agent | OLD | NEW | verdict |
 |---|---|---:|---:|---|
@@ -65,7 +65,7 @@ fresh local token). 3-rep medians unless noted.
 Disclosure did not lift da-25-1: codex *followed* the disclosed PATH_T_STAGE method but concluded
 "no FDR-significant gene," while rubric C6[A] demands the exact gold result (TP53 OR=3.08, FDR=0.0379).
 So da-25-1's low score is **exact-result reproduction difficulty, not a hidden-method defect** — it
-was mis-classified. The instruction edit was **reverted** (local + serene); da-25-1 retains its
+was mis-classified. The instruction edit was **reverted** locally and on the run worker; da-25-1 retains its
 original cap3 score as a genuine_capability failure.
 
 ### Corrected aggregate (all 50 tasks, MiniMax-3)
@@ -124,4 +124,4 @@ da-15-8's "recovery" landed right back on its original 0.53 — i.e. it was neve
 `--votes` flag (default 1; each rep's norm becomes the mean of N judge draws) so the all-reps path can
 be de-noised too. Use `--votes 5` for scores of record. **Verified working** (`--votes 3`): da-15-8
 de-noises to ~0.58, da-4-6 to ~0.45 — both ~+0.05 over originals but still inside the noise band, so
-the revert stands. (`scripts/grade_reps.py` is now in the repo; it was previously serene-only.)
+the revert stands. (`scripts/grade_reps.py` is now in the repo; it was previously private-run-worker-only.)

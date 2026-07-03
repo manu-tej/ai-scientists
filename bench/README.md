@@ -1,8 +1,8 @@
 # bench/ — the benchbench runner
 
 Three composable tools that replace ~13 scattered scripts. A benchmark run is now a
-**config**, not a new script. Same code on the Mac and on serene — only host-specific env
-differs.
+**config**, not a new script. The same code runs across local and remote machines; only
+host-specific environment settings differ.
 
 ```
 assemble.py   what to run   (dataset + prompt → buildable harbor tasks)
@@ -46,7 +46,7 @@ lacks a build definition (the silent-gap bug, made loud). Data is hardlinked (ze
 # baseline capability on the Mac: 3 agents over the base tasks, collect traces
 bench/run.sh --dataset runs/harbor_base_tasks --agents "codex claude-code antigravity-cli" --out runs/cap
 
-# a sole-arm codex push on serene with pacing + build-cache kept
+# a sole-arm codex push on a remote worker with pacing + build-cache kept
 BB_PRUNE_BUILDER=0 BB_PACE_SEC=5 BB_RETRIES=3 \
   bench/run.sh --dataset runs/harbor_tasks --agents codex --out runs/harbor_variant_matrix
 
@@ -66,7 +66,7 @@ BB_DRY_RUN=1 bench/run.sh --dataset runs/harbor_tasks --agents "codex claude-cod
 | `--verify` | run BiomniBench's verifier (`--ve ANTHROPIC_API_KEY`) | collect-only |
 | `BB_DRY_RUN=1` | print the command (secrets redacted), don't run | off |
 | `BB_PACE_SEC` `BB_RETRIES` `BB_BACKOFF_SEC` `BB_BATCH` `BB_BATCH_COOLDOWN` `BB_INITIAL_COOLDOWN` | codex pacing / 429-resilience (all default off) | — |
-| `BB_PRUNE_BUILDER` | builder-cache prune per task: `1` on the **Mac** (VM-disk), `0` on **serene** | `1` |
+| `BB_PRUNE_BUILDER` | builder-cache prune per task: `1` on local VM-backed Docker, `0` on remote/native Docker | `1` |
 
 Resume-safe (skips cells already done — replicate-aware), concurrency-safe cleanup (multiple
 agent arms can share one host). **One codex arm per ChatGPT subscription at a time** (concurrent
@@ -98,14 +98,14 @@ Reads whichever trace surface a cell has — `artifacts/trace.md` if present, el
 
 ---
 
-## Mac vs serene
+## Local vs remote workers
 
 Identical commands; only the host env differs:
 
-| | Mac | serene |
+| | Local worker | Remote/native worker |
 |---|---|---|
 | `BB_PRUNE_BUILDER` | `1` (fixed Docker-VM disk) | `0` (native Docker, keep base layer) |
-| repo path | `~/2026/ai-scientists` | `~/benchbench` |
+| repo path | checkout-dependent | checkout-dependent |
 | codex pacing | optional | optional (sole-arm sustained push) |
 
 ---
