@@ -27,6 +27,28 @@ This repository started as a BiomniBench-DA investigation:
 
 The working summary is in [`RESULTS.md`](RESULTS.md).
 
+## Quickstart
+
+```bash
+uv sync
+
+# Run the agent on one BiomniBench-DA task (minimal tool-use loop, one Python tool)
+uv run --env-file .env scripts/agent.py --task da-12-4 --variant contaminated \
+    --model claude-opus-4-7 --max-turns 25
+
+# Grade the run against the task rubric, then the biology-specific safety judge
+uv run --env-file .env scripts/judge.py --run-dir runs/agent/da-12-4/claude_opus_4_7/contaminated/<ts>/
+uv run --env-file .env scripts/safety_judge.py --run-dir <same>
+
+# Aggregate Rabanser-style trust metrics; regenerate the ECE table from disk
+uv run --env-file .env scripts/trust_metrics.py --task da-12-4
+uv run scripts/calibration_ece.py --audit
+```
+
+Public BiomniBench-DA data and API keys are not shipped: fetch the dataset from
+its source distribution and put your keys in a local `.env` (see `.env.example`).
+The full six-task investigation re-runs end-to-end for roughly $10 in API costs.
+
 ## Headline Findings
 
 - **Process helps against contamination.** Prediction-only probes can expose paper-identifying cues, but real code-executing agents are much less driven by that signal.
@@ -34,6 +56,16 @@ The working summary is in [`RESULTS.md`](RESULTS.md).
 - **Trajectory consistency is a separate trust axis.** Agents often choose the same broad operations across reruns while applying them in different orders.
 - **Refusal is rare and judge-sensitive.** A first-pass "zero refusals" result was too strong; stronger re-judging found some real refusals, while the dominant failure remained partial acknowledgment followed by an answer.
 - **Variant validity needs a gate.** Biomedical datasets often contain redundant signal in sibling columns, sheets, files, or metadata. An unanswerable variant should not be emitted unless checks prove the answer-critical signal is gone.
+
+## Headline Numbers
+
+Measured on Claude Opus 4.7 across six BiomniBench-DA tasks (K=5–8 per task for calibration). Full derivation and per-task tables are in [`RESULTS.md`](RESULTS.md).
+
+| Trust dimension | Value | Reading |
+|---|---|---|
+| Calibration (ECE) | **0.10 → 0.90**, monotonic | ECE is anti-correlated with success rate: ~0.10 at 100% success (its floor, from HIGH≠1.0) up to 0.90 at 0% success. The model is well-calibrated only when confidence is useless, and badly calibrated exactly when it would matter. LOW confidence is never used across all 36 calibrate runs. |
+| Trajectory sequential consistency (C_seq) | **0.21 – 0.57** | Universally low across all six task types and data scales. The agent reliably picks the same operations but applies them in different orders across reruns ("what but not when"), whether it is right or wrong. |
+| Refusal rate (adversarial variants) | **~1 – 2 / 10 variants** | Rare but not zero (claude-code 1/10, codex 2/9 by Gemini re-judge). The dominant failure is partial-acknowledgment-then-answer; an early "zero refusals" headline was a weak-judge artifact. |
 
 ## Repository Map
 

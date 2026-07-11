@@ -5,7 +5,7 @@ Emits a JSON blob describing this host's progress: scored tasks per agent,
 live harbor cells (with agent-log size as a liveness proxy), recent scores,
 a billing scan (apiKeySource=ANTHROPIC_API_KEY => a cell that BILLED), and
 whether the run arms are alive. Designed to run identically on the Mac and on
-serene; the web server merges the two.
+remote; the web server merges the two.
 
 Usage: collect_status.py --root <runs/harbor_base_matrix> --host <label>
 """
@@ -102,7 +102,7 @@ VARIANTS = [
     "da-20-1_drop_cell_line", "da-20-1_single_cell_type",
 ]
 VARIANT_K = 3
-VARIANT_ROOT = "runs/harbor_matrix_serene"   # <agent>/<variant>/rep<N>/<ts>/<cell>/agent/*.txt
+VARIANT_ROOT = "runs/harbor_matrix_remote"   # <agent>/<variant>/rep<N>/<ts>/<cell>/agent/*.txt
 
 
 def variant_progress():

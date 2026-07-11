@@ -1,3 +1,12 @@
+# ============================================================================
+# ⚠️  DESIGN DRAFT — DO NOT RUN AS-IS  ⚠️
+# ============================================================================
+# This file is an UNFINISHED design skeleton, not a working entry point. It has
+# unresolved placeholders (search `TODO`) for the task format, agent-CLI
+# invocation, and scientific-Python deps. Nothing here has been executed.
+# It is NOT part of the reproducible benchmark — see README.md / RESULTS.md for
+# the real, runnable pipeline, and modal_v2/DESIGN.md for this draft's status.
+# ============================================================================
 """Modal v2 harness for the BiomniBench-DA refusal matrix — PROTOTYPE / SKELETON.
 
 DO NOT RUN BLINDLY. This is runnable-in-principle but has placeholders (marked TODO)

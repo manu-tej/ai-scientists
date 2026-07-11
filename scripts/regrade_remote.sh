@@ -21,16 +21,16 @@
 #     If codex fast-fails ("GAVE UP" in ~40s, 401 "refresh token already used"), mirror a FRESH local
 #     token:  rsync -a ~/.codex/auth.json <host>:.codex/auth.json   (a valid access token avoids the
 #     rotation conflict because the remote then never needs to refresh during the run).
-#   * BB_PRUNE_BUILDER=0 on a big host (serene); =1 only on a disk-constrained VM.
+#   * BB_PRUNE_BUILDER=0 on a big host (remote); =1 only on a disk-constrained VM.
 #
 # USAGE
-#   scripts/regrade_serene.sh --mode rerun  --tasks "da-26-2 da-20-4" \
+#   scripts/regrade_remote.sh --mode rerun  --tasks "da-26-2 da-20-4" \
 #       --agents "codex claude-code antigravity-cli" --data-root data/biomnibench-da \
-#       --host serene --remote benchbench --judge openrouter:minimax/minimax-m3 \
+#       --host remote --remote benchbench --judge openrouter:minimax/minimax-m3 \
 #       --replicates 3 --out runs/regrade_full
 #
-#   scripts/regrade_serene.sh --mode regrade --tasks "da-15-8 da-4-6" --agents antigravity-cli \
-#       --data-root data/biomnibench-da --host serene --remote benchbench \
+#   scripts/regrade_remote.sh --mode regrade --tasks "da-15-8 da-4-6" --agents antigravity-cli \
+#       --data-root data/biomnibench-da --host remote --remote benchbench \
 #       --judge openrouter:minimax/minimax-m3 --traces-root runs/cap3 --out runs/regrade_rubric
 #
 #   add --dry-run to print the remote commands without executing.
@@ -38,7 +38,7 @@ set -uo pipefail
 
 # --- defaults / args ---------------------------------------------------------------------
 MODE="" TASKS="" AGENTS="codex claude-code antigravity-cli"
-DATA_ROOT="data/biomnibench-da" HOST="serene" REMOTE="benchbench"
+DATA_ROOT="data/biomnibench-da" HOST="remote" REMOTE="benchbench"
 JUDGE="openrouter:minimax/minimax-m3" REPLICATES=3
 OUT="runs/regrade" TRACES_ROOT="" ASSEMBLE_ARGS="--base"
 GRADE_SCRIPT="scripts/grade_reps.py" DRY=0

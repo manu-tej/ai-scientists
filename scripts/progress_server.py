@@ -2,7 +2,7 @@
 """Live benchbench progress dashboard.
 
 Background thread refreshes status every REFRESH_S by running the host-local
-collector on the Mac AND over SSH on serene, then merges them. The HTTP server
+collector on the Mac AND over SSH on remote, then merges them. The HTTP server
 serves a self-contained HTML page that polls /api/status. Stdlib only.
 
 Run:  python3 scripts/progress_server.py [--port 8787]
@@ -11,11 +11,11 @@ Open: http://localhost:8787
 import argparse, json, subprocess, threading, time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
-SERENE = "user@host"
+REMOTE = "user@host"
 MAC_ROOT = "runs/harbor_base_matrix"
-SERENE_ROOT = "~/benchbench/runs/harbor_base_matrix"
+REMOTE_ROOT = "~/benchbench/runs/harbor_base_matrix"
 COLLECTOR_MAC = "scripts/collect_status.py"
-COLLECTOR_SERENE = "~/benchbench/scripts/collect_status.py"
+COLLECTOR_REMOTE = "~/benchbench/scripts/collect_status.py"
 REFRESH_S = 25
 TOTAL = 50
 
@@ -29,25 +29,25 @@ def _collect_mac():
     return json.loads(out)
 
 
-def _collect_serene():
-    cmd = ["ssh", "-o", "ConnectTimeout=8", SERENE,
-           f"cd ~/benchbench && python3 {COLLECTOR_SERENE} --root {SERENE_ROOT} --host serene"]
+def _collect_remote():
+    cmd = ["ssh", "-o", "ConnectTimeout=8", REMOTE,
+           f"cd ~/benchbench && python3 {COLLECTOR_REMOTE} --root {REMOTE_ROOT} --host remote"]
     out = subprocess.run(cmd, capture_output=True, text=True, timeout=35).stdout
     return json.loads(out)
 
 
-def _merge(mac, serene):
-    """Union scored tasks across hosts (cc runs on both); codex serene-only."""
+def _merge(mac, remote):
+    """Union scored tasks across hosts (cc runs on both); codex remote-only."""
     agents = {}
     for ag in ("codex", "claude-code"):
         tasks = set()
-        for h in (mac, serene):
+        for h in (mac, remote):
             if h:
                 tasks |= set(h.get("agents", {}).get(ag, {}).get("tasks", []))
         agents[ag] = {"scored": len(tasks), "total": TOTAL, "tasks": sorted(tasks)}
     live, recent, billed, examples = [], [], 0, []
-    arms = {"serene_codex": False, "serene_cc": False, "mac_cc": False}
-    for label, h in (("serene", serene), ("mac", mac)):
+    arms = {"remote_codex": False, "remote_cc": False, "mac_cc": False}
+    for label, h in (("remote", remote), ("mac", mac)):
         if not h:
             continue
         for c in h.get("live", []):
@@ -56,17 +56,17 @@ def _merge(mac, serene):
             recent.append({**r, "host": label})
         billed += h.get("billing", {}).get("billed_cells", 0)
         examples += h.get("billing", {}).get("examples", [])
-    if serene:
-        arms["serene_codex"] = any(c["agent"] == "codex" for c in serene.get("live", [])) or serene.get("arms", {}).get("until_complete", False)
-        arms["serene_cc"] = any(c["agent"] == "claude-code" for c in serene.get("live", [])) or serene.get("arms", {}).get("until_complete", False)
+    if remote:
+        arms["remote_codex"] = any(c["agent"] == "codex" for c in remote.get("live", [])) or remote.get("arms", {}).get("until_complete", False)
+        arms["remote_cc"] = any(c["agent"] == "claude-code" for c in remote.get("live", [])) or remote.get("arms", {}).get("until_complete", False)
     if mac:
         arms["mac_cc"] = mac.get("arms", {}).get("mac_cc", False) or any(c["agent"] == "claude-code" for c in mac.get("live", []))
-    if serene:
-        arms["variant_paired"] = serene.get("arms", {}).get("variant_paired", False) or bool(serene.get("variant_live"))
+    if remote:
+        arms["variant_paired"] = remote.get("arms", {}).get("variant_paired", False) or bool(remote.get("variant_live"))
     recent.sort(key=lambda r: r.get("mtime", 0), reverse=True)
-    # variants run only on serene
-    variants = (serene or {}).get("variants", {"present": False})
-    variant_live = (serene or {}).get("variant_live", [])
+    # variants run only on remote
+    variants = (remote or {}).get("variants", {"present": False})
+    variant_live = (remote or {}).get("variant_live", [])
     return {
         "agents": agents,
         "live": live,
@@ -81,19 +81,19 @@ def _merge(mac, serene):
 
 def refresher():
     while True:
-        mac = serene = None
+        mac = remote = None
         err = []
         try:
             mac = _collect_mac()
         except Exception as e:
             err.append(f"mac: {e}")
         try:
-            serene = _collect_serene()
+            remote = _collect_remote()
         except Exception as e:
-            err.append(f"serene: {e}")
+            err.append(f"remote: {e}")
         with _lock:
-            _state["hosts"] = {"mac": mac, "serene": serene}
-            _state["merged"] = _merge(mac, serene)
+            _state["hosts"] = {"mac": mac, "remote": remote}
+            _state["merged"] = _merge(mac, remote)
             _state["updated"] = time.time()
             _state["error"] = "; ".join(err) if err else None
         time.sleep(REFRESH_S)
@@ -195,7 +195,7 @@ async function tick(){
     vars.map(v=>`<tr><td style=font-size:12px>${v}</td><td>${dots((ag0.per_variant||{})[v]||0)}</td><td>${dots((ag1.per_variant||{})[v]||0)}</td></tr>`).join('')+'</tbody></table>';
  }
  const arms=(m.arms||{});const A=k=>arms[k]?'<span class="pill ok">● up</span>':'<span class="pill warn">○ idle</span>';
- $('#sub').innerHTML=`serene-codex ${A('serene_codex')}  serene-cc ${A('serene_cc')}  mac-cc ${A('mac_cc')}  variants ${A('variant_paired')}`;
+ $('#sub').innerHTML=`remote-codex ${A('remote_codex')}  remote-cc ${A('remote_cc')}  mac-cc ${A('mac_cc')}  variants ${A('variant_paired')}`;
  const age=((Date.now()/1000)-(d.updated||0));
  $('#foot').textContent='updated '+ago(age)+' ago'+(d.error?(' · warn: '+d.error):'')+' · refreshes ~25s';
 }

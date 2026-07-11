@@ -12,7 +12,7 @@ For each requested patch (agent, task), it copies the *grading* fields
 official grade file's matching cell, stamps a ``_corrected`` provenance block, and leaves
 everything else untouched. Every grade file is backed up before the first write.
 
-It does NOT call any judge — run the re-grade first (see scripts/regrade_serene.sh), then
+It does NOT call any judge — run the re-grade first (see scripts/regrade_remote.sh), then
 point this at the resulting JSONs.
 
 MANIFEST (JSON)

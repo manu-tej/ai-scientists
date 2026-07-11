@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Mac cc arm: run claude-code on the 6 locally-available tasks that are DISJOINT
-# from serene's live cell (da-1-3). Subscription auth ($0) ONLY — every cell is
+# from remote's live cell (da-1-3). Subscription auth ($0) ONLY — every cell is
 # auth-gated: the moment a cell's agent log shows apiKeySource=ANTHROPIC_API_KEY
 # (i.e. it would BILL the API key instead of using the Max subscription), the
 # whole run aborts and the container is killed. Fails CLOSED: no OAuth -> no run.
@@ -12,7 +12,7 @@ source ~/.bb_verifier_key                                      # ANTHROPIC_API_K
 source ~/.bb_cc_token                                          # CC_OAUTH_TOKEN (agent $0 auth)
 [ -n "${CC_OAUTH_TOKEN:-}" ] || { echo "FATAL: no CC oauth token — refusing to run (would risk billing)"; exit 1; }
 
-# da-3-4 first (lightest: Mann-Whitney) for a fast auth signal; da-1-3 EXCLUDED (serene owns it).
+# da-3-4 first (lightest: Mann-Whitney) for a fast auth signal; da-1-3 EXCLUDED (remote owns it).
 TASKS=(da-3-4 da-5-1 da-20-1 da-17-1 da-13-3 da-12-4)
 B="runs/harbor_base_matrix/claude-code"
 

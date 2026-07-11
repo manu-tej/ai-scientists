@@ -1,7 +1,7 @@
 """Deduplicate + summarize the refusal judgments into the canonical table.
 
 Canonical sources (no host overlap):
-  codex       -> runs/traces_codex   (serene, 9 cells)
+  codex       -> runs/traces_codex   (remote, 9 cells)
   claude-code -> runs/harbor_matrix  (Mac, the 5 that didn't hit the session limit)
   gemini-cli  -> (pending quota reset)
 

@@ -56,7 +56,7 @@ cleanup_task() {
       && docker rmi -f "$img" >/dev/null 2>&1 || true
   done
   # Builder-cache prune is needed ONLY on the mac (fixed Docker-VM disk cascades). On a
-  # native-Linux host with ample disk (serene), pruning every task destroys the shared
+  # native-Linux host with ample disk (remote), pruning every task destroys the shared
   # apt+codex base layer and forces a full reinstall per build. Opt out with BB_PRUNE_BUILDER=0.
   [ "${BB_PRUNE_BUILDER:-1}" = "1" ] && docker builder prune -f >/dev/null 2>&1 || true
 }

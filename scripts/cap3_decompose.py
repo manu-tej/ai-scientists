@@ -3,7 +3,7 @@
 
 The MiniMax-3 grade files give a 3-rep median per (agent, task). This decomposes each
 median into its 3 actual replicate traces in the CANONICAL run tree `runs/cap3/` (the full
-450 = 3 agents x 50 tasks x 3 reps, fetched from serene:~/benchbench/runs/cap3) and flags
+450 = 3 agents x 50 tasks x 3 reps, fetched from remote:~/benchbench/runs/cap3) and flags
 whether every rep actually delivered a real answer — so a low median can be read as genuine
 low-quality work vs a non-delivery floor.
 
